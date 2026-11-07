@@ -15,6 +15,8 @@ import '../../../core/combat/team.dart';
 import '../../../core/combat/unit.dart';
 import '../../../core/combat/unit_kind.dart';
 import '../../../core/combat/unit_objective.dart';
+import 'util/heading_math.dart';
+import 'util/plane_flight.dart';
 import '../../../core/combat/weapon_type.dart';
 import '../../../core/pathfinding/astar.dart';
 import '../../ai_director/domain/models/strategy_directive.dart';
@@ -76,6 +78,19 @@ const _planeTurnRate = 3.0;
 /// overlapping/stacking - see
 /// [MobileUnitComponent.applySeparationSteering].
 const _separationRadiusSq = 26.0 * 26.0;
+
+/// Ground-unit turn rates (radians/sec): infantry pivot quickly, vehicles
+/// swing their hull around more slowly.
+const _infantryTurnRate = 9.0;
+const _vehicleTurnRate = 4.0;
+
+/// Seconds a ground unit takes to reach full speed after starting to move.
+const _infantryAccelSeconds = 0.15;
+const _vehicleAccelSeconds = 0.4;
+
+/// A vehicle facing far away from its path direction crawls at this share of
+/// its speed until it has turned toward it.
+const _minTurnSpeedShare = 0.25;
 
 /// Whether [candidate] can currently be targeted from [observerPosition] -
 /// a stealth unit (`MobileUnitBlueprint.isStealth`, e.g. the Stealth
@@ -170,6 +185,13 @@ class MobileUnitComponent extends PositionComponent
   Attackable? _engaging;
   Attackable? _huntTarget;
   double _bobPhase = spawnRandomPhase();
+
+  /// 0..1 ramp toward full speed after starting to move (see
+  /// [_followPath]); resets while standing still.
+  double _speedShare = 0;
+
+  /// Circling flight model for non-hovering aircraft - see [_flyAsPlane].
+  PlaneFlight? _planeFlight;
 
   /// Drives the pulsing selection ring/glow in [render] - same idea as
   /// `TowerComponent._idlePhase`, just a separate field so a unit's own
@@ -272,6 +294,13 @@ class MobileUnitComponent extends PositionComponent
   /// True for plane-type attackers (jets), which fly a strafing run instead
   /// of stopping to trade fire - see [_updateStrafingRun].
   bool get _isStrafingPlane => blueprint.kind.bodyType == VehicleUnitType.plane;
+
+  /// Aircraft that fly forever instead of hovering: every air unit except
+  /// the helicopter (and except wave invaders, which fly off the map).
+  bool get _keepsFlying =>
+      isAirUnit &&
+      blueprint.kind != UnitKind.helicopter &&
+      objective != UnitObjective.rushBase;
 
   double get _levelMultiplier => pow(1.25, level).toDouble();
 
@@ -427,6 +456,16 @@ class MobileUnitComponent extends PositionComponent
     underManualControl = true;
     forcedTarget = null;
     moveOrderTarget = point.clone();
+    _repathTimer = 0;
+  }
+
+  /// Hands this unit back to its automatic [objective] (e.g. marching on
+  /// the enemy base) after an earlier [issueMoveOrder]/[issueAttackOrder] -
+  /// used by the skirmish AI's army commander to launch a held-back army.
+  void releaseManualControl() {
+    underManualControl = false;
+    moveOrderTarget = null;
+    forcedTarget = null;
     _repathTimer = 0;
   }
 
@@ -631,16 +670,16 @@ class MobileUnitComponent extends PositionComponent
       }
     }
 
+    final before = position.clone();
     if (_maybeEngage(dt)) {
-      _wasMoving = false;
-      _applyBob(dt);
-      _updateVisualExtras(dt);
+      _finishFrame(before, dt);
       return;
     }
 
     final goal = goalPosition();
-    _wasMoving = goal != null;
-    if (goal != null) {
+    if (_keepsFlying) {
+      _flyAsPlane(goal, dt);
+    } else if (goal != null) {
       if (isAirUnit) {
         _flyToward(goal, dt);
       } else {
@@ -649,8 +688,36 @@ class MobileUnitComponent extends PositionComponent
         _followPath(dt);
       }
     }
+    _finishFrame(before, dt);
+  }
+
+  /// Per-frame bookkeeping once movement is resolved: "moving" means the
+  /// unit actually changed position this frame (so a unit holding at its
+  /// destination stops animating), then the movement visuals follow.
+  void _finishFrame(Vector2 positionBefore, double dt) {
+    _wasMoving = position.distanceToSquared(positionBefore) > 1e-6;
+    if (!_wasMoving) _speedShare = 0;
     _applyBob(dt);
     _updateVisualExtras(dt);
+  }
+
+  /// Non-hovering aircraft: bank toward the goal and circle it on arrival
+  /// (or circle in place with no goal), never stopping in mid-air.
+  void _flyAsPlane(Vector2? goal, double dt) {
+    final flight = _planeFlight ??= PlaneFlight(
+      minOrbitRadius: game.terrainMap.grid.cellSize * 2,
+    );
+    final step = flight.step(
+      position: position,
+      facing: _facingAngle,
+      goal: goal,
+      speed: blueprint.speed,
+      turnRate: _planeTurnRate,
+      dt: dt,
+    );
+    position.setFrom(step.position);
+    _facingAngle = step.facing;
+    _emitFlightTrail(step.heading, dt);
   }
 
   /// Keeps chasing the same hostile it already committed to instead of
@@ -676,13 +743,24 @@ class MobileUnitComponent extends PositionComponent
   }
 
   void _applyBob(double dt) {
-    _bobPhase += dt * (blueprint.movementStyle == MovementStyle.roll ? 6 : 10);
+    // Walking and rolling bodies only animate while actually travelling; a
+    // standing unit settles into a still pose. Hovering/flying/sailing
+    // bodies keep their gentle idle motion.
+    final animates =
+        _wasMoving ||
+        (blueprint.movementStyle != MovementStyle.walk &&
+            blueprint.movementStyle != MovementStyle.roll);
+    if (animates) {
+      _bobPhase +=
+          dt * (blueprint.movementStyle == MovementStyle.roll ? 6 : 10);
+    }
     switch (blueprint.movementStyle) {
       case MovementStyle.walk:
-        _visual.position = size / 2 + Vector2(0, sin(_bobPhase) * 1.5);
+        _visual.position =
+            size / 2 + Vector2(0, animates ? sin(_bobPhase) * 1.5 : 0);
       case MovementStyle.roll:
         _visual.position = size / 2;
-        _visual.angle = _facingAngle + sin(_bobPhase) * 0.05;
+        _visual.angle = _facingAngle + (animates ? sin(_bobPhase) * 0.05 : 0);
       case MovementStyle.hover:
         _visual.position = size / 2 + Vector2(0, sin(_bobPhase) * 2.5);
       case MovementStyle.swoop:
@@ -701,12 +779,11 @@ class MobileUnitComponent extends PositionComponent
   /// [_updateStrafingRun].
   Vector2 _bankTurnToward(Vector2 toTarget, double dt) {
     if (!toTarget.isZero()) {
-      final desiredAngle = atan2(toTarget.y, toTarget.x) + pi / 2;
-      var diff = (desiredAngle - _facingAngle) % (2 * pi);
-      if (diff > pi) diff -= 2 * pi;
-      if (diff < -pi) diff += 2 * pi;
-      final maxStep = _planeTurnRate * dt;
-      _facingAngle += diff.clamp(-maxStep, maxStep);
+      _facingAngle = turnTowardAngle(
+        _facingAngle,
+        atan2(toTarget.y, toTarget.x) + pi / 2,
+        _planeTurnRate * dt,
+      );
     }
     final dirAngle = _facingAngle - pi / 2;
     return Vector2(cos(dirAngle), sin(dirAngle));
@@ -872,6 +949,11 @@ class MobileUnitComponent extends PositionComponent
     position += dir * step;
     _facingAngle = atan2(dir.y, dir.x) + pi / 2;
 
+    _emitFlightTrail(dir, dt);
+  }
+
+  /// Vapor cone / jet flare particles behind a flying unit heading `dir`.
+  void _emitFlightTrail(Vector2 dir, double dt) {
     if (blueprint.movementStyle == MovementStyle.swoop) {
       _vaporTimer -= dt;
       if (_vaporTimer <= 0) {
@@ -907,7 +989,7 @@ class MobileUnitComponent extends PositionComponent
     final target = _path[_pathIndex];
     final toTarget = target - position;
     final dist = toTarget.length;
-    final step = blueprint.speed * dt;
+    final step = blueprint.speed * dt * _groundSpeedShare(toTarget, dt);
 
     if (dist <= step) {
       position.setFrom(target);
@@ -916,8 +998,27 @@ class MobileUnitComponent extends PositionComponent
     } else {
       final dir = applySeparationSteering(toTarget / dist);
       position += dir * step;
-      _facingAngle = atan2(dir.y, dir.x) + pi / 2;
     }
+  }
+
+  /// Turns the hull toward the path direction at a limited rate and returns
+  /// the share (0..1) of full speed to use this frame: ramping up after a
+  /// standing start, and slower while a vehicle is still swinging around.
+  double _groundSpeedShare(Vector2 toTarget, double dt) {
+    final accel = blueprint.isVehicle
+        ? _vehicleAccelSeconds
+        : _infantryAccelSeconds;
+    _speedShare = min(1.0, _speedShare + dt / accel);
+
+    final desired = atan2(toTarget.y, toTarget.x) + pi / 2;
+    final turnRate = blueprint.isVehicle ? _vehicleTurnRate : _infantryTurnRate;
+    final error = shortestAngleDiff(_facingAngle, desired).abs();
+    _facingAngle = turnTowardAngle(_facingAngle, desired, turnRate * dt);
+
+    final alignment = blueprint.isVehicle
+        ? max(_minTurnSpeedShare, cos(error))
+        : 1.0;
+    return _speedShare * alignment;
   }
 
   bool _maybeEngage(double dt) {
@@ -970,7 +1071,12 @@ class MobileUnitComponent extends PositionComponent
     }
 
     final toTarget = target.position - position;
-    _facingAngle = atan2(toTarget.y, toTarget.x) + pi / 2;
+    // Strafing planes bank their own facing (see [_bankTurnToward]); snapping
+    // it straight at the target every frame made them flip around in place
+    // when directly above their prey.
+    if (!_isStrafingPlane) {
+      _facingAngle = atan2(toTarget.y, toTarget.x) + pi / 2;
+    }
 
     // A zero-length tick (e.g. the single `update(0)` frame used to mount
     // a just-spawned unit) must never resolve a shot - otherwise simply
@@ -1169,9 +1275,15 @@ class MobileUnitComponent extends PositionComponent
         final dist = toTarget.length;
         final boosting =
             dist <= _planeBoostRangeCells * game.terrainMap.grid.cellSize;
-        final desired = dist > 1
-            ? toTarget
-            : Vector2(cos(_facingAngle - pi / 2), sin(_facingAngle - pi / 2));
+        final heading = Vector2(
+          cos(_facingAngle - pi / 2),
+          sin(_facingAngle - pi / 2),
+        );
+        // Once the target is behind the plane it flies straight on through
+        // instead of turning back on top of it - the loop-out comes after the
+        // clip is empty (the loiter phase).
+        final targetAhead = dist > 1 && toTarget.dot(heading) > 0;
+        final desired = targetAhead ? toTarget : heading;
         final steered = applySeparationSteering(_bankTurnToward(desired, dt));
         final speed =
             blueprint.speed * (boosting ? _planeBoostSpeedMultiplier : 1.0);
@@ -1221,7 +1333,7 @@ class MobileUnitComponent extends PositionComponent
   /// animation for infantry - layered on top of [_applyBob] rather than
   /// replacing it, so the existing per-[MovementStyle] wobble is untouched.
   void _updateVisualExtras(double dt) {
-    _limbs?.setPhase(_bobPhase);
+    _limbs?.setPhase(_wasMoving ? _bobPhase : 0);
 
     final body = blueprint.kind.bodyType;
     if (body is Human) return;

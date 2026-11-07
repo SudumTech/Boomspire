@@ -114,6 +114,22 @@
   },
   "sceneCompleted": "COMPLETED",
   "@sceneCompleted": {},
+  "aiIntelDebugLabel": "AI {stance} | target {target} | raid {raid} | army {army} ({armyPower} vs {enemyPower}) | structures {structures} | nodes {nodes} | gold {gold} | air {air} | weakness {weakness}",
+  "@aiIntelDebugLabel": {
+    "placeholders": {
+      "stance": {"type": "String"},
+      "target": {"type": "String"},
+      "raid": {"type": "String"},
+      "army": {"type": "int"},
+      "armyPower": {"type": "int"},
+      "enemyPower": {"type": "int"},
+      "structures": {"type": "int"},
+      "nodes": {"type": "int"},
+      "gold": {"type": "int"},
+      "air": {"type": "String"},
+      "weakness": {"type": "String"}
+    }
+  },
   "hudWaveLabel": "WAVE {current} / {total}",
   "@hudWaveLabel": {
     "placeholders": {

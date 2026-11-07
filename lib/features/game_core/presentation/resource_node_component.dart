@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import '../../../core/combat/team.dart';
 import '../domain/models/game_config.dart';
 import 'boomspire_game.dart';
+import 'capture_radar_component.dart';
 import 'util/paint_resource_node_plate.dart';
 
 /// A capturable second-resource node placed on a skirmish map (see
@@ -26,7 +27,7 @@ class ResourceNodeComponent extends PositionComponent
   double _captureProgress = 0;
   double _payoutTimer = 0;
 
-  late final CircleComponent _progressRing;
+  late final CaptureRadarComponent _radar;
   late final _ResourceNodePlate _icon;
 
   ResourceNodeComponent({required Vector2 position})
@@ -36,11 +37,9 @@ class ResourceNodeComponent extends PositionComponent
 
   @override
   Future<void> onLoad() async {
-    _progressRing = CircleComponent(
-      radius: size.x / 2,
-      anchor: Anchor.center,
-      position: size / 2,
-      paint: Paint()..color = const Color(0x00000000),
+    _radar = CaptureRadarComponent(
+      radius: GameConfig.resourceNodeCaptureRadius,
+      center: size / 2,
     );
     // A hexagonal building-style plate - grey (neutral) while unclaimed,
     // tinted to whichever team's color once a vehicle claims it (see
@@ -51,7 +50,7 @@ class ResourceNodeComponent extends PositionComponent
       ..size = Vector2.all(size.x - 6)
       ..position = size / 2
       ..anchor = Anchor.center;
-    await addAll([_progressRing, _icon]);
+    await addAll([_icon, _radar]);
   }
 
   @override
@@ -60,9 +59,6 @@ class ResourceNodeComponent extends PositionComponent
     _updateCapture(dt);
     _updatePayout(dt);
     _icon.accent = _ownerColor;
-    _progressRing.paint.color = (_leadingTeam?.color ?? _ownerColor).withValues(
-      alpha: _captureProgress / GameConfig.resourceNodeCaptureTime * 0.6,
-    );
   }
 
   void _updateCapture(double dt) {
@@ -77,6 +73,11 @@ class ResourceNodeComponent extends PositionComponent
 
     if (nearbyVehicleTeams.length != 1) {
       // Empty or contested: no progress is gained or lost either way.
+      _showRadar(
+        present: nearbyVehicleTeams.isNotEmpty,
+        sweeping: false,
+        contested: nearbyVehicleTeams.length > 1,
+      );
       return;
     }
 
@@ -84,6 +85,7 @@ class ResourceNodeComponent extends PositionComponent
     if (contender == owner) {
       _captureProgress = 0;
       _leadingTeam = null;
+      _showRadar(present: false, sweeping: false, contested: false);
       return;
     }
 
@@ -98,7 +100,26 @@ class ResourceNodeComponent extends PositionComponent
       _leadingTeam = null;
       _captureProgress = 0;
       _payoutTimer = 0;
+      _showRadar(present: false, sweeping: false, contested: false);
+      return;
     }
+    _showRadar(present: true, sweeping: true, contested: false);
+  }
+
+  /// Pushes the capture state to the radar indicator. A capture that is
+  /// partly done stays visible (frozen) even with nobody in the zone.
+  void _showRadar({
+    required bool present,
+    required bool sweeping,
+    required bool contested,
+  }) {
+    _radar
+      ..color = _leadingTeam?.color ?? _ownerColor
+      ..progress = (_captureProgress / GameConfig.resourceNodeCaptureTime)
+          .clamp(0.0, 1.0)
+      ..sweeping = sweeping
+      ..contested = contested
+      ..shown = present || _captureProgress > 0;
   }
 
   void _updatePayout(double dt) {

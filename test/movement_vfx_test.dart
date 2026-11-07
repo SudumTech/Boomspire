@@ -41,13 +41,22 @@ void main() {
       final game = await _bootGame();
       final tank = await _spawnMoving(game, UnitKind.tank);
 
+      var sawSmoke = false;
+      var sawMarks = false;
+      var sawDust = false;
       for (var i = 0; i < 40; i++) {
         game.update(0.1);
+        final children = game.world.children;
+        sawSmoke |= children.whereType<SmokeTrailComponent>().isNotEmpty;
+        sawMarks |= children.whereType<TrackMarkComponent>().isNotEmpty;
+        sawDust |= children.whereType<DustPuffComponent>().isNotEmpty;
       }
 
-      expect(game.world.children.whereType<SmokeTrailComponent>(), isNotEmpty);
-      expect(game.world.children.whereType<TrackMarkComponent>(), isNotEmpty);
-      expect(game.world.children.whereType<DustPuffComponent>(), isEmpty);
+      // Tracked across the run: the invader can reach the base (and despawn)
+      // before the last frame, depending on its random spawn point.
+      expect(sawSmoke, isTrue);
+      expect(sawMarks, isTrue);
+      expect(sawDust, isFalse);
       tank.removeFromParent();
     },
   );
@@ -56,12 +65,17 @@ void main() {
     final game = await _bootGame();
     final buggy = await _spawnMoving(game, UnitKind.lightVehicle);
 
+    var sawDust = false;
+    var sawMarks = false;
     for (var i = 0; i < 40; i++) {
       game.update(0.1);
+      final children = game.world.children;
+      sawDust |= children.whereType<DustPuffComponent>().isNotEmpty;
+      sawMarks |= children.whereType<TrackMarkComponent>().isNotEmpty;
     }
 
-    expect(game.world.children.whereType<DustPuffComponent>(), isNotEmpty);
-    expect(game.world.children.whereType<TrackMarkComponent>(), isEmpty);
+    expect(sawDust, isTrue);
+    expect(sawMarks, isFalse);
     buggy.removeFromParent();
   });
 }

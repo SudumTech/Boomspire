@@ -177,7 +177,10 @@ void main() {
 
       // 60% / 10% / 30% focus split, per the feature's own example.
       final blended = settings.sampleBlend([0.6, 0.1, 0.3]);
-      expect(blended.rainIntensity, closeTo(0.6 * 0 + 0.1 * 1 + 0.3 * 0.5, 0.0001));
+      expect(
+        blended.rainIntensity,
+        closeTo(0.6 * 0 + 0.1 * 1 + 0.3 * 0.5, 0.0001),
+      );
     });
 
     test('windType comes from whichever keyframe has the most focus', () {

@@ -74,9 +74,8 @@ void paintWindStreaks(
           ui.Offset(pos.x, pos.y),
           ui.Offset(pos.x + streakLength * 0.5, pos.y - streakLength * 0.12),
           ui.Paint()
-            ..color = const ui.Color(
-              0xFF4a3524,
-            ).withValues(alpha: 0.22 * strength)
+            ..color = const ui.Color(0xFF4a3524)
+                .withValues(alpha: 0.22 * strength)
             ..strokeWidth = 1.6
             ..strokeCap = ui.StrokeCap.round,
         );

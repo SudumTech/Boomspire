@@ -19,8 +19,7 @@ ui.Path waveCrestPath({
     final baseX = bounds.left + dist - bounds.height * f;
     final baseY = bounds.top + bounds.height * f;
     final wobble =
-        sin(f * bounds.height / wavelength * 2 * pi + wobblePhase) *
-        amplitude;
+        sin(f * bounds.height / wavelength * 2 * pi + wobblePhase) * amplitude;
     final offset = ui.Offset(baseX + wobble, baseY);
     if (s == 0) {
       path.moveTo(offset.dx, offset.dy);

@@ -23,13 +23,7 @@ class AmbientWeatherAudioComponent extends Component
       rainIntensity: weather.rainIntensity,
       combatIntensity: game.combatIntensity,
     );
-    game.audioRepository.setAmbientVolume(
-      AmbientSoundType.wind,
-      volumes.wind,
-    );
-    game.audioRepository.setAmbientVolume(
-      AmbientSoundType.rain,
-      volumes.rain,
-    );
+    game.audioRepository.setAmbientVolume(AmbientSoundType.wind, volumes.wind);
+    game.audioRepository.setAmbientVolume(AmbientSoundType.rain, volumes.rain);
   }
 }

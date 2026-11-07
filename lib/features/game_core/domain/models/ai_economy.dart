@@ -10,11 +10,20 @@ class AiEconomy {
   int health;
   final int maxHealth;
 
-  AiEconomy({this.gold = 150, this.health = 20, this.maxHealth = 20});
+  /// Scales every payout the AI receives - 1.0 earns exactly what the human
+  /// player does; difficulty lowers or raises it (see `SkirmishAiProfile`).
+  final double incomeMultiplier;
+
+  AiEconomy({
+    this.gold = 150,
+    this.health = 20,
+    this.maxHealth = 20,
+    this.incomeMultiplier = 1.0,
+  });
 
   bool get isDefeated => health <= 0;
 
-  void addGold(int amount) => gold += amount;
+  void addGold(int amount) => gold += (amount * incomeMultiplier).round();
 
   void damageBase(int amount) {
     if (isDefeated) return;

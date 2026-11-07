@@ -80,9 +80,15 @@ class SkirmishPlacementArgs {
   final GameScene? scene;
   final MapDraft? draft;
 
-  const SkirmishPlacementArgs({this.scene, this.draft})
-    : assert(
-        (scene == null) != (draft == null),
-        'Provide exactly one of scene or draft',
-      );
+  /// How hard the AI opponent plays, picked on the skirmish map list.
+  final GameDifficulty difficulty;
+
+  const SkirmishPlacementArgs({
+    this.scene,
+    this.draft,
+    this.difficulty = GameDifficulty.normal,
+  }) : assert(
+         (scene == null) != (draft == null),
+         'Provide exactly one of scene or draft',
+       );
 }

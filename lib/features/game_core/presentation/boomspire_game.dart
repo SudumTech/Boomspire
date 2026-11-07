@@ -46,6 +46,8 @@ import '../domain/models/game_status.dart';
 import '../domain/models/inspected_info.dart';
 import '../domain/repos/game_state_repository.dart';
 import 'ai_home_base_component.dart';
+import '../../skirmish_ai/domain/models/ai_intel.dart';
+import '../../skirmish_ai/extensions/game_difficulty_ai_extensions.dart';
 import 'ai_skirmish_controller_component.dart';
 import 'game_world.dart';
 import 'ghost_placement_component.dart';
@@ -86,6 +88,9 @@ class BoomspireGame extends FlameGame<GameWorld>
   /// [onLoad] and [restart].
   Team? aiTeam;
   AiEconomy? aiEconomy;
+
+  /// What the skirmish AI is currently thinking - shown in the debug HUD.
+  final ValueNotifier<AiIntel?> aiIntel = ValueNotifier(null);
 
   late TerrainMap terrainMap;
 
@@ -931,6 +936,7 @@ class BoomspireGame extends FlameGame<GameWorld>
         gold: _resolvedStartingGold,
         health: GameConfig.startingHealth,
         maxHealth: GameConfig.startingHealth,
+        incomeMultiplier: difficulty.skirmishAiProfile.incomeMultiplier,
       );
     } else {
       aiTeam = null;

@@ -11,6 +11,7 @@ import '../../../shared/app_theme/app_theme_borders.dart';
 import '../../../shared/app_theme/app_theme_colors.dart';
 import '../../../shared/app_theme/app_theme_paddings.dart';
 import '../../../shared/app_theme/app_theme_spacing.dart';
+import '../../game_core/domain/models/game_difficulty.dart';
 import '../../game_core/domain/models/game_scene.dart';
 import '../../map_editor/domain/models/editor_point.dart';
 import '../../map_editor/domain/models/editor_terrain_preview.dart';
@@ -43,12 +44,17 @@ Offset _fractionForLayout(HomeLayout layout) => switch (layout) {
 class SkirmishPlacementPage extends StatefulWidget {
   final GameScene? scene;
   final MapDraft? draft;
+  final GameDifficulty difficulty;
 
-  const SkirmishPlacementPage({super.key, this.scene, this.draft})
-    : assert(
-        (scene == null) != (draft == null),
-        'Provide exactly one of scene or draft',
-      );
+  const SkirmishPlacementPage({
+    super.key,
+    this.scene,
+    this.draft,
+    this.difficulty = GameDifficulty.normal,
+  }) : assert(
+         (scene == null) != (draft == null),
+         'Provide exactly one of scene or draft',
+       );
 
   @override
   State<SkirmishPlacementPage> createState() => _SkirmishPlacementPageState();
@@ -335,7 +341,10 @@ class _SkirmishPlacementPageState extends State<SkirmishPlacementPage> {
     if (!_isDraft) {
       await context.push(
         Routes.game.route,
-        extra: GameRouteArgs(scene: _sceneForLaunch()),
+        extra: GameRouteArgs(
+          scene: _sceneForLaunch(),
+          difficulty: widget.difficulty,
+        ),
       );
       return;
     }
@@ -368,6 +377,7 @@ class _SkirmishPlacementPageState extends State<SkirmishPlacementPage> {
     await context.push(
       Routes.game.route,
       extra: GameRouteArgs(
+        difficulty: widget.difficulty,
         scene: GameScene(
           id: 'draft-${draft.id}',
           name: draft.name.isEmpty

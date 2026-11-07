@@ -10,10 +10,12 @@ import '../../../shared/app_theme/app_theme_borders.dart';
 import '../../../shared/app_theme/app_theme_colors.dart';
 import '../../../shared/app_theme/app_theme_paddings.dart';
 import '../../../shared/app_theme/app_theme_spacing.dart';
+import '../../game_core/domain/models/game_difficulty.dart';
 import '../../game_core/domain/models/game_scenes.dart';
 import '../../map_editor/domain/models/map_draft.dart';
 import '../../map_editor/domain/repos/map_draft_repository.dart';
 import 'state/skirmish_level_select_state.dart';
+import 'widgets/level_select_difficulty_selector_widget.dart';
 import 'widgets/skirmish_level_select_draft_tile_widget.dart';
 import 'widgets/skirmish_level_select_scene_card_widget.dart';
 
@@ -81,6 +83,17 @@ class _SkirmishLevelSelectPageState extends State<SkirmishLevelSelectPage> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: AppThemeSpacing.space20),
+                      Center(
+                        child: ValueListenableBuilder<GameDifficulty>(
+                          valueListenable: _state.difficulty,
+                          builder: (context, difficulty, _) =>
+                              LevelSelectDifficultySelectorWidget(
+                                value: difficulty,
+                                onChanged: _state.selectDifficulty,
+                              ),
+                        ),
+                      ),
                       const SizedBox(height: AppThemeSpacing.space28),
                       Text(
                         S.current.skirmishSelectFeatured,
@@ -92,27 +105,33 @@ class _SkirmishLevelSelectPageState extends State<SkirmishLevelSelectPage> {
                         ),
                       ),
                       const SizedBox(height: AppThemeSpacing.space12),
-                      GridView.count(
-                        shrinkWrap: true,
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
-                        childAspectRatio: 1.4,
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: [
-                          for (final (index, scene)
-                              in GameScenes.skirmishes.indexed)
-                            SkirmishLevelSelectSceneCardWidget(scene: scene)
-                                .animate()
-                                .fadeIn(
-                                  duration: 380.ms,
-                                  delay: (120 + index * 90).ms,
-                                )
-                                .scale(
-                                  begin: const Offset(0.92, 0.92),
-                                  curve: Curves.easeOutCubic,
-                                ),
-                        ],
+                      ValueListenableBuilder<GameDifficulty>(
+                        valueListenable: _state.difficulty,
+                        builder: (context, difficulty, _) => GridView.count(
+                          shrinkWrap: true,
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: 1.4,
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: [
+                            for (final (index, scene)
+                                in GameScenes.skirmishes.indexed)
+                              SkirmishLevelSelectSceneCardWidget(
+                                    scene: scene,
+                                    difficulty: difficulty,
+                                  )
+                                  .animate()
+                                  .fadeIn(
+                                    duration: 380.ms,
+                                    delay: (120 + index * 90).ms,
+                                  )
+                                  .scale(
+                                    begin: const Offset(0.92, 0.92),
+                                    curve: Curves.easeOutCubic,
+                                  ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: AppThemeSpacing.space28),
                       Text(
@@ -156,6 +175,7 @@ class _SkirmishLevelSelectPageState extends State<SkirmishLevelSelectPage> {
                                       Routes.skirmishPlacement.route,
                                       extra: SkirmishPlacementArgs(
                                         draft: draft,
+                                        difficulty: _state.difficulty.value,
                                       ),
                                     ),
                                   ),

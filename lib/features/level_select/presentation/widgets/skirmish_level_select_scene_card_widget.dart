@@ -6,6 +6,7 @@ import '../../../../shared/app_theme/app_theme_borders.dart';
 import '../../../../shared/app_theme/app_theme_colors.dart';
 import '../../../../shared/app_theme/app_theme_paddings.dart';
 import '../../../../shared/app_theme/app_theme_spacing.dart';
+import '../../../game_core/domain/models/game_difficulty.dart';
 import '../../../game_core/domain/models/game_scene.dart';
 import '../../../terrain/extensions/biome_extensions.dart';
 import '../biome_preview.dart';
@@ -14,8 +15,13 @@ import '../biome_preview.dart';
 /// terrain preview plus name/briefing, tap to open placement.
 class SkirmishLevelSelectSceneCardWidget extends StatelessWidget {
   final GameScene scene;
+  final GameDifficulty difficulty;
 
-  const SkirmishLevelSelectSceneCardWidget({super.key, required this.scene});
+  const SkirmishLevelSelectSceneCardWidget({
+    super.key,
+    required this.scene,
+    required this.difficulty,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +32,7 @@ class SkirmishLevelSelectSceneCardWidget extends StatelessWidget {
         borderRadius: AppThemeBorders.radius14,
         onTap: () => context.push(
           Routes.skirmishPlacement.route,
-          extra: SkirmishPlacementArgs(scene: scene),
+          extra: SkirmishPlacementArgs(scene: scene, difficulty: difficulty),
         ),
         child: ClipRRect(
           borderRadius: AppThemeBorders.radius14,

@@ -18,9 +18,8 @@ void paintSunLight(
   canvas.drawRect(
     rect,
     ui.Paint()
-      ..color = const ui.Color(
-        0xFF120A24,
-      ).withValues(alpha: (1 - sun.sunHeight) * 0.4),
+      ..color = const ui.Color(0xFF120A24)
+          .withValues(alpha: (1 - sun.sunHeight) * 0.4),
   );
 
   final from = sun.sunFromRight ? ui.Offset(width, 0) : ui.Offset.zero;

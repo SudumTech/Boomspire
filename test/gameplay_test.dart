@@ -14,13 +14,23 @@ import 'package:boomspire/core/combat/team.dart';
 import 'package:boomspire/core/combat/unit_kind.dart';
 import 'package:boomspire/core/combat/unit_objective.dart';
 import 'package:boomspire/core/combat/weapon_type.dart';
+import 'package:boomspire/features/ai_director/domain/models/skirmish_directive.dart';
+import 'package:boomspire/features/skirmish_ai/impl/player_weakness_analyzer.dart';
+import 'package:boomspire/features/skirmish_ai/impl/skirmish_build_planner.dart';
 import 'package:boomspire/features/ai_director/impl/ai_director_repository_impl.dart';
 import 'package:boomspire/features/audio/domain/models/ambient_sound_type.dart';
 import 'package:boomspire/features/audio/domain/models/sfx_type.dart';
 import 'package:boomspire/features/audio/domain/repos/audio_repository.dart';
 import 'package:boomspire/features/combat/presentation/mobile_unit_component.dart';
 import 'package:boomspire/features/game_core/domain/models/game_config.dart';
+import 'package:boomspire/features/game_core/domain/models/game_difficulty.dart';
 import 'package:boomspire/features/game_core/domain/models/game_scene.dart';
+import 'package:boomspire/features/skirmish_ai/domain/enums/army_stance.dart';
+import 'package:boomspire/features/skirmish_ai/domain/models/army_strength.dart';
+import 'package:boomspire/features/skirmish_ai/extensions/game_difficulty_ai_extensions.dart';
+import 'package:boomspire/features/skirmish_ai/domain/enums/strike_target_kind.dart';
+import 'package:boomspire/features/skirmish_ai/impl/army_commander.dart';
+import 'package:boomspire/features/skirmish_ai/impl/strike_planner.dart';
 import 'package:boomspire/features/game_core/domain/models/game_scenes.dart';
 import 'package:boomspire/features/game_core/domain/models/inspected_info.dart';
 import 'package:boomspire/features/game_core/impl/game_state_repository_impl.dart';
@@ -687,41 +697,38 @@ void main() {
       },
     );
 
-    test(
-      'the AI produces its first unit within a reasonable number of '
-      'decision ticks using only its default starting gold, instead of '
-      'spending everything on buildings first (regression: the AI used to '
-      'burn through its whole wallet on infrastructure/towers before it '
-      'could ever afford to produce anything)',
-      () async {
-        final game = await _bootGame(GameScenes.skirmishes.first);
-        final aiTeam = game.aiTeam!;
+    test('the AI produces its first unit within a reasonable number of '
+        'decision ticks using only its default starting gold, instead of '
+        'spending everything on buildings first (regression: the AI used to '
+        'burn through its whole wallet on infrastructure/towers before it '
+        'could ever afford to produce anything)', () async {
+      final game = await _bootGame(GameScenes.skirmishes.first);
+      final aiTeam = game.aiTeam!;
 
-        for (var i = 0; i < 300; i++) {
-          game.update(0.1);
-        }
+      for (var i = 0; i < 300; i++) {
+        game.update(0.1);
+      }
 
-        final hasProduction = game.world.activeTowers.any(
-          (t) =>
-              t.owner.id == aiTeam.id &&
-              (t is TrainingCenterComponent || t is WarFactoryComponent),
-        );
-        expect(
-          hasProduction,
-          isTrue,
-          reason:
-              'the AI should have built its first production building '
-              'within default starting gold and this many decision ticks',
-        );
-        expect(
-          game.world.activeUnits.where((u) => u.team.id == aiTeam.id),
-          isNotEmpty,
-          reason:
-              'the AI should have actually produced a unit by now instead '
-              'of pouring every coin into more buildings',
-        );
-      },
-    );
+      final hasProduction = game.world.activeTowers.any(
+        (t) =>
+            t.owner.id == aiTeam.id &&
+            (t is TrainingCenterComponent || t is WarFactoryComponent),
+      );
+      expect(
+        hasProduction,
+        isTrue,
+        reason:
+            'the AI should have built its first production building '
+            'within default starting gold and this many decision ticks',
+      );
+      expect(
+        game.world.activeUnits.where((u) => u.team.id == aiTeam.id),
+        isNotEmpty,
+        reason:
+            'the AI should have actually produced a unit by now instead '
+            'of pouring every coin into more buildings',
+      );
+    });
   });
 
   group('combat damage fixes', () {
@@ -976,98 +983,95 @@ void main() {
       },
     );
 
-    test(
-      'after destroying an attack-ordered target, the unit automatically '
-      'presses on to the next hostile within its radius instead of '
-      'freezing in place once it arrives',
-      () async {
-        final game = await _bootGame(GameScenes.all.first);
-        const allyBlueprint = MobileUnitBlueprint(
-          kind: UnitKind.soldier,
-          name: 'Test Ally',
-          maxHealth: 40,
-          speed: 80,
-          bounty: 0,
-          size: 34,
-          attackDamage: 200,
-          attackRange: 150,
-          attackInterval: 0.1,
-          weaponType: WeaponType.laser,
-        );
-        final ally = MobileUnitComponent(
-          blueprint: allyBlueprint,
-          team: game.playerTeam,
-          objective: UnitObjective.huntHostiles,
-        );
-        game.world.spawnUnit(ally);
+    test('after destroying an attack-ordered target, the unit automatically '
+        'presses on to the next hostile within its radius instead of '
+        'freezing in place once it arrives', () async {
+      final game = await _bootGame(GameScenes.all.first);
+      const allyBlueprint = MobileUnitBlueprint(
+        kind: UnitKind.soldier,
+        name: 'Test Ally',
+        maxHealth: 40,
+        speed: 80,
+        bounty: 0,
+        size: 34,
+        attackDamage: 200,
+        attackRange: 150,
+        attackInterval: 0.1,
+        weaponType: WeaponType.laser,
+      );
+      final ally = MobileUnitComponent(
+        blueprint: allyBlueprint,
+        team: game.playerTeam,
+        objective: UnitObjective.huntHostiles,
+      );
+      game.world.spawnUnit(ally);
+      await Future<void>.delayed(Duration.zero);
+      game.update(0);
+      ally.position = Vector2(300, 300);
+
+      const nearEnemyBlueprint = MobileUnitBlueprint(
+        kind: UnitKind.soldier,
+        name: 'Test Enemy Near',
+        maxHealth: 10,
+        speed: 0,
+        bounty: 0,
+        size: 34,
+      );
+      final nearEnemy = MobileUnitComponent(
+        blueprint: nearEnemyBlueprint,
+        team: Team.invaders,
+        objective: UnitObjective.huntHostiles,
+      );
+      game.world.spawnUnit(nearEnemy);
+      await Future<void>.delayed(Duration.zero);
+      game.update(0);
+      nearEnemy.position = Vector2(340, 300);
+
+      const farEnemyBlueprint = MobileUnitBlueprint(
+        kind: UnitKind.soldier,
+        name: 'Test Enemy Far',
+        maxHealth: 200,
+        speed: 0,
+        bounty: 0,
+        size: 34,
+      );
+      final farEnemy = MobileUnitComponent(
+        blueprint: farEnemyBlueprint,
+        team: Team.invaders,
+        objective: UnitObjective.huntHostiles,
+      );
+      game.world.spawnUnit(farEnemy);
+      await Future<void>.delayed(Duration.zero);
+      game.update(0);
+      // Outside attack range (150) but well inside the auto-continue
+      // radius (attackRange * 3 = 450), so the unit must walk toward it.
+      // Kept far enough away (400) that, even after nearEnemy dies and
+      // the ally spends the first assertion loop (10 * 0.2s = 2s)
+      // closing the gap at its 80 units/s speed, it still can't have
+      // covered enough ground to already be in range and one-shot it
+      // before the first checkpoint below - it must still be alive and
+      // merely "being hunted" at that point.
+      farEnemy.position = Vector2(700, 300);
+
+      game.handleArenaTap(ally.position);
+      game.handleArenaTap(nearEnemy.position);
+      expect(ally.forcedTarget, nearEnemy);
+
+      for (var i = 0; i < 10; i++) {
         await Future<void>.delayed(Duration.zero);
-        game.update(0);
-        ally.position = Vector2(300, 300);
+        game.update(0.2);
+      }
 
-        const nearEnemyBlueprint = MobileUnitBlueprint(
-          kind: UnitKind.soldier,
-          name: 'Test Enemy Near',
-          maxHealth: 10,
-          speed: 0,
-          bounty: 0,
-          size: 34,
-        );
-        final nearEnemy = MobileUnitComponent(
-          blueprint: nearEnemyBlueprint,
-          team: Team.invaders,
-          objective: UnitObjective.huntHostiles,
-        );
-        game.world.spawnUnit(nearEnemy);
+      expect(nearEnemy.destroyed, isTrue);
+      expect(ally.forcedTarget, farEnemy);
+
+      for (var i = 0; i < 30; i++) {
         await Future<void>.delayed(Duration.zero);
-        game.update(0);
-        nearEnemy.position = Vector2(340, 300);
+        game.update(0.2);
+      }
 
-        const farEnemyBlueprint = MobileUnitBlueprint(
-          kind: UnitKind.soldier,
-          name: 'Test Enemy Far',
-          maxHealth: 200,
-          speed: 0,
-          bounty: 0,
-          size: 34,
-        );
-        final farEnemy = MobileUnitComponent(
-          blueprint: farEnemyBlueprint,
-          team: Team.invaders,
-          objective: UnitObjective.huntHostiles,
-        );
-        game.world.spawnUnit(farEnemy);
-        await Future<void>.delayed(Duration.zero);
-        game.update(0);
-        // Outside attack range (150) but well inside the auto-continue
-        // radius (attackRange * 3 = 450), so the unit must walk toward it.
-        // Kept far enough away (400) that, even after nearEnemy dies and
-        // the ally spends the first assertion loop (10 * 0.2s = 2s)
-        // closing the gap at its 80 units/s speed, it still can't have
-        // covered enough ground to already be in range and one-shot it
-        // before the first checkpoint below - it must still be alive and
-        // merely "being hunted" at that point.
-        farEnemy.position = Vector2(700, 300);
-
-        game.handleArenaTap(ally.position);
-        game.handleArenaTap(nearEnemy.position);
-        expect(ally.forcedTarget, nearEnemy);
-
-        for (var i = 0; i < 10; i++) {
-          await Future<void>.delayed(Duration.zero);
-          game.update(0.2);
-        }
-
-        expect(nearEnemy.destroyed, isTrue);
-        expect(ally.forcedTarget, farEnemy);
-
-        for (var i = 0; i < 30; i++) {
-          await Future<void>.delayed(Duration.zero);
-          game.update(0.2);
-        }
-
-        expect(farEnemy.health, lessThan(farEnemy.blueprint.maxHealth));
-      },
-    );
+      expect(farEnemy.health, lessThan(farEnemy.blueprint.maxHealth));
+    });
 
     test(
       'tapping an enemy while a unit is selected issues an attack order',
@@ -1317,6 +1321,338 @@ void main() {
     });
   });
 
+  group('skirmish AI', () {
+    MobileUnitComponent spawnSoldier(
+      BoomspireGame game,
+      Team team,
+      Vector2 at,
+    ) {
+      final blueprint = game.unitRepository.blueprintFor(
+        team,
+        UnitKind.soldier,
+      );
+      final unit = MobileUnitComponent(
+        blueprint: blueprint,
+        team: team,
+        objective: UnitObjective.assaultBase,
+        position: at,
+      );
+      game.world.spawnUnit(unit);
+      return unit;
+    }
+
+    Future<void> settle(BoomspireGame game) async {
+      await Future<void>.delayed(Duration.zero);
+      game.update(0);
+    }
+
+    test('difficulty scales reaction speed, income and aggression', () {
+      final easy = GameDifficulty.easy.skirmishAiProfile;
+      final normal = GameDifficulty.normal.skirmishAiProfile;
+      final hard = GameDifficulty.hard.skirmishAiProfile;
+      expect(hard.decisionInterval, lessThan(normal.decisionInterval));
+      expect(normal.decisionInterval, lessThan(easy.decisionInterval));
+      expect(hard.incomeMultiplier, greaterThan(normal.incomeMultiplier));
+      expect(easy.incomeMultiplier, lessThan(normal.incomeMultiplier));
+      expect(hard.attackPowerRatio, lessThan(easy.attackPowerRatio));
+      expect(hard.mistakeChance, lessThan(easy.mistakeChance));
+    });
+
+    test('army power grows with headcount, and an empty army has none', () {
+      const one = ArmyStrength(health: 100, dps: 10);
+      expect(ArmyStrength.zero.power, 0);
+      expect((one + one).power, closeTo(one.power * 2, 1e-9));
+    });
+
+    test('AI income follows the difficulty multiplier', () async {
+      final hard = await _bootGame(
+        GameScenes.skirmishes.first,
+        difficulty: GameDifficulty.hard,
+      );
+      final before = hard.aiEconomy!.gold;
+      hard.aiEconomy!.addGold(100);
+      expect(hard.aiEconomy!.gold - before, 125);
+    });
+
+    test('the strike planner hits a lightly guarded gold mine, not the '
+        'fortified base', () async {
+      final game = await _bootGame(GameScenes.skirmishes.first);
+      final aiTeam = game.aiTeam!;
+      final grid = game.terrainMap.grid;
+      final base = Vector2(
+        game.terrainMap.basePoint.x,
+        game.terrainMap.basePoint.y,
+      );
+      final baseCell = grid.worldToCell(base);
+      var towers = 0;
+      for (var dx = -3; dx <= 3 && towers < 5; dx++) {
+        final cell = Point(baseCell.x + dx, baseCell.y - 3);
+        if (grid.isBlocked(cell.x, cell.y)) continue;
+        if (game.buildStructure(
+              game.playerTeam,
+              TowerType.machineGun,
+              grid.cellCenter(cell),
+            ) !=
+            null) {
+          towers++;
+        }
+      }
+      expect(towers, greaterThan(0));
+      final aiBase = game.world.aiHomeBase!.position;
+      final mineCell = grid.worldToCell(aiBase + (base - aiBase) * 0.5);
+      final mine = game.buildStructure(
+        game.playerTeam,
+        BuildingType.goldMine,
+        grid.cellCenter(mineCell),
+      );
+      expect(mine, isNotNull);
+      await settle(game);
+
+      final plan = StrikePlanner(game).plan(
+        aiTeam: aiTeam,
+        armyCenter: aiBase,
+        armyPower: 60,
+        allowRaid: false,
+        raidPower: 0,
+      );
+      expect(plan.main.kind, StrikeTargetKind.economy);
+    });
+
+    test(
+      'the AI builds several War Factories once it can afford them',
+      () async {
+        final game = await _bootGame(
+          GameScenes.skirmishes.first,
+          difficulty: GameDifficulty.hard,
+        );
+        final aiTeam = game.aiTeam!;
+        game.aiEconomy!.addGold(20000);
+        final planner = SkirmishBuildPlanner(
+          game,
+          GameDifficulty.hard.skirmishAiProfile,
+        );
+        const directive = SkirmishDirective(aggression: 0.5, buildBias: 0.5);
+        for (var i = 0; i < 40; i++) {
+          planner.tryBuild(aiTeam, directive);
+          await settle(game);
+        }
+        final factories = game.world.activeTowers
+            .where(
+              (t) =>
+                  t.owner.id == aiTeam.id &&
+                  t.blueprint.type == BuildingType.warFactory,
+            )
+            .length;
+        expect(factories, greaterThan(1));
+      },
+    );
+
+    test('the AI spots a missing anti-air defense and reacts to one being '
+        'built', () async {
+      final game = await _bootGame(GameScenes.skirmishes.first);
+      final aiTeam = game.aiTeam!;
+      final analyzer = PlayerWeaknessAnalyzer(game);
+      expect(analyzer.analyze(aiTeam).lacksAntiAir, isTrue);
+
+      final grid = game.terrainMap.grid;
+      final cell = _findOpenCell(game);
+      final tower = game.buildStructure(
+        game.playerTeam,
+        TowerType.antiAir,
+        grid.cellCenter(cell),
+      );
+      expect(tower, isNotNull);
+      await settle(game);
+      expect(analyzer.analyze(aiTeam).lacksAntiAir, isFalse);
+    });
+
+    test('the AI only banks gold for a building for a limited time', () async {
+      final game = await _bootGame(
+        GameScenes.skirmishes.first,
+        difficulty: GameDifficulty.hard,
+      );
+      final aiTeam = game.aiTeam!;
+      game.aiEconomy!.addGold(20000);
+      final planner = SkirmishBuildPlanner(
+        game,
+        GameDifficulty.hard.skirmishAiProfile,
+      );
+      const directive = SkirmishDirective(aggression: 0.5, buildBias: 0.5);
+      // Reach the state where it has production but still wants more.
+      for (var i = 0; i < 6; i++) {
+        planner.tryBuild(aiTeam, directive);
+        await settle(game);
+      }
+      game.aiEconomy!.gold = 100;
+
+      expect(planner.savingsTarget(aiTeam, 0), greaterThan(0));
+      expect(planner.savingsTarget(aiTeam, 25), 0, reason: 'time-boxed');
+      expect(planner.savingsTarget(aiTeam, 45), greaterThan(0));
+    });
+
+    test(
+      'a small AI army musters at the rally point instead of rushing',
+      () async {
+        final game = await _bootGame(GameScenes.skirmishes.first);
+        final aiTeam = game.aiTeam!;
+        final base = game.world.aiHomeBase!.position;
+        final units = [
+          for (var i = 0; i < 2; i++) spawnSoldier(game, aiTeam, base.clone()),
+        ];
+        await settle(game);
+
+        final commander = ArmyCommander(
+          game,
+          GameDifficulty.normal.skirmishAiProfile,
+        );
+        commander.command(aiTeam, 0.5);
+
+        expect(commander.stance, ArmyStance.muster);
+        expect(units.every((u) => u.underManualControl), isTrue);
+        expect(units.every((u) => u.moveOrderTarget != null), isTrue);
+      },
+    );
+
+    test('a large AI army is released to attack together', () async {
+      final game = await _bootGame(GameScenes.skirmishes.first);
+      final aiTeam = game.aiTeam!;
+      final base = game.world.aiHomeBase!.position;
+      final units = [
+        for (var i = 0; i < 8; i++) spawnSoldier(game, aiTeam, base.clone()),
+      ];
+      await settle(game);
+
+      final commander = ArmyCommander(
+        game,
+        GameDifficulty.normal.skirmishAiProfile,
+      );
+      commander.command(aiTeam, 0.5); // no enemy forces: strong enough
+      expect(commander.stance, ArmyStance.attack);
+      expect(units.every((u) => !u.underManualControl), isTrue);
+    });
+
+    test('units attacking the AI base pull the army back to defend', () async {
+      final game = await _bootGame(GameScenes.skirmishes.first);
+      final aiTeam = game.aiTeam!;
+      final base = game.world.aiHomeBase!.position;
+      final defenders = [
+        for (var i = 0; i < 4; i++) spawnSoldier(game, aiTeam, base.clone()),
+      ];
+      final raider = spawnSoldier(
+        game,
+        game.playerTeam,
+        base + Vector2(120, 0),
+      );
+      await settle(game);
+
+      final commander = ArmyCommander(
+        game,
+        GameDifficulty.normal.skirmishAiProfile,
+      );
+      commander.command(aiTeam, 0.5);
+
+      expect(commander.stance, ArmyStance.defend);
+      for (final defender in defenders) {
+        expect(
+          defender.moveOrderTarget!.distanceTo(raider.position),
+          lessThan(1),
+        );
+      }
+    });
+
+    test(
+      'the AI opponent builds an economy and fields units on its own',
+      () async {
+        final game = await _bootGame(
+          GameScenes.skirmishes.first,
+          difficulty: GameDifficulty.hard,
+        );
+        final aiTeam = game.aiTeam!;
+        for (var i = 0; i < 400; i++) {
+          game.update(0.5);
+          await Future<void>.delayed(Duration.zero);
+        }
+        final structures = game.world.activeTowers
+            .where((t) => t.owner.id == aiTeam.id)
+            .toList();
+        final units = game.world.activeUnits.where(
+          (u) => u.team.id == aiTeam.id,
+        );
+        expect(
+          structures.any((t) => t.blueprint.type == BuildingType.goldMine),
+          isTrue,
+        );
+        expect(
+          structures.any(
+            (t) => t is TrainingCenterComponent || t is WarFactoryComponent,
+          ),
+          isTrue,
+        );
+        expect(units, isNotEmpty);
+      },
+    );
+  });
+
+  group('aircraft', () {
+    test(
+      'an attack plane ordered onto a ground unit flies passes over it and '
+      'loops back instead of hovering/jittering on top of it (regression)',
+      () async {
+        final game = await _bootGame(GameScenes.skirmishes.first);
+        final target = MobileUnitComponent(
+          blueprint: const MobileUnitBlueprint(
+            kind: UnitKind.soldier,
+            name: 'Dummy',
+            maxHealth: 100000,
+            speed: 0,
+            size: 30,
+          ),
+          team: game.aiTeam!,
+          objective: UnitObjective.assaultBase,
+          position: Vector2(600, 400),
+        );
+        game.world.spawnUnit(target);
+        final plane = MobileUnitComponent(
+          blueprint: game.unitRepository.blueprintFor(
+            game.playerTeam,
+            UnitKind.aircraft,
+          ),
+          team: game.playerTeam,
+          objective: UnitObjective.assaultBase,
+          position: Vector2(300, 400),
+        );
+        game.world.spawnUnit(plane);
+        await Future<void>.delayed(Duration.zero);
+        game.update(0);
+        plane.issueMoveOrder(target.position.clone());
+
+        var farthest = 0.0;
+        var closeFrames = 0;
+        const frames = 900;
+        for (var i = 0; i < frames; i++) {
+          game.update(1 / 30);
+          final d = plane.position.distanceTo(target.position);
+          if (i > 90) {
+            if (d > farthest) farthest = d;
+            if (d < 15) closeFrames++;
+          }
+        }
+
+        expect(
+          farthest,
+          greaterThan(150),
+          reason: 'the plane must loop out between attack passes',
+        );
+        expect(
+          closeFrames,
+          lessThan(frames ~/ 4),
+          reason: 'the plane must not sit on top of its target',
+        );
+        expect(target.health, lessThan(100000));
+      },
+    );
+  });
+
   test('every scene generates a terrain where every spawn can reach base', () {
     for (final scene in GameScenes.all) {
       final terrain = TerrainRepositoryImpl().loadTerrain(scene: scene);
@@ -1338,8 +1674,11 @@ void main() {
 }
 
 /// Boots a game without pumping a full Flutter widget tree (much faster).
-Future<BoomspireGame> _bootGame(GameScene scene) async {
-  final game = _newGame(scene);
+Future<BoomspireGame> _bootGame(
+  GameScene scene, {
+  GameDifficulty difficulty = GameDifficulty.normal,
+}) async {
+  final game = _newGame(scene, difficulty: difficulty);
   game.onGameResize(Vector2(1280, 720));
   // ignore: invalid_use_of_internal_member
   await game.load();
@@ -1372,7 +1711,11 @@ Point<int> _findOpenCell(BoomspireGame game) {
   throw StateError('no open cell found');
 }
 
-BoomspireGame _newGame(GameScene scene) => BoomspireGame(
+BoomspireGame _newGame(
+  GameScene scene, {
+  GameDifficulty difficulty = GameDifficulty.normal,
+}) => BoomspireGame(
+  difficulty: difficulty,
   terrainRepository: TerrainRepositoryImpl(),
   towerRepository: TowerRepositoryImpl(),
   buildingRepository: BuildingRepositoryImpl(),

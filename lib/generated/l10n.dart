@@ -550,6 +550,40 @@ class S {
     );
   }
 
+  /// `AI {stance} | target {target} | raid {raid} | army {army} ({armyPower} vs {enemyPower}) | structures {structures} | nodes {nodes} | gold {gold} | air {air} | weakness {weakness}`
+  String aiIntelDebugLabel(
+    String stance,
+    String target,
+    String raid,
+    int army,
+    int armyPower,
+    int enemyPower,
+    int structures,
+    int nodes,
+    int gold,
+    String air,
+    String weakness,
+  ) {
+    return Intl.message(
+      'AI $stance | target $target | raid $raid | army $army ($armyPower vs $enemyPower) | structures $structures | nodes $nodes | gold $gold | air $air | weakness $weakness',
+      name: 'aiIntelDebugLabel',
+      desc: '',
+      args: [
+        stance,
+        target,
+        raid,
+        army,
+        armyPower,
+        enemyPower,
+        structures,
+        nodes,
+        gold,
+        air,
+        weakness,
+      ],
+    );
+  }
+
   /// `WAVE {current} / {total}`
   String hudWaveLabel(int current, int total) {
     return Intl.message(

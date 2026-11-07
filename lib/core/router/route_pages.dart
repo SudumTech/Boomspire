@@ -75,7 +75,11 @@ class _SkirmishPlacementRoutePageState
   @override
   Widget build(BuildContext context) {
     final args = _skirmishPlacementArgs.value;
-    return SkirmishPlacementPage(scene: args.scene, draft: args.draft);
+    return SkirmishPlacementPage(
+      scene: args.scene,
+      draft: args.draft,
+      difficulty: args.difficulty,
+    );
   }
 
   @override

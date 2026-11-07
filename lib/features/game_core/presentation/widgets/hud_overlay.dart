@@ -10,6 +10,7 @@ import '../../../../shared/app_theme/app_theme_paddings.dart';
 import '../../domain/models/game_scene.dart';
 import '../boomspire_game.dart';
 import 'build_menu.dart';
+import 'game_core_ai_intel_widget.dart';
 import 'game_core_entity_panel_widget.dart';
 import 'game_core_hud_stat_chip_widget.dart';
 import 'minimap_widget.dart';
@@ -99,7 +100,10 @@ class HudOverlay extends StatelessWidget {
                             listenable: game.gameState,
                             builder: (context, _) {
                               if (game.scene.mode == GameMode.skirmish) {
-                                return const SizedBox.shrink();
+                                return SizedBox(
+                                  width: 280,
+                                  child: GameCoreAiIntelWidget(game: game),
+                                );
                               }
                               return Text(
                                 S.current.hudWaveLabel(
