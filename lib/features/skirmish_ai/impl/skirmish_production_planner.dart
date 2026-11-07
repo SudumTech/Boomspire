@@ -30,6 +30,16 @@ class SkirmishProductionPlanner {
   /// buildings - a minimum defense comes first.
   static const _minArmyBeforeSaving = 3;
 
+  /// Saves for the preferred unit only once it holds this share of its cost.
+  static const _saveReachFraction = 0.5;
+
+  /// Longest the AI saves for one unit before settling for something cheaper.
+  static const _maxWaitRounds = 6;
+
+  /// Score bonus (at full effect) for siege/bomber units when the opponent
+  /// has many defensive structures.
+  static const _structureBonus = 1.5;
+
   /// Most anti-air units the AI ever wants at once.
   static const _maxAntiAirUnits = 8;
 
@@ -92,9 +102,27 @@ class SkirmishProductionPlanner {
   ) {
     final spendable = _game.goldFor(aiTeam) - context.keepGold;
     final affordable = kinds.where((k) => costOf(k) <= spendable).toList();
+    // What the AI would build with unlimited gold - so a stealth bomber or
+    // helicopter is *planned for*, not starved by cheap units that are always
+    // affordable. If it is within reach, hold the gold for a few rounds.
+    final ideal = _pickKind(aiTeam, kinds, context);
+    if (!affordable.contains(ideal) &&
+        spendable >= costOf(ideal) * _saveReachFraction &&
+        _waitedRounds < _maxWaitRounds) {
+      _waitedRounds++;
+      return;
+    }
+    _waitedRounds = 0;
     if (affordable.isEmpty) return;
-    produce(_pickKind(aiTeam, affordable, context));
+    produce(
+      affordable.contains(ideal)
+          ? ideal
+          : _pickKind(aiTeam, affordable, context),
+    );
   }
+
+  /// Consecutive rounds spent saving for an unaffordable first choice.
+  int _waitedRounds = 0;
 
   int _ownUnitCount(Team aiTeam) => _game.world.activeUnits
       .where((u) => !u.destroyed && u.team.id == aiTeam.id)
@@ -117,7 +145,8 @@ class SkirmishProductionPlanner {
           _valueForCost(blueprint) / bestValue +
           _counterScore(blueprint, context.enemy) +
           _weaknessScore(blueprint, context) +
-          _antiAirNeedScore(blueprint, context) -
+          _antiAirNeedScore(blueprint, context) +
+          _structureScore(aiTeam, blueprint) -
           _varietyPenalty * (ownCounts[kind] ?? 0) / ownTotal;
       if (score > bestScore) {
         bestScore = score;
@@ -173,6 +202,16 @@ class SkirmishProductionPlanner {
         blueprint.attackDamage > 0 &&
         blueprint.attackDomains.contains(UnitDomain.air);
     return context.antiAirDeficit > 0 && shootsAir ? _antiAirNeedBonus : 0;
+  }
+
+  /// Artillery and bombers are worth more the more towers they have to
+  /// break; against an opponent with no defenses they add nothing.
+  double _structureScore(Team aiTeam, MobileUnitBlueprint blueprint) {
+    if (!blueprint.prefersStructures) return 0;
+    final towers = _game.world.activeTowers
+        .where((t) => t.owner.relationTo(aiTeam) == TeamRelation.enemy)
+        .length;
+    return _structureBonus * min(1.0, towers / 4);
   }
 
   Map<UnitKind, int> _ownKindCounts(Team aiTeam) {

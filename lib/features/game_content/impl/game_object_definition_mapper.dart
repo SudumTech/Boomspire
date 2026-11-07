@@ -1,5 +1,6 @@
 import '../../../core/combat/enums/unit_catalog.dart';
 import '../../../core/combat/mobile_unit_blueprint.dart';
+import '../../../core/combat/secondary_weapon.dart';
 import '../../towers/domain/models/building_type.dart';
 import '../../towers/domain/models/tower_type.dart';
 import '../../towers/domain/models/unit_blueprint.dart';
@@ -7,6 +8,7 @@ import '../domain/models/asset_source.dart';
 import '../domain/models/build_requirement.dart';
 import '../domain/models/game_object_category.dart';
 import '../domain/models/game_object_definition.dart';
+import '../domain/models/secondary_weapon_definition.dart';
 import '../domain/models/sound_ref.dart';
 
 UnitBlueprint applyBuildingOverride(
@@ -43,16 +45,25 @@ MobileUnitBlueprint applyMobileUnitOverride(
   attackRange: override.range,
   attackInterval: override.fireRate,
   projectileCount: override.projectileCount,
-  clipShotInterval: base.clipShotInterval,
+  clipShotInterval: override.clipShotInterval,
   movementStyle: override.movementStyle,
   isVehicle: override.unitType == MobilityType.vehicle,
   weaponType: override.weaponType,
   bounty: override.bounty,
   cost: override.cost,
   prefersStructures: override.prefersStructures,
-  // Not part of a synced definition - keep what the unit already has.
-  isStealth: base.isStealth,
-  secondary: base.secondary,
+  isStealth: override.isStealth,
+  secondary: override.secondary == null
+      ? null
+      : SecondaryWeapon(
+          damage: override.secondary!.damage,
+          range: override.secondary!.range,
+          interval: override.secondary!.interval,
+          weaponType: override.secondary!.weaponType,
+          projectileCount: override.secondary!.projectileCount,
+          clipShotInterval: override.secondary!.clipShotInterval,
+          attackDomains: override.secondary!.attackDomains,
+        ),
 );
 
 /// Returns [base] with combat/cost stats replaced by [override]'s - `name`/
@@ -141,8 +152,25 @@ GameObjectDefinition mobileUnitToDefinition(
         : MobilityType.infantry,
     bounty: blueprint.bounty,
     prefersStructures: blueprint.prefersStructures,
+    clipShotInterval: blueprint.clipShotInterval,
+    isStealth: blueprint.isStealth,
+    secondary: blueprint.secondary == null
+        ? null
+        : SecondaryWeaponDefinition(
+            damage: blueprint.secondary!.damage,
+            range: blueprint.secondary!.range,
+            interval: blueprint.secondary!.interval,
+            weaponType: blueprint.secondary!.weaponType,
+            projectileCount: blueprint.secondary!.projectileCount,
+            clipShotInterval: blueprint.secondary!.clipShotInterval,
+            attackDomains: blueprint.secondary!.attackDomains,
+          ),
     requirements: requirements,
-    modelView: AssetSource(path: 'unit_${blueprint.kind.name}'),
+    // The Lottie model for this side - `ally_<kind>` / `enemy_<kind>`.
+    modelView: AssetSource(
+      path:
+          '${catalog == UnitCatalog.invaderRoster ? 'enemy' : 'ally'}_${blueprint.kind.name}',
+    ),
     sound: const SoundRef(),
   );
 }

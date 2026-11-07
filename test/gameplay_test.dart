@@ -21,6 +21,7 @@ import 'package:boomspire/core/combat/weapon_type.dart';
 import 'package:boomspire/features/ai_director/domain/models/skirmish_directive.dart';
 import 'package:boomspire/features/skirmish_ai/impl/player_weakness_analyzer.dart';
 import 'package:boomspire/features/skirmish_ai/impl/skirmish_build_planner.dart';
+import 'package:boomspire/features/skirmish_ai/impl/skirmish_production_planner.dart';
 import 'package:boomspire/features/ai_director/impl/ai_director_repository_impl.dart';
 import 'package:boomspire/features/audio/domain/models/ambient_environment.dart';
 import 'package:boomspire/features/audio/domain/models/sfx_type.dart';
@@ -1487,6 +1488,57 @@ void main() {
       expect(tower, isNotNull);
       await settle(game);
       expect(analyzer.analyze(aiTeam).lacksAntiAir, isFalse);
+    });
+
+    test('the AI can build every unit the player can, and fields the '
+        'expensive ones when rich', () async {
+      final game = await _bootGame(
+        GameScenes.skirmishes.first,
+        difficulty: GameDifficulty.hard,
+      );
+      final aiTeam = game.aiTeam!;
+      expect(
+        game.unitRepository.kindsFor(aiTeam).toSet(),
+        game.unitRepository.kindsFor(game.playerTeam).toSet(),
+      );
+      game.aiEconomy!.addGold(100000);
+      final builder = SkirmishBuildPlanner(
+        game,
+        GameDifficulty.hard.skirmishAiProfile,
+      );
+      const directive = SkirmishDirective(aggression: 0.5, buildBias: 0.5);
+      for (var i = 0; i < 12; i++) {
+        builder.tryBuild(aiTeam, directive);
+        await settle(game);
+      }
+      // Give the player several defenses so siege units and bombers pay off.
+      final grid = game.terrainMap.grid;
+      for (var i = 0; i < 4; i++) {
+        game.buildStructure(
+          game.playerTeam,
+          TowerType.machineGun,
+          grid.cellCenter(_findOpenCell(game)),
+        );
+        await settle(game);
+      }
+      final producer = SkirmishProductionPlanner(game);
+      final seen = <UnitKind>{};
+      for (var i = 0; i < 160; i++) {
+        game.aiEconomy!.addGold(400);
+        producer.produce(aiTeam);
+        for (final tower in game.world.activeTowers) {
+          if (tower.owner.id != aiTeam.id) continue;
+          if (tower is WarFactoryComponent) tower.cooldownRemaining = 0;
+          if (tower is TrainingCenterComponent) tower.cooldownRemaining = 0;
+        }
+        for (final u in game.world.activeUnits) {
+          if (u.team.id == aiTeam.id) seen.add(u.blueprint.kind);
+        }
+        await settle(game);
+      }
+      expect(seen, contains(UnitKind.stealthBomber));
+      expect(seen, contains(UnitKind.helicopter));
+      expect(seen.length, greaterThanOrEqualTo(5), reason: '$seen');
     });
 
     test('the AI only banks gold for a building for a limited time', () async {

@@ -41,6 +41,13 @@ _GameObjectDefinition _$GameObjectDefinitionFromJson(
       MobilityType.infantry,
   bounty: (json['bounty'] as num?)?.toInt() ?? 0,
   prefersStructures: json['prefersStructures'] as bool? ?? false,
+  clipShotInterval: (json['clipShotInterval'] as num?)?.toDouble() ?? 0.12,
+  isStealth: json['isStealth'] as bool? ?? false,
+  secondary: json['secondary'] == null
+      ? null
+      : SecondaryWeaponDefinition.fromJson(
+          json['secondary'] as Map<String, dynamic>,
+        ),
   producibleUnitIds:
       (json['producibleUnitIds'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -78,6 +85,9 @@ Map<String, dynamic> _$GameObjectDefinitionToJson(
   'unitType': _$MobilityTypeEnumMap[instance.unitType]!,
   'bounty': instance.bounty,
   'prefersStructures': instance.prefersStructures,
+  'clipShotInterval': instance.clipShotInterval,
+  'isStealth': instance.isStealth,
+  'secondary': instance.secondary?.toJson(),
   'producibleUnitIds': instance.producibleUnitIds,
   'requirements': _requirementsToJson(instance.requirements),
   'modelView': instance.modelView.toJson(),

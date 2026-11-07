@@ -11,7 +11,10 @@
     "splashRadius": 0.0,
     "maxHp": 90.0,
     "domain": "ground",
-    "attackDomains": ["ground", "sea"],
+    "attackDomains": [
+      "ground",
+      "sea"
+    ],
     "cost": 100,
     "speed": 0.0,
     "size": 0.0,
@@ -20,6 +23,9 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
@@ -43,7 +49,10 @@
     "splashRadius": 75.0,
     "maxHp": 120.0,
     "domain": "ground",
-    "attackDomains": ["ground", "sea"],
+    "attackDomains": [
+      "ground",
+      "sea"
+    ],
     "cost": 250,
     "speed": 0.0,
     "size": 0.0,
@@ -52,6 +61,9 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
@@ -75,7 +87,10 @@
     "splashRadius": 55.0,
     "maxHp": 200.0,
     "domain": "ground",
-    "attackDomains": ["ground", "sea"],
+    "attackDomains": [
+      "ground",
+      "sea"
+    ],
     "cost": 300,
     "speed": 0.0,
     "size": 0.0,
@@ -84,6 +99,9 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
@@ -107,7 +125,9 @@
     "splashRadius": 0.0,
     "maxHp": 100.0,
     "domain": "ground",
-    "attackDomains": ["air"],
+    "attackDomains": [
+      "air"
+    ],
     "cost": 150,
     "speed": 0.0,
     "size": 0.0,
@@ -116,6 +136,9 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
@@ -129,7 +152,7 @@
   },
   {
     "id": "tower.laser",
-    "version": 2,
+    "version": 1,
     "category": "tower",
     "damage": 14.0,
     "weaponType": "bullet",
@@ -139,7 +162,11 @@
     "splashRadius": 0.0,
     "maxHp": 100.0,
     "domain": "ground",
-    "attackDomains": ["ground", "air", "sea"],
+    "attackDomains": [
+      "ground",
+      "air",
+      "sea"
+    ],
     "cost": 1000,
     "speed": 0.0,
     "size": 0.0,
@@ -148,6 +175,9 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [
       {
@@ -171,7 +201,7 @@
   },
   {
     "id": "tower.rocketSilo",
-    "version": 2,
+    "version": 1,
     "category": "tower",
     "damage": 90.0,
     "weaponType": "bullet",
@@ -181,7 +211,10 @@
     "splashRadius": 90.0,
     "maxHp": 150.0,
     "domain": "ground",
-    "attackDomains": ["ground", "sea"],
+    "attackDomains": [
+      "ground",
+      "sea"
+    ],
     "cost": 500,
     "speed": 0.0,
     "size": 0.0,
@@ -190,6 +223,9 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [
       {
@@ -228,7 +264,10 @@
     "splashRadius": 40.0,
     "maxHp": 200.0,
     "domain": "ground",
-    "attackDomains": ["ground", "sea"],
+    "attackDomains": [
+      "ground",
+      "sea"
+    ],
     "cost": 800,
     "speed": 0.0,
     "size": 0.0,
@@ -237,6 +276,9 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [
       {
@@ -256,7 +298,7 @@
   },
   {
     "id": "tower.sam",
-    "version": 2,
+    "version": 1,
     "category": "tower",
     "damage": 48.0,
     "weaponType": "bullet",
@@ -266,7 +308,9 @@
     "splashRadius": 20.0,
     "maxHp": 40.0,
     "domain": "ground",
-    "attackDomains": ["air"],
+    "attackDomains": [
+      "air"
+    ],
     "cost": 900,
     "speed": 0.0,
     "size": 0.0,
@@ -275,6 +319,9 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [
       {
@@ -303,7 +350,7 @@
   },
   {
     "id": "building.techLab",
-    "version": 2,
+    "version": 1,
     "category": "building",
     "damage": 0.0,
     "weaponType": "bullet",
@@ -313,7 +360,9 @@
     "splashRadius": 0.0,
     "maxHp": 200.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 500,
     "speed": 0.0,
     "size": 0.0,
@@ -322,6 +371,9 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [
       {
@@ -345,7 +397,7 @@
   },
   {
     "id": "building.commandPost",
-    "version": 2,
+    "version": 1,
     "category": "building",
     "damage": 0.0,
     "weaponType": "bullet",
@@ -355,7 +407,9 @@
     "splashRadius": 0.0,
     "maxHp": 200.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 600,
     "speed": 0.0,
     "size": 0.0,
@@ -364,11 +418,17 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [
       {
         "kind": "anyBuildingExists",
-        "buildingIds": ["building.warFactory", "building.trainingCenter"]
+        "buildingIds": [
+          "building.warFactory",
+          "building.trainingCenter"
+        ]
       },
       {
         "kind": "maxCount",
@@ -396,7 +456,9 @@
     "splashRadius": 0.0,
     "maxHp": 200.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 550,
     "speed": 0.0,
     "size": 0.0,
@@ -405,10 +467,14 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [
       "unit.buildable.soldier",
       "unit.buildable.antiTankSoldier",
-      "unit.buildable.antiAirSoldier"
+      "unit.buildable.antiAirSoldier",
+      "unit.buildable.heavySoldier"
     ],
     "requirements": [
       {
@@ -437,7 +503,9 @@
     "splashRadius": 0.0,
     "maxHp": 200.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 700,
     "speed": 0.0,
     "size": 0.0,
@@ -446,11 +514,20 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [
       "unit.buildable.tank",
       "unit.buildable.lightVehicle",
       "unit.buildable.aircraft",
-      "unit.buildable.rocketBarrage"
+      "unit.buildable.attackPlane",
+      "unit.buildable.rocketBarrage",
+      "unit.buildable.artilleryBarrage",
+      "unit.buildable.antiAirVehicle",
+      "unit.buildable.helicopter",
+      "unit.buildable.drone",
+      "unit.buildable.stealthBomber"
     ],
     "requirements": [
       {
@@ -479,7 +556,9 @@
     "splashRadius": 0.0,
     "maxHp": 200.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 250,
     "speed": 0.0,
     "size": 0.0,
@@ -488,6 +567,9 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
@@ -511,7 +593,9 @@
     "splashRadius": 0.0,
     "maxHp": 200.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 350,
     "speed": 0.0,
     "size": 0.0,
@@ -520,6 +604,9 @@
     "unitType": "infantry",
     "bounty": 0,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [
       {
@@ -548,7 +635,9 @@
     "splashRadius": 0.0,
     "maxHp": 45.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 0,
     "speed": 70.0,
     "size": 34.0,
@@ -557,11 +646,14 @@
     "unitType": "infantry",
     "bounty": 12,
     "prefersStructures": false,
+    "clipShotInterval": 0.1,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_soldier"
+      "path": "enemy_soldier"
     },
     "sound": {
       "type": null,
@@ -580,7 +672,9 @@
     "splashRadius": 0.0,
     "maxHp": 150.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 0,
     "speed": 40.0,
     "size": 46.0,
@@ -589,11 +683,14 @@
     "unitType": "infantry",
     "bounty": 30,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_heavySoldier"
+      "path": "enemy_heavySoldier"
     },
     "sound": {
       "type": null,
@@ -604,28 +701,44 @@
     "id": "unit.invader.helicopter",
     "version": 1,
     "category": "unit",
-    "damage": 6.0,
-    "weaponType": "rocket",
-    "fireRate": 0.9,
-    "range": 160.0,
+    "damage": 9.0,
+    "weaponType": "bullet",
+    "fireRate": 1.1,
+    "range": 190.0,
     "minRange": 0.0,
     "splashRadius": 0.0,
     "maxHp": 60.0,
     "domain": "air",
-    "attackDomains": ["ground", "air"],
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
     "cost": 0,
     "speed": 95.0,
     "size": 38.0,
-    "projectileCount": 1,
+    "projectileCount": 5,
     "movementStyle": "hover",
     "unitType": "vehicle",
     "bounty": 22,
     "prefersStructures": false,
+    "clipShotInterval": 0.08,
+    "isStealth": false,
+    "secondary": {
+      "damage": 36.0,
+      "range": 190.0,
+      "interval": 3.6,
+      "weaponType": "rocket",
+      "projectileCount": 2,
+      "clipShotInterval": 0.25,
+      "attackDomains": [
+        "ground"
+      ]
+    },
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_helicopter"
+      "path": "enemy_helicopter"
     },
     "sound": {
       "type": null,
@@ -644,7 +757,9 @@
     "splashRadius": 0.0,
     "maxHp": 360.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 0,
     "speed": 30.0,
     "size": 50.0,
@@ -653,11 +768,14 @@
     "unitType": "vehicle",
     "bounty": 60,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_tank"
+      "path": "enemy_tank"
     },
     "sound": {
       "type": null,
@@ -676,7 +794,10 @@
     "splashRadius": 0.0,
     "maxHp": 65.0,
     "domain": "air",
-    "attackDomains": ["ground", "air"],
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
     "cost": 0,
     "speed": 270.0,
     "size": 40.0,
@@ -685,11 +806,14 @@
     "unitType": "vehicle",
     "bounty": 40,
     "prefersStructures": false,
+    "clipShotInterval": 0.4,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_attackPlane"
+      "path": "enemy_attackPlane"
     },
     "sound": {
       "type": null,
@@ -708,7 +832,9 @@
     "splashRadius": 0.0,
     "maxHp": 200.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 0,
     "speed": 26.0,
     "size": 52.0,
@@ -717,11 +843,14 @@
     "unitType": "vehicle",
     "bounty": 70,
     "prefersStructures": true,
+    "clipShotInterval": 0.15,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_artilleryBarrage"
+      "path": "enemy_artilleryBarrage"
     },
     "sound": {
       "type": null,
@@ -740,7 +869,10 @@
     "splashRadius": 0.0,
     "maxHp": 180.0,
     "domain": "ground",
-    "attackDomains": ["ground", "air"],
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
     "cost": 0,
     "speed": 34.0,
     "size": 50.0,
@@ -749,11 +881,14 @@
     "unitType": "vehicle",
     "bounty": 65,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_rocketBarrage"
+      "path": "enemy_rocketBarrage"
     },
     "sound": {
       "type": null,
@@ -772,7 +907,10 @@
     "splashRadius": 0.0,
     "maxHp": 160.0,
     "domain": "ground",
-    "attackDomains": ["ground", "air"],
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
     "cost": 0,
     "speed": 45.0,
     "size": 46.0,
@@ -781,11 +919,14 @@
     "unitType": "vehicle",
     "bounty": 48,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_antiAirVehicle"
+      "path": "enemy_antiAirVehicle"
     },
     "sound": {
       "type": null,
@@ -804,7 +945,9 @@
     "splashRadius": 0.0,
     "maxHp": 110.0,
     "domain": "air",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 0,
     "speed": 190.0,
     "size": 54.0,
@@ -813,11 +956,202 @@
     "unitType": "vehicle",
     "bounty": 90,
     "prefersStructures": true,
+    "clipShotInterval": 0.12,
+    "isStealth": true,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_stealthBomber"
+      "path": "enemy_stealthBomber"
+    },
+    "sound": {
+      "type": null,
+      "path": null
+    }
+  },
+  {
+    "id": "unit.invader.drone",
+    "version": 1,
+    "category": "unit",
+    "damage": 16.0,
+    "weaponType": "rocket",
+    "fireRate": 1.6,
+    "range": 160.0,
+    "minRange": 0.0,
+    "splashRadius": 0.0,
+    "maxHp": 35.0,
+    "domain": "air",
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
+    "cost": 0,
+    "speed": 230.0,
+    "size": 32.0,
+    "projectileCount": 2,
+    "movementStyle": "swoop",
+    "unitType": "vehicle",
+    "bounty": 20,
+    "prefersStructures": false,
+    "clipShotInterval": 0.3,
+    "isStealth": false,
+    "secondary": null,
+    "producibleUnitIds": [],
+    "requirements": [],
+    "modelView": {
+      "type": "assets",
+      "path": "enemy_drone"
+    },
+    "sound": {
+      "type": null,
+      "path": null
+    }
+  },
+  {
+    "id": "unit.invader.lightVehicle",
+    "version": 1,
+    "category": "unit",
+    "damage": 8.0,
+    "weaponType": "rocket",
+    "fireRate": 0.8,
+    "range": 150.0,
+    "minRange": 0.0,
+    "splashRadius": 0.0,
+    "maxHp": 90.0,
+    "domain": "ground",
+    "attackDomains": [
+      "ground"
+    ],
+    "cost": 0,
+    "speed": 90.0,
+    "size": 38.0,
+    "projectileCount": 1,
+    "movementStyle": "roll",
+    "unitType": "vehicle",
+    "bounty": 30,
+    "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
+    "producibleUnitIds": [],
+    "requirements": [],
+    "modelView": {
+      "type": "assets",
+      "path": "enemy_lightVehicle"
+    },
+    "sound": {
+      "type": null,
+      "path": null
+    }
+  },
+  {
+    "id": "unit.invader.aircraft",
+    "version": 1,
+    "category": "unit",
+    "damage": 10.0,
+    "weaponType": "rocket",
+    "fireRate": 1.4,
+    "range": 200.0,
+    "minRange": 0.0,
+    "splashRadius": 0.0,
+    "maxHp": 65.0,
+    "domain": "air",
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
+    "cost": 0,
+    "speed": 175.0,
+    "size": 40.0,
+    "projectileCount": 4,
+    "movementStyle": "swoop",
+    "unitType": "vehicle",
+    "bounty": 45,
+    "prefersStructures": false,
+    "clipShotInterval": 0.4,
+    "isStealth": false,
+    "secondary": null,
+    "producibleUnitIds": [],
+    "requirements": [],
+    "modelView": {
+      "type": "assets",
+      "path": "enemy_aircraft"
+    },
+    "sound": {
+      "type": null,
+      "path": null
+    }
+  },
+  {
+    "id": "unit.invader.antiTankSoldier",
+    "version": 1,
+    "category": "unit",
+    "damage": 26.0,
+    "weaponType": "rocket",
+    "fireRate": 1.6,
+    "range": 150.0,
+    "minRange": 0.0,
+    "splashRadius": 0.0,
+    "maxHp": 55.0,
+    "domain": "ground",
+    "attackDomains": [
+      "ground"
+    ],
+    "cost": 0,
+    "speed": 58.0,
+    "size": 34.0,
+    "projectileCount": 1,
+    "movementStyle": "walk",
+    "unitType": "infantry",
+    "bounty": 25,
+    "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
+    "producibleUnitIds": [],
+    "requirements": [],
+    "modelView": {
+      "type": "assets",
+      "path": "enemy_antiTankSoldier"
+    },
+    "sound": {
+      "type": null,
+      "path": null
+    }
+  },
+  {
+    "id": "unit.invader.antiAirSoldier",
+    "version": 1,
+    "category": "unit",
+    "damage": 14.0,
+    "weaponType": "rocket",
+    "fireRate": 1.2,
+    "range": 190.0,
+    "minRange": 0.0,
+    "splashRadius": 0.0,
+    "maxHp": 48.0,
+    "domain": "ground",
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
+    "cost": 0,
+    "speed": 62.0,
+    "size": 34.0,
+    "projectileCount": 1,
+    "movementStyle": "walk",
+    "unitType": "infantry",
+    "bounty": 22,
+    "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
+    "producibleUnitIds": [],
+    "requirements": [],
+    "modelView": {
+      "type": "assets",
+      "path": "enemy_antiAirSoldier"
     },
     "sound": {
       "type": null,
@@ -836,7 +1170,9 @@
     "splashRadius": 0.0,
     "maxHp": 40.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 40,
     "speed": 78.0,
     "size": 34.0,
@@ -845,11 +1181,14 @@
     "unitType": "infantry",
     "bounty": 15,
     "prefersStructures": false,
+    "clipShotInterval": 0.1,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_soldier"
+      "path": "ally_soldier"
     },
     "sound": {
       "type": null,
@@ -860,15 +1199,17 @@
     "id": "unit.buildable.tank",
     "version": 1,
     "category": "unit",
-    "damage": 16.0,
+    "damage": 18.0,
     "weaponType": "cannon",
     "fireRate": 1.0,
     "range": 170.0,
     "minRange": 0.0,
     "splashRadius": 0.0,
-    "maxHp": 170.0,
+    "maxHp": 190.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 150,
     "speed": 34.0,
     "size": 50.0,
@@ -877,11 +1218,14 @@
     "unitType": "vehicle",
     "bounty": 55,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_tank"
+      "path": "ally_tank"
     },
     "sound": {
       "type": null,
@@ -892,7 +1236,7 @@
     "id": "unit.buildable.lightVehicle",
     "version": 1,
     "category": "unit",
-    "damage": 8.0,
+    "damage": 10.0,
     "weaponType": "rocket",
     "fireRate": 0.8,
     "range": 150.0,
@@ -900,7 +1244,9 @@
     "splashRadius": 0.0,
     "maxHp": 80.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 90,
     "speed": 96.0,
     "size": 38.0,
@@ -909,11 +1255,14 @@
     "unitType": "vehicle",
     "bounty": 35,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_lightVehicle"
+      "path": "ally_lightVehicle"
     },
     "sound": {
       "type": null,
@@ -924,16 +1273,19 @@
     "id": "unit.buildable.aircraft",
     "version": 1,
     "category": "unit",
-    "damage": 10.0,
+    "damage": 30.0,
     "weaponType": "rocket",
     "fireRate": 1.4,
     "range": 200.0,
     "minRange": 0.0,
     "splashRadius": 0.0,
-    "maxHp": 60.0,
+    "maxHp": 75.0,
     "domain": "air",
-    "attackDomains": ["ground", "air"],
-    "cost": 120,
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
+    "cost": 300,
     "speed": 170.0,
     "size": 40.0,
     "projectileCount": 4,
@@ -941,11 +1293,14 @@
     "unitType": "vehicle",
     "bounty": 45,
     "prefersStructures": false,
+    "clipShotInterval": 0.4,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_aircraft"
+      "path": "ally_aircraft"
     },
     "sound": {
       "type": null,
@@ -956,7 +1311,7 @@
     "id": "unit.buildable.rocketBarrage",
     "version": 1,
     "category": "unit",
-    "damage": 22.0,
+    "damage": 34.0,
     "weaponType": "rocket",
     "fireRate": 1.6,
     "range": 230.0,
@@ -964,8 +1319,11 @@
     "splashRadius": 0.0,
     "maxHp": 140.0,
     "domain": "ground",
-    "attackDomains": ["ground", "air"],
-    "cost": 220,
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
+    "cost": 200,
     "speed": 30.0,
     "size": 50.0,
     "projectileCount": 1,
@@ -973,11 +1331,14 @@
     "unitType": "vehicle",
     "bounty": 80,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_rocketBarrage"
+      "path": "ally_rocketBarrage"
     },
     "sound": {
       "type": null,
@@ -996,7 +1357,9 @@
     "splashRadius": 0.0,
     "maxHp": 50.0,
     "domain": "ground",
-    "attackDomains": ["ground"],
+    "attackDomains": [
+      "ground"
+    ],
     "cost": 70,
     "speed": 60.0,
     "size": 34.0,
@@ -1005,11 +1368,14 @@
     "unitType": "infantry",
     "bounty": 25,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_antiTankSoldier"
+      "path": "ally_antiTankSoldier"
     },
     "sound": {
       "type": null,
@@ -1028,7 +1394,10 @@
     "splashRadius": 0.0,
     "maxHp": 45.0,
     "domain": "ground",
-    "attackDomains": ["ground", "air"],
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
     "cost": 65,
     "speed": 65.0,
     "size": 34.0,
@@ -1037,11 +1406,14 @@
     "unitType": "infantry",
     "bounty": 22,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_antiAirSoldier"
+      "path": "ally_antiAirSoldier"
     },
     "sound": {
       "type": null,
@@ -1052,16 +1424,18 @@
     "id": "unit.buildable.stealthBomber",
     "version": 1,
     "category": "unit",
-    "damage": 200.0,
+    "damage": 260.0,
     "weaponType": "rocket",
     "fireRate": 2.2,
     "range": 200.0,
     "minRange": 0.0,
     "splashRadius": 0.0,
-    "maxHp": 100.0,
+    "maxHp": 120.0,
     "domain": "air",
-    "attackDomains": ["ground"],
-    "cost": 260,
+    "attackDomains": [
+      "ground"
+    ],
+    "cost": 650,
     "speed": 190.0,
     "size": 54.0,
     "projectileCount": 1,
@@ -1069,11 +1443,250 @@
     "unitType": "vehicle",
     "bounty": 95,
     "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": true,
+    "secondary": null,
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
       "type": "assets",
-      "path": "unit_stealthBomber"
+      "path": "ally_stealthBomber"
+    },
+    "sound": {
+      "type": null,
+      "path": null
+    }
+  },
+  {
+    "id": "unit.buildable.drone",
+    "version": 1,
+    "category": "unit",
+    "damage": 22.0,
+    "weaponType": "rocket",
+    "fireRate": 1.6,
+    "range": 160.0,
+    "minRange": 0.0,
+    "splashRadius": 0.0,
+    "maxHp": 34.0,
+    "domain": "air",
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
+    "cost": 110,
+    "speed": 230.0,
+    "size": 32.0,
+    "projectileCount": 2,
+    "movementStyle": "swoop",
+    "unitType": "vehicle",
+    "bounty": 18,
+    "prefersStructures": false,
+    "clipShotInterval": 0.3,
+    "isStealth": false,
+    "secondary": null,
+    "producibleUnitIds": [],
+    "requirements": [],
+    "modelView": {
+      "type": "assets",
+      "path": "ally_drone"
+    },
+    "sound": {
+      "type": null,
+      "path": null
+    }
+  },
+  {
+    "id": "unit.buildable.artilleryBarrage",
+    "version": 1,
+    "category": "unit",
+    "damage": 60.0,
+    "weaponType": "rocket",
+    "fireRate": 2.4,
+    "range": 270.0,
+    "minRange": 0.0,
+    "splashRadius": 0.0,
+    "maxHp": 170.0,
+    "domain": "ground",
+    "attackDomains": [
+      "ground"
+    ],
+    "cost": 320,
+    "speed": 26.0,
+    "size": 52.0,
+    "projectileCount": 3,
+    "movementStyle": "roll",
+    "unitType": "vehicle",
+    "bounty": 85,
+    "prefersStructures": true,
+    "clipShotInterval": 0.15,
+    "isStealth": false,
+    "secondary": null,
+    "producibleUnitIds": [],
+    "requirements": [],
+    "modelView": {
+      "type": "assets",
+      "path": "ally_artilleryBarrage"
+    },
+    "sound": {
+      "type": null,
+      "path": null
+    }
+  },
+  {
+    "id": "unit.buildable.antiAirVehicle",
+    "version": 1,
+    "category": "unit",
+    "damage": 15.0,
+    "weaponType": "cannon",
+    "fireRate": 1.0,
+    "range": 215.0,
+    "minRange": 0.0,
+    "splashRadius": 0.0,
+    "maxHp": 160.0,
+    "domain": "ground",
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
+    "cost": 240,
+    "speed": 48.0,
+    "size": 46.0,
+    "projectileCount": 2,
+    "movementStyle": "roll",
+    "unitType": "vehicle",
+    "bounty": 55,
+    "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
+    "producibleUnitIds": [],
+    "requirements": [],
+    "modelView": {
+      "type": "assets",
+      "path": "ally_antiAirVehicle"
+    },
+    "sound": {
+      "type": null,
+      "path": null
+    }
+  },
+  {
+    "id": "unit.buildable.helicopter",
+    "version": 1,
+    "category": "unit",
+    "damage": 10.0,
+    "weaponType": "bullet",
+    "fireRate": 1.1,
+    "range": 195.0,
+    "minRange": 0.0,
+    "splashRadius": 0.0,
+    "maxHp": 90.0,
+    "domain": "air",
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
+    "cost": 280,
+    "speed": 100.0,
+    "size": 38.0,
+    "projectileCount": 5,
+    "movementStyle": "hover",
+    "unitType": "vehicle",
+    "bounty": 40,
+    "prefersStructures": false,
+    "clipShotInterval": 0.08,
+    "isStealth": false,
+    "secondary": {
+      "damage": 42.0,
+      "range": 195.0,
+      "interval": 3.4,
+      "weaponType": "rocket",
+      "projectileCount": 2,
+      "clipShotInterval": 0.25,
+      "attackDomains": [
+        "ground"
+      ]
+    },
+    "producibleUnitIds": [],
+    "requirements": [],
+    "modelView": {
+      "type": "assets",
+      "path": "ally_helicopter"
+    },
+    "sound": {
+      "type": null,
+      "path": null
+    }
+  },
+  {
+    "id": "unit.buildable.attackPlane",
+    "version": 1,
+    "category": "unit",
+    "damage": 60.0,
+    "weaponType": "rocket",
+    "fireRate": 1.4,
+    "range": 180.0,
+    "minRange": 0.0,
+    "splashRadius": 0.0,
+    "maxHp": 75.0,
+    "domain": "air",
+    "attackDomains": [
+      "ground",
+      "air"
+    ],
+    "cost": 380,
+    "speed": 250.0,
+    "size": 40.0,
+    "projectileCount": 4,
+    "movementStyle": "swoop",
+    "unitType": "vehicle",
+    "bounty": 40,
+    "prefersStructures": false,
+    "clipShotInterval": 0.4,
+    "isStealth": false,
+    "secondary": null,
+    "producibleUnitIds": [],
+    "requirements": [],
+    "modelView": {
+      "type": "assets",
+      "path": "ally_attackPlane"
+    },
+    "sound": {
+      "type": null,
+      "path": null
+    }
+  },
+  {
+    "id": "unit.buildable.heavySoldier",
+    "version": 1,
+    "category": "unit",
+    "damage": 13.0,
+    "weaponType": "cannon",
+    "fireRate": 1.4,
+    "range": 140.0,
+    "minRange": 0.0,
+    "splashRadius": 0.0,
+    "maxHp": 140.0,
+    "domain": "ground",
+    "attackDomains": [
+      "ground"
+    ],
+    "cost": 100,
+    "speed": 42.0,
+    "size": 46.0,
+    "projectileCount": 1,
+    "movementStyle": "walk",
+    "unitType": "infantry",
+    "bounty": 35,
+    "prefersStructures": false,
+    "clipShotInterval": 0.12,
+    "isStealth": false,
+    "secondary": null,
+    "producibleUnitIds": [],
+    "requirements": [],
+    "modelView": {
+      "type": "assets",
+      "path": "ally_heavySoldier"
     },
     "sound": {
       "type": null,

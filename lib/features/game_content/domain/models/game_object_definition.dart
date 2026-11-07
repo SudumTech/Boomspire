@@ -7,6 +7,7 @@ import '../enums/mobility_type.dart';
 import 'asset_source.dart';
 import 'build_requirement.dart';
 import 'game_object_category.dart';
+import 'secondary_weapon_definition.dart';
 import 'sound_ref.dart';
 
 export '../enums/mobility_type.dart';
@@ -74,6 +75,16 @@ abstract class GameObjectDefinition with _$GameObjectDefinition {
     @Default(MobilityType.infantry) MobilityType unitType,
     @Default(0) int bounty,
     @Default(false) bool prefersStructures,
+
+    /// Seconds between rounds inside one clip (units with a multi-round
+    /// clip only).
+    @Default(0.12) double clipShotInterval,
+
+    /// Only targetable once an attacker gets close (stealth bomber).
+    @Default(false) bool isStealth,
+
+    /// Optional second weapon (a helicopter's rockets).
+    SecondaryWeaponDefinition? secondary,
 
     /// Buildings only: ids of [GameObjectDefinition]s (category == unit)
     /// this building can produce.

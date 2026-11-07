@@ -1,74 +1,9 @@
-// One-off generator: converts today's hardcoded Tower/Building/MobileUnit
-// blueprints into the versioned `GameObjectDefinition` JSON manifest,
-// writing the same content to both the server's copy (served verbatim by
-// `server/gemini_proxy.dart`'s `/content-manifest` route - "the database"
-// for now, per-file until a real one replaces it) and the client's bundled
-// seed asset (so the game has full content with zero network / in tests).
+// Regenerates the content manifest (server copy + bundled seed asset).
+// It imports Flutter-backed code, so `dart run` can't load it; regenerate via
+// the test runner instead:
 //
-// Run with: dart run tool/generate_content_manifest.dart
-// Re-run whenever a tower/building/unit blueprint's hardcoded stats change,
-// then bump the affected entries' `version` by hand before committing.
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:boomspire/core/combat/mobile_unit_repository_impl.dart';
-import 'package:boomspire/core/combat/team.dart';
-import 'package:boomspire/features/game_content/domain/models/default_build_requirements.dart';
-import 'package:boomspire/features/game_content/domain/models/game_object_definition.dart';
-import 'package:boomspire/features/game_content/impl/game_object_definition_mapper.dart';
-import 'package:boomspire/features/towers/domain/models/building_type.dart';
-import 'package:boomspire/features/towers/domain/models/tower_type.dart';
-import 'package:boomspire/features/towers/impl/building_repository_impl.dart';
-import 'package:boomspire/features/towers/impl/tower_repository_impl.dart';
-
-void main() {
-  final definitions = <GameObjectDefinition>[
-    for (final blueprint in TowerRepositoryImpl().all)
-      towerToDefinition(
-        blueprint,
-        requirements: defaultRequirementsForTower(blueprint.type as TowerType),
-      ),
-    for (final blueprint in BuildingRepositoryImpl().all)
-      buildingToDefinition(
-        blueprint,
-        requirements: defaultRequirementsForBuilding(
-          blueprint.type as BuildingType,
-        ),
-        producibleUnitIds: _producibleUnitIdsFor(
-          blueprint.type as BuildingType,
-        ),
-      ),
-    for (final team in [Team.invaders, Team.defaultPlayer])
-      for (final kind in MobileUnitRepositoryImpl().kindsFor(team))
-        mobileUnitToDefinition(
-          MobileUnitRepositoryImpl().blueprintFor(team, kind),
-          team.catalog,
-        ),
-  ];
-
-  final json = const JsonEncoder.withIndent('  ')
-      .convert(definitions.map((d) => d.toJson()).toList());
-
-  File('server/content_manifest.json').writeAsStringSync('$json\n');
-  File('assets/game_content/manifest.json').createSync(recursive: true);
-  File('assets/game_content/manifest.json').writeAsStringSync('$json\n');
-
-  stdout.writeln('Wrote ${definitions.length} game object definitions.');
-}
-
-List<String> _producibleUnitIdsFor(BuildingType type) => switch (type) {
-  BuildingType.trainingCenter => const [
-    'unit.buildable.soldier',
-    'unit.buildable.antiTankSoldier',
-    'unit.buildable.antiAirSoldier',
-  ],
-  // War Factory: "any buildable unit of their choosing" minus whatever the
-  // Training Center already covers - see `war_factory_component.dart`.
-  BuildingType.warFactory => const [
-    'unit.buildable.tank',
-    'unit.buildable.lightVehicle',
-    'unit.buildable.aircraft',
-    'unit.buildable.rocketBarrage',
-  ],
-  _ => const [],
-};
+//   BOOMSPIRE_WRITE_MANIFEST=1 flutter test test/content_manifest_test.dart
+//
+// The logic lives in lib/features/game_content/impl/content_manifest_builder.dart.
+// Bump the affected entries' `version` by hand before committing so clients
+// with a cached copy pick the change up.

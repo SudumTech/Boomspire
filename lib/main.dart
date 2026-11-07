@@ -9,6 +9,7 @@ import 'features/account/domain/models/account.dart';
 import 'features/account/domain/repos/account_repository.dart';
 import 'features/account/presentation/create_account_content.dart';
 import 'features/account/presentation/state/account_profile_state.dart';
+import 'features/game_content/impl/bundled_game_content_seed.dart';
 import 'features/game_content/impl/game_content_sync_service.dart';
 import 'features/game_content/impl/http_game_content_repository_impl.dart';
 import 'features/game_content/impl/local_game_content_cache_repository_impl.dart';
@@ -27,7 +28,7 @@ Future<void> main() async {
   final gameContentOverrides = await GameContentSyncService(
     HttpGameContentRepositoryImpl(),
     LocalGameContentCacheRepositoryImpl(),
-  ).resolveCatalog(const []);
+  ).resolveCatalog(await loadBundledGameContentSeed());
   // Same best-effort layering for the scene/map catalog (see
   // `SceneSyncService`) - a failed/offline fetch just keeps `GameScenes`'
   // built-in defaults.

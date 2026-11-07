@@ -147,6 +147,9 @@ class $AssetsModelsGen {
   /// File path: assets/models/ally_artilleryBarrage.json
   String get allyArtilleryBarrage => 'assets/models/ally_artilleryBarrage.json';
 
+  /// File path: assets/models/ally_attackPlane.json
+  String get allyAttackPlane => 'assets/models/ally_attackPlane.json';
+
   /// File path: assets/models/ally_drone.json
   String get allyDrone => 'assets/models/ally_drone.json';
 
@@ -171,8 +174,17 @@ class $AssetsModelsGen {
   /// File path: assets/models/ally_tank.json
   String get allyTank => 'assets/models/ally_tank.json';
 
+  /// File path: assets/models/enemy_aircraft.json
+  String get enemyAircraft => 'assets/models/enemy_aircraft.json';
+
+  /// File path: assets/models/enemy_antiAirSoldier.json
+  String get enemyAntiAirSoldier => 'assets/models/enemy_antiAirSoldier.json';
+
   /// File path: assets/models/enemy_antiAirVehicle.json
   String get enemyAntiAirVehicle => 'assets/models/enemy_antiAirVehicle.json';
+
+  /// File path: assets/models/enemy_antiTankSoldier.json
+  String get enemyAntiTankSoldier => 'assets/models/enemy_antiTankSoldier.json';
 
   /// File path: assets/models/enemy_artilleryBarrage.json
   String get enemyArtilleryBarrage =>
@@ -189,6 +201,9 @@ class $AssetsModelsGen {
 
   /// File path: assets/models/enemy_helicopter.json
   String get enemyHelicopter => 'assets/models/enemy_helicopter.json';
+
+  /// File path: assets/models/enemy_lightVehicle.json
+  String get enemyLightVehicle => 'assets/models/enemy_lightVehicle.json';
 
   /// File path: assets/models/enemy_rocketBarrage.json
   String get enemyRocketBarrage => 'assets/models/enemy_rocketBarrage.json';
@@ -210,6 +225,7 @@ class $AssetsModelsGen {
     allyAntiAirVehicle,
     allyAntiTankSoldier,
     allyArtilleryBarrage,
+    allyAttackPlane,
     allyDrone,
     allyHeavySoldier,
     allyHelicopter,
@@ -218,12 +234,16 @@ class $AssetsModelsGen {
     allySoldier,
     allyStealthBomber,
     allyTank,
+    enemyAircraft,
+    enemyAntiAirSoldier,
     enemyAntiAirVehicle,
+    enemyAntiTankSoldier,
     enemyArtilleryBarrage,
     enemyAttackPlane,
     enemyDrone,
     enemyHeavySoldier,
     enemyHelicopter,
+    enemyLightVehicle,
     enemyRocketBarrage,
     enemySoldier,
     enemyStealthBomber,

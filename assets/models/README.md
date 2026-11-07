@@ -24,6 +24,15 @@ sprite:
 exists for a given key, the existing procedural sprite is used - nothing
 changes visually until a file exists here.
 
+## Every unit has two forms
+
+All 14 `UnitKind`s ship as both `ally_<kind>.json` and `enemy_<kind>.json`
+(28 files), and `assets/game_content/manifest.json` carries the matching
+stats for each (`unit.buildable.<kind>` / `unit.invader.<kind>`: cost, damage,
+range, fire rate, health, speed, weapons, model). `test/content_manifest_test.dart`
+fails if a form or its data goes missing. After changing a blueprint, regenerate with
+`BOOMSPIRE_WRITE_MANIFEST=1 flutter test test/content_manifest_test.dart`.
+
 ## Lottie assets (generated)
 
 Every `ally_*.json`/`enemy_*.json` file currently in this
