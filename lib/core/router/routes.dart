@@ -3,10 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/game_core/domain/models/game_difficulty.dart';
 import '../../features/game_core/domain/models/game_scene.dart';
-import '../../features/level_select/presentation/level_select_page.dart';
 import '../../features/level_select/presentation/main_menu_page.dart';
 import '../../features/level_select/presentation/single_player_mode_select_page.dart';
-import '../../features/level_select/presentation/skirmish_level_select_page.dart';
+import '../../features/level_select/presentation/scene_select_page.dart';
 import '../../features/map_editor/domain/models/map_draft.dart';
 import '../../features/map_editor/presentation/map_drafts_list_page.dart';
 import '../../features/terrain/domain/repos/terrain_repository.dart';
@@ -55,8 +54,10 @@ enum Routes {
   get _builder => {
     Routes.mainMenu: (_, _) => const MainMenuPage(),
     Routes.singlePlayerModeSelect: (_, _) => const SinglePlayerModeSelectPage(),
-    Routes.towerDefenseLevelSelect: (_, _) => const LevelSelectPage(),
-    Routes.skirmishLevelSelect: (_, _) => const SkirmishLevelSelectPage(),
+    Routes.towerDefenseLevelSelect: (_, _) =>
+        const SceneSelectPage(mode: GameMode.waveDefense),
+    Routes.skirmishLevelSelect: (_, _) =>
+        const SceneSelectPage(mode: GameMode.skirmish),
     Routes.skirmishPlacement: (_, state) =>
         SkirmishPlacementRoutePage(state: state),
     Routes.game: (_, state) => GameRoutePage(state: state),

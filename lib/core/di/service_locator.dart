@@ -27,6 +27,8 @@ import '../../features/waves/impl/wave_repository_impl.dart';
 import '../combat/mobile_unit_repository.dart';
 import '../combat/mobile_unit_repository_impl.dart';
 import '../rendering/domain/repos/unit_render_repository.dart';
+import '../../features/game_core/domain/repos/scene_catalog_repository.dart';
+import '../../features/game_core/impl/scene_catalog_repository_impl.dart';
 import '../rendering/impl/composite_unit_render_repository_impl.dart';
 
 /// App-wide service locator - the single composition root for every
@@ -63,6 +65,9 @@ void setupServiceLocator({
     )
     ..registerLazySingleton<MapDraftRepository>(
       () => LocalMapDraftRepositoryImpl(),
+    )
+    ..registerLazySingleton<SceneCatalogRepository>(
+      () => SceneCatalogRepositoryImpl(),
     )
     ..registerLazySingleton<TerrainRepository>(() => TerrainRepositoryImpl())
     ..registerLazySingleton<TowerRepository>(

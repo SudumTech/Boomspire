@@ -7,14 +7,11 @@ import 'package:flutter/material.dart' show Icons;
 import '../../../../core/router/routes.dart';
 import '../../../../generated/l10n.dart';
 import '../../../game_core/domain/models/game_scene.dart';
-import '../../../waves/impl/wave_repository_impl.dart';
 import '../../domain/models/editor_terrain_preview.dart';
 import '../../domain/models/map_draft.dart';
 import '../../domain/repos/map_draft_repository.dart';
-import '../../impl/map_draft_scene_factory.dart';
-import '../../impl/draft_wave_repository.dart';
 import '../../impl/editor_terrain_generator.dart';
-import '../../impl/map_draft_terrain_repository.dart';
+import '../../impl/map_draft_launch_args_factory.dart';
 import 'map_editor_draft_state.dart';
 import 'map_editor_notice.dart';
 
@@ -146,30 +143,14 @@ class MapEditorPersistenceState {
     }
   }
 
-  GameRouteArgs _buildLaunchArgs(MapDraft draft, EditorTerrainPreview preview) {
-    return GameRouteArgs(
-      scene: const MapDraftSceneFactory().sceneFor(
-        draft,
-        mode: GameMode.waveDefense,
-        briefing: S.current.testingHandDrawnMapBriefingEditorPage,
-      ),
-      terrainRepository: MapDraftTerrainRepository(
-        draft: draft,
-        preview: preview,
-        humanBaseSite: draft.homeSites.isNotEmpty
-            ? draft.homeSites.first
-            : null,
-      ),
-      waveRepository: DraftWaveRepository(
-        loadouts: draft.waveLoadouts,
-        totalWaves: draft.waveCount,
-        fallback: WaveRepositoryImpl(
-          totalWaves: draft.waveCount,
-          biome: draft.biome,
-        ),
-      ),
-    );
-  }
+  GameRouteArgs _buildLaunchArgs(
+    MapDraft draft,
+    EditorTerrainPreview preview,
+  ) => waveDefenseLaunchArgs(
+    draft,
+    preview,
+    briefing: S.current.testingHandDrawnMapBriefingEditorPage,
+  );
 
   Future<MapDraft> _decodeDraftFile(dynamic file, String keepId) async {
     final bytes = await file.readAsBytes();

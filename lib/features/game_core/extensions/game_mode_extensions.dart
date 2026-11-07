@@ -1,3 +1,4 @@
+import '../../../generated/l10n.dart';
 import '../domain/enums/game_mode.dart';
 
 extension GameModeExtensions on GameMode {
@@ -17,5 +18,16 @@ extension GameModeExtensions on GameMode {
   int get requiredHomeSites => switch (this) {
     GameMode.waveDefense => 0,
     GameMode.skirmish => 2,
+  };
+
+  /// Heading and subtitle of this mode's scene-select screen.
+  String get selectTitle => switch (this) {
+    GameMode.waveDefense => S.current.levelSelectTitle,
+    GameMode.skirmish => S.current.skirmishSelectTitle,
+  };
+
+  String get selectSubtitle => switch (this) {
+    GameMode.waveDefense => S.current.levelSelectSubtitle,
+    GameMode.skirmish => S.current.skirmishSelectSubtitle,
   };
 }

@@ -32,8 +32,16 @@
   "@skirmishSelectFeatured": {},
   "skirmishSelectCustomMaps": "Your Maps",
   "@skirmishSelectCustomMaps": {},
-  "skirmishSelectEmptyCustom": "No custom skirmish maps yet - draw one in the Map Editor.",
-  "@skirmishSelectEmptyCustom": {},
+  "sceneSelectEmptyCustom": "No custom maps for this mode yet - draw one in the Map Editor.",
+  "@sceneSelectEmptyCustom": {},
+  "seatsCount": "{count} PLAYERS",
+  "@seatsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "skirmishPlacementTitle": "Choose Your Base",
   "@skirmishPlacementTitle": {},
   "skirmishPlacementSubtitleDraft": "Tap a numbered site to claim it, or randomize",

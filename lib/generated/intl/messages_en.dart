@@ -72,18 +72,20 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m18(name) => "Saved \"${name}\"";
 
-  static String m19(count) =>
+  static String m19(count) => "${count} PLAYERS";
+
+  static String m20(count) =>
       "A skirmish map needs ${count} home sites - place them with the Home tool";
 
-  static String m20(percent) => "Sun angle: ${percent}%";
+  static String m21(percent) => "Sun angle: ${percent}%";
 
-  static String m21(tier) => "Tier ${tier}";
+  static String m22(tier) => "Tier ${tier}";
 
-  static String m22(current, total) => "Wave ${current} / ${total}";
+  static String m23(current, total) => "Wave ${current} / ${total}";
 
-  static String m23(count) => "${count} WAVES";
+  static String m24(count) => "${count} WAVES";
 
-  static String m24(percent) => "${percent}%";
+  static String m25(percent) => "${percent}%";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -337,10 +339,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "saveLabelEditorPage": MessageLookupByLibrary.simpleMessage("Save"),
     "savedMapEditorPage": m18,
     "sceneCompleted": MessageLookupByLibrary.simpleMessage("COMPLETED"),
+    "sceneSelectEmptyCustom": MessageLookupByLibrary.simpleMessage(
+      "No custom maps for this mode yet - draw one in the Map Editor.",
+    ),
+    "seatsCount": m19,
     "singleKeyframeHintEditorPage": MessageLookupByLibrary.simpleMessage(
       "Only the first keyframe applies while Dynamic Weather is off",
     ),
-    "skirmishNeedsHomesEditorPage": m19,
+    "skirmishNeedsHomesEditorPage": m20,
     "skirmishOptionEditorPage": MessageLookupByLibrary.simpleMessage(
       "Skirmish",
     ),
@@ -377,9 +383,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "skirmishSelectCustomMaps": MessageLookupByLibrary.simpleMessage(
       "Your Maps",
     ),
-    "skirmishSelectEmptyCustom": MessageLookupByLibrary.simpleMessage(
-      "No custom skirmish maps yet - draw one in the Map Editor.",
-    ),
     "skirmishSelectFeatured": MessageLookupByLibrary.simpleMessage("Featured"),
     "skirmishSelectSubtitle": MessageLookupByLibrary.simpleMessage(
       "Choose a battlefield",
@@ -392,7 +395,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "startingGoldLabelEditorPage": MessageLookupByLibrary.simpleMessage(
       "Starting gold",
     ),
-    "sunAngleLabelEditorPage": m20,
+    "sunAngleLabelEditorPage": m21,
     "testingHandDrawnMapBriefingEditorPage":
         MessageLookupByLibrary.simpleMessage(
           "Testing your hand-drawn map draft.",
@@ -410,7 +413,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "towerNameRocket": MessageLookupByLibrary.simpleMessage("Rocket Battery"),
     "towerNameRocketSilo": MessageLookupByLibrary.simpleMessage("Rocket Silo"),
     "towerNameSam": MessageLookupByLibrary.simpleMessage("SAM Site"),
-    "towerTier": m21,
+    "towerTier": m22,
     "treeHintEditorPage": MessageLookupByLibrary.simpleMessage(
       "Drag to plant trees",
     ),
@@ -449,8 +452,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "waveDefenseOptionEditorPage": MessageLookupByLibrary.simpleMessage(
       "Wave Defense",
     ),
-    "waveHeaderEditorPage": m22,
-    "wavesCount": m23,
+    "waveHeaderEditorPage": m23,
+    "wavesCount": m24,
     "wavesLabelEditorPage": MessageLookupByLibrary.simpleMessage("Waves"),
     "weaponLabelBullet": MessageLookupByLibrary.simpleMessage("Bullets"),
     "weaponLabelCannon": MessageLookupByLibrary.simpleMessage("Cannon Shells"),
@@ -481,6 +484,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "zoomOutTooltipEditorPage": MessageLookupByLibrary.simpleMessage(
       "Zoom out",
     ),
-    "zoomPercentEditorPage": m24,
+    "zoomPercentEditorPage": m25,
   };
 }

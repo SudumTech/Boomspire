@@ -210,13 +210,23 @@ class S {
     );
   }
 
-  /// `No custom skirmish maps yet - draw one in the Map Editor.`
-  String get skirmishSelectEmptyCustom {
+  /// `No custom maps for this mode yet - draw one in the Map Editor.`
+  String get sceneSelectEmptyCustom {
     return Intl.message(
-      'No custom skirmish maps yet - draw one in the Map Editor.',
-      name: 'skirmishSelectEmptyCustom',
+      'No custom maps for this mode yet - draw one in the Map Editor.',
+      name: 'sceneSelectEmptyCustom',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `{count} PLAYERS`
+  String seatsCount(int count) {
+    return Intl.message(
+      '$count PLAYERS',
+      name: 'seatsCount',
+      desc: '',
+      args: [count],
     );
   }
 
