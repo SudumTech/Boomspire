@@ -191,8 +191,13 @@ class BoomspireGame extends FlameGame<GameWorld>
   /// `GoldMineComponent.killGoldBonus`) - added on top of the normal
   /// escalating streak bonus for every kill (see
   /// `GameStateRepository.addKillGold`).
-  double get goldMineKillGoldBonus => world.activeTowers
+  double get goldMineKillGoldBonus => goldMineKillGoldBonusFor(playerTeam);
+
+  /// The kill-gold bonus from [owner]'s own standing Gold Mines - an enemy's
+  /// mine never boosts your rewards.
+  double goldMineKillGoldBonusFor(Team owner) => world.activeTowers
       .whereType<GoldMineComponent>()
+      .where((mine) => mine.owner.id == owner.id)
       .fold(0.0, (sum, mine) => sum + mine.killGoldBonus);
 
   /// True once [terrainMap] has been assigned - the HUD (built as a plain
@@ -748,6 +753,16 @@ class BoomspireGame extends FlameGame<GameWorld>
 
   /// Spends [amount] from whichever wallet [owner] draws from (see
   /// [goldFor]) - returns whether it actually happened.
+  /// Pays [amount] to [owner]'s wallet - the player's gold, or the AI
+  /// opponent's economy (which applies its difficulty income multiplier).
+  void addGoldFor(Team owner, int amount) {
+    if (owner.id == playerTeam.id) {
+      gameState.addGold(amount);
+    } else {
+      aiEconomy?.addGold(amount);
+    }
+  }
+
   bool spendGoldFor(Team owner, int amount) => owner.id == playerTeam.id
       ? gameState.spendGold(amount)
       : (aiEconomy?.spendGold(amount) ?? false);

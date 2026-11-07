@@ -43,6 +43,7 @@ import 'package:boomspire/features/skirmish_ai/impl/ai_base_queries.dart';
 import 'package:boomspire/features/skirmish_ai/impl/army_commander.dart';
 import 'package:boomspire/features/skirmish_ai/impl/strike_planner.dart';
 import 'package:boomspire/features/game_core/domain/models/game_scenes.dart';
+import 'package:boomspire/features/game_core/domain/models/game_status.dart';
 import 'package:boomspire/features/game_core/domain/models/inspected_info.dart';
 import 'package:boomspire/features/game_core/impl/game_state_repository_impl.dart';
 import 'package:boomspire/features/game_core/presentation/boomspire_game.dart';
@@ -1539,6 +1540,75 @@ void main() {
       expect(seen, contains(UnitKind.stealthBomber));
       expect(seen, contains(UnitKind.helicopter));
       expect(seen.length, greaterThanOrEqualTo(5), reason: '$seen');
+    });
+
+    test(
+      'a gold mine pays the side that owns it, never the other side',
+      () async {
+        final game = await _bootGame(GameScenes.skirmishes.first);
+        final aiTeam = game.aiTeam!;
+        game.aiEconomy!.gold = 2000;
+        game.gameState.addGold(2000);
+        final grid = game.terrainMap.grid;
+        final aiMine = game.buildStructure(
+          aiTeam,
+          BuildingType.goldMine,
+          grid.cellCenter(_findOpenCell(game)),
+        );
+        expect(aiMine, isNotNull);
+        await settle(game);
+        final playerBefore = game.gameState.gold;
+        for (var i = 0; i < 24; i++) {
+          game.update(0.5);
+          await Future<void>.delayed(Duration.zero);
+        }
+        // (The AI spends what it earns, so its balance can't be compared; the
+        // payout routing is checked directly below.)
+        expect(
+          game.gameState.gold,
+          playerBefore,
+          reason: "the AI's mine must not pay the player",
+        );
+        // And its kill bonus only boosts its own rewards.
+        game.aiEconomy!.gold = 0;
+        game.addGoldFor(aiTeam, 40);
+        expect(game.aiEconomy!.gold, greaterThan(0));
+        expect(game.gameState.gold, playerBefore);
+        expect(game.goldMineKillGoldBonusFor(aiTeam), greaterThan(0));
+        expect(game.goldMineKillGoldBonus, 0);
+      },
+    );
+
+    test('an AI match runs without errors; the AI builds an economy, '
+        'production and defenses', () async {
+      final game = await _bootGame(
+        GameScenes.skirmishes.first,
+        difficulty: GameDifficulty.hard,
+      );
+      final aiTeam = game.aiTeam!;
+      // Units aim at structures the moment they are built - this used to
+      // throw LateInitializationError on a tower's target highlight.
+      for (var i = 0; i < 160; i++) {
+        if (game.gameState.status != GameStatus.playing) break;
+        game.update(0.5);
+        await Future<void>.delayed(Duration.zero);
+      }
+      final owned = {
+        for (final t in game.world.activeTowers)
+          if (t.owner.id == aiTeam.id) t.blueprint.type,
+      };
+      expect(
+        owned,
+        containsAll([
+          BuildingType.goldMine,
+          BuildingType.warFactory,
+          BuildingType.trainingCenter,
+        ]),
+      );
+      expect(
+        game.world.activeUnits.where((u) => u.team.id == aiTeam.id),
+        isNotEmpty,
+      );
     });
 
     test('the AI only banks gold for a building for a limited time', () async {

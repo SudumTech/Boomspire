@@ -243,7 +243,7 @@ class MobileUnitComponent extends PositionComponent
   VehicleTreadComponent? _tread;
 
   late final PositionComponent _visual;
-  late final TargetHighlightComponent _targetHighlight;
+  TargetHighlightComponent? _targetHighlight;
 
   MobileUnitComponent({
     required this.blueprint,
@@ -480,7 +480,7 @@ class MobileUnitComponent extends PositionComponent
   /// brief moment so the player can always tell what's being shot at right
   /// now. Retriggered continuously while targeted, so it stays lit and
   /// only fades once no tower is aiming at it anymore.
-  void markTargeted(Color color) => _targetHighlight.trigger(color);
+  void markTargeted(Color color) => _targetHighlight?.trigger(color);
 
   /// Called right after this unit's own death FX are spawned - a
   /// base-rush unit banks its kill/escape bounty for the player, while a
@@ -510,7 +510,11 @@ class MobileUnitComponent extends PositionComponent
     if (team.id == game.playerTeam.id) {
       // A player-built unit died in a skirmish - the AI opponent gets the
       // credit (and gold) for the kill.
-      game.aiEconomy?.addGold(blueprint.bounty);
+      final aiTeam = game.aiTeam;
+      final bonus = aiTeam == null
+          ? 0.0
+          : game.goldMineKillGoldBonusFor(aiTeam);
+      game.aiEconomy?.addGold((blueprint.bounty * (1 + bonus)).round());
       return;
     }
     if (game.aiTeam != null && team.id == game.aiTeam!.id) {
@@ -563,10 +567,11 @@ class MobileUnitComponent extends PositionComponent
       );
     }
 
-    _targetHighlight = TargetHighlightComponent()
+    final highlight = TargetHighlightComponent()
       ..size = size
       ..position = Vector2.zero();
-    await add(_targetHighlight);
+    await add(highlight);
+    _targetHighlight = highlight;
 
     if (objective == UnitObjective.huntHostiles) {
       // "Alive" build-in, matching a tower's spawn pop - base-rushers walk

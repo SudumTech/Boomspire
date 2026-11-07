@@ -8,6 +8,12 @@ class GameConfig {
   /// far more up-front capital than the drip-fed wave-defense economy.
   /// Overridable per-scene/per-draft via `GameScene.startingGold`.
   static const startingSkirmishGold = 3000;
+
+  /// Combat towers cost this much more in a skirmish: with thousands of gold
+  /// up front, tower-defense prices would let either side wall itself in with
+  /// cheap defenses instead of fighting. Tower defense keeps the listed
+  /// prices.
+  static const skirmishTowerCostMultiplier = 1.6;
   static const arenaWidth = 1280.0;
   static const arenaHeight = 720.0;
 

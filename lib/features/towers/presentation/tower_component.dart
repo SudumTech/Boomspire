@@ -125,7 +125,10 @@ abstract class TowerComponent extends PositionComponent
   double _lowHpSmokeTimer = 0;
 
   late final PositionComponent turret;
-  late final TargetHighlightComponent _targetHighlight;
+
+  /// Null until [onLoad] finishes - a unit can aim at a tower in the frame
+  /// it is built, before its children exist.
+  TargetHighlightComponent? _targetHighlight;
 
   /// Player-issued "always shoot this specific enemy, even if a closer or
   /// less-contested one is available" order - see
@@ -236,7 +239,7 @@ abstract class TowerComponent extends PositionComponent
   /// Lets whoever's currently targeting this tower (a [MobileUnitComponent])
   /// tint it with their own color while the player has that attacker
   /// selected - mirrors [MobileUnitComponent.markTargeted].
-  void markTargeted(Color color) => _targetHighlight.trigger(color);
+  void markTargeted(Color color) => _targetHighlight?.trigger(color);
 
   @override
   Future<void> onLoad() async {
@@ -274,10 +277,11 @@ abstract class TowerComponent extends PositionComponent
         );
     await add(turret);
 
-    _targetHighlight = TargetHighlightComponent()
+    final highlight = TargetHighlightComponent()
       ..size = size
       ..position = Vector2.zero();
-    await add(_targetHighlight);
+    await add(highlight);
+    _targetHighlight = highlight;
 
     // "Alive" build-in: pop in from nothing instead of just appearing.
     scale = Vector2.zero();

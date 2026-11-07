@@ -78,6 +78,9 @@ class SkirmishBuildPlanner {
   static const _nodeGuardRadius = 240.0;
   static const _sitesTriedPerBuild = 24;
 
+  /// Different build orders tried in one round when sites run out.
+  static const _maxOrderAttempts = 4;
+
   /// Spare gold means this many cheapest-unit costs beyond the reserve.
   static const _spareGoldReserveFactor = 2;
 
@@ -114,14 +117,22 @@ class SkirmishBuildPlanner {
     }
 
     final threats = _queries.threatsNear(aiTeam, base.position);
-    final order = _chooseOrder(
-      aiTeam,
-      directive,
-      threats,
-      _BaseContext(base.position, enemyBase),
-    );
-    if (order == null) return null;
-    return _place(aiTeam, order) ? order.type : null;
+    // A build that finds no legal site must not block everything behind it:
+    // set that type aside for this round and fall through to the next
+    // priority, instead of retrying the same impossible order forever.
+    final unplaceable = <UnitType>{};
+    for (var attempt = 0; attempt < _maxOrderAttempts; attempt++) {
+      final order = _chooseOrder(
+        aiTeam,
+        directive,
+        threats,
+        _BaseContext(base.position, enemyBase, unplaceable),
+      );
+      if (order == null) return null;
+      if (_place(aiTeam, order)) return order.type;
+      unplaceable.add(order.type);
+    }
+    return null;
   }
 
   _BuildOrder? _chooseOrder(
@@ -184,7 +195,7 @@ class SkirmishBuildPlanner {
     final fortify = _nodeNeedingGuard(aiTeam);
     if (fortify != null) {
       final tower = _pickCombatTower(aiTeam, reserve, threatDomain);
-      if (tower != null) {
+      if (tower != null && !context.unplaceable.contains(tower)) {
         return _BuildOrder(
           tower,
           fortify.position,
@@ -444,10 +455,13 @@ class _BaseContext {
   final Vector2 base;
   final Vector2 enemyBase;
 
-  const _BaseContext(this.base, this.enemyBase);
+  /// Types that found no legal site this round - never ordered again.
+  final Set<UnitType> unplaceable;
+
+  const _BaseContext(this.base, this.enemyBase, this.unplaceable);
 
   _BuildOrder? order(UnitType? type, _SiteSide side) {
-    if (type == null) return null;
+    if (type == null || unplaceable.contains(type)) return null;
     final direction = side == _SiteSide.front ? _offset : -_offset;
     final toward = enemyBase - base;
     final preferred = toward.length2 == 0

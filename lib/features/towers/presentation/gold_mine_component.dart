@@ -45,14 +45,17 @@ class GoldMineComponent extends TowerComponent {
     _payoutTimer -= dt;
     if (_payoutTimer <= 0) {
       _payoutTimer += GameConfig.goldMineTickInterval;
-      game.gameState.addGold(payoutAmount);
-      game.audioRepository.play(SfxType.goldGain, volume: 0.3);
-      game.world.spawn(
-        FloatingTextComponent(
-          text: '+${payoutAmount}g',
-          position: position.clone() + Vector2(0, -size.y / 2 - 4),
-        ),
-      );
+      // Pays whoever owns the mine - an AI mine used to feed the player.
+      game.addGoldFor(owner, payoutAmount);
+      if (owner.id == game.playerTeam.id) {
+        game.audioRepository.play(SfxType.goldGain, volume: 0.3);
+        game.world.spawn(
+          FloatingTextComponent(
+            text: '+${payoutAmount}g',
+            position: position.clone() + Vector2(0, -size.y / 2 - 4),
+          ),
+        );
+      }
     }
   }
 }

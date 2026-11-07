@@ -20,6 +20,7 @@ import '../../progress/domain/repos/progress_repository.dart';
 import '../../terrain/domain/repos/terrain_repository.dart';
 import '../../towers/domain/repos/building_repository.dart';
 import '../../towers/domain/repos/tower_repository.dart';
+import '../../towers/impl/scaled_cost_tower_repository.dart';
 import '../../waves/domain/repos/wave_repository.dart';
 import '../domain/models/game_config.dart';
 import '../domain/models/game_difficulty.dart';
@@ -211,7 +212,12 @@ class _GamePageState extends State<GamePage> {
       ..reset(startingGold: BoomspireGame.resolvedStartingGold(widget.scene));
     _game = BoomspireGame(
       terrainRepository: widget.terrainRepository ?? getIt<TerrainRepository>(),
-      towerRepository: getIt<TowerRepository>(),
+      towerRepository: widget.scene.mode == GameMode.skirmish
+          ? ScaledCostTowerRepository(
+              getIt<TowerRepository>(),
+              GameConfig.skirmishTowerCostMultiplier,
+            )
+          : getIt<TowerRepository>(),
       buildingRepository: getIt<BuildingRepository>(),
       unitRepository: getIt<MobileUnitRepository>(),
       waveRepository:
