@@ -50,14 +50,16 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
   }
 
-  testWidgets('every brush tool has a visible chip', (tester) async {
+  testWidgets('every brush tool has a button in the tool palette', (
+    tester,
+  ) async {
     await pumpEditor(tester);
 
     for (final tool in EditorTool.values) {
       expect(
-        find.widgetWithText(ChoiceChip, tool.label),
+        find.byTooltip(tool.label),
         findsOneWidget,
-        reason: 'No ChoiceChip renders EditorTool.$tool',
+        reason: 'No palette button renders EditorTool.$tool',
       );
     }
   });
@@ -79,12 +81,17 @@ void main() {
     await tester.tap(find.byType(ModalBarrier).last);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(DropdownButtonFormField<GameMode>));
+    // The mode is a two-way switch: Tower Defense (the default, one home)
+    // and Skirmish (two homes), with the allowed home count spelled out.
+    expect(find.byType(SegmentedButton<GameMode>), findsOneWidget);
+    expect(find.text(S.current.waveDefenseOptionEditorPage), findsOneWidget);
+    expect(find.text(S.current.skirmishOptionEditorPage), findsOneWidget);
+    expect(find.text(S.current.modeHomesHintEditorPage(1)), findsOneWidget);
+    await tester.tap(find.text(S.current.skirmishOptionEditorPage));
     await tester.pumpAndSettle();
-    expect(find.text(S.current.waveDefenseOptionEditorPage), findsWidgets);
-    expect(find.text(S.current.skirmishOptionEditorPage), findsWidgets);
-    await tester.tap(find.byType(ModalBarrier).last);
-    await tester.pumpAndSettle();
+    expect(find.text(S.current.modeHomesHintEditorPage(2)), findsOneWidget);
+    // Skirmish maps have no waves to author.
+    expect(find.text(S.current.wavesLabelEditorPage), findsNothing);
 
     // The default draft's biome (grassPlains) has no trees - the hint next
     // to the biome picker must say so, proving tree presence is visible in

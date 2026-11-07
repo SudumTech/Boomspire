@@ -36,6 +36,11 @@ _MapDraft _$MapDraftFromJson(Map<String, dynamic> json) => _MapDraft(
           ?.map((e) => EditorPoint.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
+  resourceNodes:
+      (json['resourceNodes'] as List<dynamic>?)
+          ?.map((e) => EditorPoint.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
   environment: json['environment'] == null
       ? const EnvironmentSettings()
       : EnvironmentSettings.fromJson(
@@ -61,6 +66,7 @@ Map<String, dynamic> _$MapDraftToJson(_MapDraft instance) => <String, dynamic>{
   'treeCells': instance.treeCells.map((e) => e.toJson()).toList(),
   'waterPaths': instance.waterPaths.map((e) => e.toJson()).toList(),
   'homeSites': instance.homeSites.map((e) => e.toJson()).toList(),
+  'resourceNodes': instance.resourceNodes.map((e) => e.toJson()).toList(),
   'environment': instance.environment.toJson(),
   'startingGold': instance.startingGold,
   'waveCount': instance.waveCount,

@@ -13,5 +13,6 @@ extension EditorToolExtensions on EditorTool {
     EditorTool.lava => S.current.lavaLabelEditorPage,
     EditorTool.volcanicLake => S.current.volcanicLakeLabelEditorPage,
     EditorTool.homeSite => S.current.homeLabelEditorPage,
+    EditorTool.resourceNode => S.current.resourceNodeLabelEditorPage,
   };
 }

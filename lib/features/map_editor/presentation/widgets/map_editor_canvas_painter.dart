@@ -1,3 +1,7 @@
+import '../../../game_core/presentation/util/paint_resource_node_plate.dart';
+
+import 'package:flame/components.dart' show Vector2;
+
 import 'dart:math';
 import 'dart:ui' as ui;
 
@@ -27,6 +31,7 @@ class MapEditorCanvasPainter extends CustomPainter {
   final double previewProgress;
   final List<EditorPoint> homeSites;
   final List<TreeCell> treeCells;
+  final List<EditorPoint> resourceNodes;
 
   MapEditorCanvasPainter({
     required this.preview,
@@ -38,6 +43,7 @@ class MapEditorCanvasPainter extends CustomPainter {
     required this.previewProgress,
     required this.homeSites,
     required this.treeCells,
+    this.resourceNodes = const [],
   });
 
   @override
@@ -92,6 +98,7 @@ class MapEditorCanvasPainter extends CustomPainter {
 
     _paintSunLight(canvas, rect, size);
     _paintWeather(canvas, rect, size);
+    _paintResourceNodes(canvas, size);
     _paintHomeSites(canvas, size);
 
     if (activeStroke.length >= 2) {
@@ -132,7 +139,29 @@ class MapEditorCanvasPainter extends CustomPainter {
         oldDelegate.environment != environment ||
         oldDelegate.previewProgress != previewProgress ||
         oldDelegate.homeSites != homeSites ||
+        oldDelegate.resourceNodes != resourceNodes ||
         oldDelegate.treeCells != treeCells;
+  }
+
+  /// Draws each capturable resource node with the same hexagonal plate it has
+  /// in the game, tinted violet.
+  void _paintResourceNodes(Canvas canvas, Size size) {
+    const nodeSize = 36.0;
+    final scale = size.width / arenaWidth;
+    for (final node in resourceNodes) {
+      canvas.save();
+      canvas.translate(
+        node.x * scale - nodeSize * scale / 2,
+        node.y / arenaHeight * size.height - nodeSize * scale / 2,
+      );
+      canvas.scale(scale);
+      paintResourceNodePlate(
+        canvas,
+        size: Vector2.all(nodeSize),
+        accent: const Color(0xFFB388FF),
+      );
+      canvas.restore();
+    }
   }
 
   /// Draws each skirmish home site as a numbered, colored marker so a map

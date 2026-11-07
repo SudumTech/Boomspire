@@ -9,6 +9,7 @@ import '../../../core/combat/attackable.dart';
 import '../../../core/combat/enums/unit_body_type.dart';
 import '../../../core/combat/enums/vehicle_unit_type.dart';
 import '../../../core/combat/extensions/unit_kind_extensions.dart';
+import '../../../core/combat/extensions/unit_marker_extensions.dart';
 import '../../../core/combat/mobile_unit_blueprint.dart';
 import '../../../core/combat/movement_style.dart';
 import '../../../core/combat/team.dart';
@@ -17,6 +18,7 @@ import '../../../core/combat/unit_kind.dart';
 import '../../../core/combat/unit_objective.dart';
 import 'util/heading_math.dart';
 import 'util/plane_flight.dart';
+import '../../../core/combat/secondary_weapon.dart';
 import '../../../core/combat/weapon_type.dart';
 import '../../../core/pathfinding/astar.dart';
 import '../../ai_director/domain/models/strategy_directive.dart';
@@ -42,7 +44,7 @@ import 'rocket_component.dart';
 import 'rotor_component.dart';
 import 'smoke_trail_component.dart';
 import 'target_highlight_component.dart';
-import 'team_stripe_marker_component.dart';
+import 'team_glow_marker_component.dart';
 import 'track_mark_component.dart';
 import 'util/paint_mobile_unit_overlay.dart';
 import 'util/spawn_base_rush_position.dart';
@@ -50,7 +52,6 @@ import 'util/spawn_pre_explosion_delay.dart';
 import 'util/spawn_random_phase.dart';
 import 'util/spawn_repath_delay.dart';
 import 'vapor_cone_component.dart';
-import 'vehicle_player_marker_component.dart';
 import 'vehicle_tread_component.dart';
 
 /// Distance (in grid cells) to an engaged target within which a strafing
@@ -83,6 +84,14 @@ const _separationRadiusSq = 26.0 * 26.0;
 /// swing their hull around more slowly.
 const _infantryTurnRate = 9.0;
 const _vehicleTurnRate = 4.0;
+
+/// How fast a hovering gunship swings its nose around (radians/sec) - slower
+/// than a tank hull, so it visibly has to turn to face a target.
+const _helicopterTurnRate = 2.6;
+
+/// A helicopter's guns point along its nose, so it only fires once its nose
+/// is within this angle (radians) of the target.
+const _helicopterFireArc = 0.55;
 
 /// Seconds a ground unit takes to reach full speed after starting to move.
 const _infantryAccelSeconds = 0.15;
@@ -171,6 +180,11 @@ class MobileUnitComponent extends PositionComponent
   double _repathTimer = 0;
   double _attackCooldown = 0;
 
+  /// The secondary weapon's own reload/clip state - see
+  /// [MobileUnitBlueprint.secondary].
+  double _secondaryCooldown = 0;
+  int _secondaryClipShots = 0;
+
   /// Rounds already fired in the current clip - see [_maybeEngage]/
   /// [_updateStrafingRun]. Resets to 0 (with [_attackCooldown] set to
   /// [MobileUnitBlueprint.attackInterval], the reload) once it reaches
@@ -220,10 +234,6 @@ class MobileUnitComponent extends PositionComponent
   double _engineSmokeTimer = 0;
   double _groundEffectTimer = 0;
 
-  /// Independently-rotating weapon overlay for ground vehicles - null for
-  /// infantry, air units, and unarmed vehicles. See [addExtraVisuals].
-  VehiclePlayerMarkerComponent? _playerMarker;
-
   /// Leg/arm animation overlay for infantry - null for every vehicle. See
   /// [addExtraVisuals].
   HumanLimbsComponent? _limbs;
@@ -232,9 +242,6 @@ class MobileUnitComponent extends PositionComponent
   /// infantry and air units. See [addExtraVisuals].
   VehicleTreadComponent? _tread;
 
-  /// Team-color stripe overlay for plane-body units - null for everything
-  /// else. See [addExtraVisuals].
-  TeamStripeMarkerComponent? _teamStripe;
   late final PositionComponent _visual;
   late final TargetHighlightComponent _targetHighlight;
 
@@ -315,14 +322,13 @@ class MobileUnitComponent extends PositionComponent
 
   /// Attaches extra always-on visuals once the model/sprite is loaded -
   /// a spinning rotor for [UnitKind.helicopter], or a [UnitBodyType]-driven
-  /// overlay: leg/arm animation for infantry, a scrolling tread plus a
-  /// static team-color marker for ground vehicles, and a team-color stripe
-  /// for planes. Air vehicles other than the helicopter get their
-  /// jet-flare/vapor-cone treatment purely in [_flyToward], with no extra
-  /// child component for that part.
+  /// overlay: leg/arm animation for infantry and a scrolling tread for
+  /// ground vehicles. Every unit also gets its glowing team-colour point
+  /// (see [TeamGlowMarkerComponent]). Air vehicles other than the helicopter
+  /// get their jet-flare/vapor-cone treatment purely in [_flyToward].
   Future<void> addExtraVisuals(PositionComponent visual) async {
     if (blueprint.kind == UnitKind.helicopter) {
-      await visual.add(RotorComponent(position: visual.size / 2));
+      await visual.add(RotorComponent(hullSize: visual.size));
     }
 
     final body = blueprint.kind.bodyType;
@@ -333,18 +339,15 @@ class MobileUnitComponent extends PositionComponent
         body == VehicleUnitType.lightVehicle) {
       _tread = VehicleTreadComponent(hullSize: visual.size);
       await visual.add(_tread!);
-      _playerMarker = VehiclePlayerMarkerComponent(
-        hullSize: visual.size,
-        team: team,
-      );
-      await visual.add(_playerMarker!);
-    } else if (body == VehicleUnitType.plane) {
-      _teamStripe = TeamStripeMarkerComponent(
-        hullSize: visual.size,
-        team: team,
-      );
-      await visual.add(_teamStripe!);
     }
+    await visual.add(
+      TeamGlowMarkerComponent(
+        hullSize: visual.size,
+        team: team,
+        anchorFraction: blueprint.kind.markerAnchor,
+        phase: _idlePhase,
+      ),
+    );
   }
 
   /// Blends a raw direction with a short-range separation push away from
@@ -623,7 +626,6 @@ class MobileUnitComponent extends PositionComponent
       selected: game.selectedUnit.value == this,
       idlePhase: _idlePhase,
       accent: team.color,
-      teamColor: teamColor,
       attackRange: blueprint.attackRange,
       health: health,
       effectiveMaxHealth: effectiveMaxHealth,
@@ -762,11 +764,14 @@ class MobileUnitComponent extends PositionComponent
       case MovementStyle.walk:
         _visual.position =
             size / 2 + Vector2(0, animates ? sin(_bobPhase) * 1.5 : 0);
+        _visual.angle = _facingAngle;
       case MovementStyle.roll:
         _visual.position = size / 2;
         _visual.angle = _facingAngle + (animates ? sin(_bobPhase) * 0.05 : 0);
       case MovementStyle.hover:
         _visual.position = size / 2 + Vector2(0, sin(_bobPhase) * 2.5);
+        // The sprite is drawn nose-up and turns with the unit's heading.
+        _visual.angle = _facingAngle + sin(_bobPhase * 0.4) * 0.03;
       case MovementStyle.swoop:
         _visual.position = size / 2;
         _visual.angle = _facingAngle + sin(_bobPhase * 0.5) * 0.08;
@@ -888,6 +893,72 @@ class MobileUnitComponent extends PositionComponent
   /// split evenly across its rounds so changing the clip size reshapes the
   /// attack instead of buffing it. Called once per round by [_maybeEngage]
   /// and [_updateStrafingRun].
+  /// How fast this unit swings its body toward a heading, by body type.
+  double get _turnRate {
+    if (blueprint.movementStyle == MovementStyle.hover) {
+      return _helicopterTurnRate;
+    }
+    return blueprint.isVehicle ? _vehicleTurnRate : _infantryTurnRate;
+  }
+
+  /// Whether the unit's weapons are lined up on [toTarget]. Only a
+  /// helicopter - whose guns are fixed along its nose - has to wait for its
+  /// turn to finish before firing; everything else fires freely.
+  bool _isAimedAt(Vector2 toTarget) {
+    if (blueprint.movementStyle != MovementStyle.hover) return true;
+    final desired = atan2(toTarget.y, toTarget.x) + pi / 2;
+    return shortestAngleDiff(_facingAngle, desired).abs() <= _helicopterFireArc;
+  }
+
+  /// Runs the secondary weapon (if the unit has one): it reloads on its own
+  /// timer and only fires at targets its domains allow and in its range.
+  void _updateSecondary(
+    Attackable target,
+    Vector2 toTarget,
+    double dt, {
+    required bool aimed,
+  }) {
+    final weapon = blueprint.secondary;
+    if (weapon == null) return;
+    _secondaryCooldown -= dt;
+    if (_secondaryCooldown > 0 || !aimed) return;
+    if (!weapon.attackDomains.contains(target.domain)) return;
+    if (toTarget.length > weapon.range * detectionRangeMultiplier) return;
+
+    _fireSecondaryRound(weapon, target, toTarget, _secondaryClipShots);
+    _secondaryClipShots++;
+    if (_secondaryClipShots >= weapon.projectileCount) {
+      _secondaryClipShots = 0;
+      _secondaryCooldown = weapon.interval;
+    } else {
+      _secondaryCooldown = weapon.clipShotInterval;
+    }
+  }
+
+  /// One round of the secondary weapon, launched from alternating wing
+  /// pylons so a salvo leaves both sides of the aircraft.
+  void _fireSecondaryRound(
+    SecondaryWeapon weapon,
+    Attackable target,
+    Vector2 toTarget,
+    int clipIndex,
+  ) {
+    final dir = toTarget.normalized();
+    final side = Vector2(-dir.y, dir.x);
+    final pylon = (clipIndex.isEven ? 1.0 : -1.0) * size.x * 0.28;
+    final spawnPos = position + dir * (size.x * 0.35) + side * pylon;
+    _spawnProjectile(
+      spawnPos,
+      target,
+      weapon.damage * _levelMultiplier / weapon.projectileCount,
+      team.color,
+      weapon: weapon.weaponType,
+      domains: weapon.attackDomains,
+    );
+    game.world.spawn(MuzzleFlashComponent(position: spawnPos));
+    _playFireSfx(weapon.weaponType);
+  }
+
   void _fireOneRound(
     Attackable target,
     Vector2 toTarget,
@@ -950,6 +1021,19 @@ class MobileUnitComponent extends PositionComponent
       return;
     }
     final dir = applySeparationSteering(toTarget / dist);
+    if (blueprint.movementStyle == MovementStyle.hover) {
+      // A gunship turns its nose toward the goal like a tank turns its hull,
+      // crawling until it is facing the right way, then flies on.
+      final desired = atan2(dir.y, dir.x) + pi / 2;
+      final error = shortestAngleDiff(_facingAngle, desired).abs();
+      _facingAngle = turnTowardAngle(
+        _facingAngle,
+        desired,
+        _helicopterTurnRate * dt,
+      );
+      position += dir * (step * max(_minTurnSpeedShare, cos(error)));
+      return;
+    }
     position += dir * step;
     _facingAngle = atan2(dir.y, dir.x) + pi / 2;
 
@@ -1079,7 +1163,11 @@ class MobileUnitComponent extends PositionComponent
     // it straight at the target every frame made them flip around in place
     // when directly above their prey.
     if (!_isStrafingPlane) {
-      _facingAngle = atan2(toTarget.y, toTarget.x) + pi / 2;
+      _facingAngle = turnTowardAngle(
+        _facingAngle,
+        atan2(toTarget.y, toTarget.x) + pi / 2,
+        _turnRate * dt,
+      );
     }
 
     // A zero-length tick (e.g. the single `update(0)` frame used to mount
@@ -1094,8 +1182,10 @@ class MobileUnitComponent extends PositionComponent
       return true;
     }
 
+    final aimed = _isAimedAt(toTarget);
+    _updateSecondary(target, toTarget, dt, aimed: aimed);
     _attackCooldown -= dt;
-    if (_attackCooldown <= 0) {
+    if (_attackCooldown <= 0 && aimed) {
       _fireOneRound(
         target,
         toTarget,
@@ -1144,10 +1234,10 @@ class MobileUnitComponent extends PositionComponent
     return best;
   }
 
-  void _playFireSfx() {
+  void _playFireSfx([WeaponType? weapon]) {
     final hostileToPlayer =
         team.relationTo(game.playerTeam) == TeamRelation.enemy;
-    switch (blueprint.weaponType) {
+    switch (weapon ?? blueprint.weaponType) {
       case WeaponType.bullet:
         game.audioRepository.play(
           hostileToPlayer ? SfxType.enemyShot : SfxType.machineGunShot,
@@ -1168,11 +1258,14 @@ class MobileUnitComponent extends PositionComponent
     Vector2 spawnPos,
     Attackable target,
     double damage,
-    Color accent,
-  ) {
+    Color accent, {
+    WeaponType? weapon,
+    Set<UnitDomain>? domains,
+  }) {
     final hostileToPlayer =
         team.relationTo(game.playerTeam) == TeamRelation.enemy;
-    switch (blueprint.weaponType) {
+    final firedDomains = domains ?? blueprint.attackDomains;
+    switch (weapon ?? blueprint.weaponType) {
       case WeaponType.bullet:
         game.world.spawn(
           BulletComponent(
@@ -1192,7 +1285,7 @@ class MobileUnitComponent extends PositionComponent
             bodyColor: const Color(0xFF6D4C41),
             tipColor: accent,
             firedBy: team,
-            attackDomains: blueprint.attackDomains,
+            attackDomains: firedDomains,
           ),
         );
       case WeaponType.rocket:
@@ -1205,7 +1298,7 @@ class MobileUnitComponent extends PositionComponent
             bodyColor: const Color(0xFFB0BEC5),
             tipColor: accent,
             firedBy: team,
-            attackDomains: blueprint.attackDomains,
+            attackDomains: firedDomains,
           ),
         );
       case WeaponType.laser:

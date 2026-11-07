@@ -7,9 +7,10 @@ Each `*_unit` function below mirrors one Dart `_paint*` method line-for-line
 (same `size`/`center` variables, same multipliers) so it can be diffed
 against the source by eye. Run with:
 
-    tool/lottie_gen/.venv/bin/python3 tool/lottie_gen/gen_units.py
+    tool/lottie_gen/.venv/bin/python3 tool/lottie_gen/gen_units.py [--svg]
 """
 import os
+import sys
 
 from lottie_shapes import (
     bounds,
@@ -29,8 +30,9 @@ from lottie_shapes import (
 
 OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "models")
 
-# Plain SVGs, not a runtime asset - source material to hand-import into an
-# external vector/rigging tool (e.g. Rive) and animate from there.
+# Optional plain SVGs (`--svg`), NOT a runtime asset and not bundled: the game
+# only loads the Lottie `.json` files above. They exist purely as source
+# material to import into an external vector/rigging tool (e.g. Rive).
 SVG_OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "models_svg")
 
 # --- shared building blocks ------------------------------------------------
@@ -40,50 +42,9 @@ def shadow(cx, cy, w, h, argb=0x40000000):
     return op(ellipse(cx, cy, w, h), fill(argb))
 
 
-def legs(cx, cy, s, color):
-    return [
-        op(rrect(cx + dx, cy + 0.28 * s, 0.1 * s, 0.26 * s, 3), fill(color))
-        for dx in (-0.075 * s, 0.075 * s)
-    ]
 
 
-def torso(cx, cy, s, colors):
-    pts = [
-        (cx - 0.26 * s, cy - 0.2 * s),
-        (cx + 0.26 * s, cy - 0.2 * s),
-        (cx + 0.17 * s, cy + 0.2 * s),
-        (cx - 0.17 * s, cy + 0.2 * s),
-    ]
-    bx, by, bw, bh = bounds(pts)
-    return polygon(pts), gradient_fill(colors, bx, by, bw, bh, "vertical")
 
-
-def shoulder_pads(cx, cy, s, color_left, color_right=None):
-    color_right = color_left if color_right is None else color_right
-    return [
-        op(rrect(cx + dx, cy - 0.18 * s, 0.13 * s, 0.1 * s, 2), fill(c))
-        for dx, c in zip((-0.24 * s, 0.24 * s), (color_left, color_right))
-    ]
-
-
-def rifle(cx, cy, s, width):
-    return op(
-        line_shape((cx + 0.14 * s, cy - 0.12 * s), (cx + 0.34 * s, cy - 0.46 * s)),
-        stroke(0xFF1A1A1A, width, round_cap=True),
-    )
-
-
-def helmet(cx, cy, s, dark, light, visor_bg, glint_color, glint_alpha=None, r_back=0.16, r_front=0.14):
-    ops = [
-        op(circle(cx, cy - 0.3 * s, r_back * s), fill(dark)),
-        op(circle(cx, cy - 0.32 * s, r_front * s), fill(light)),
-    ]
-    vw, vh = 0.22 * s, 0.05 * s
-    vcx, vcy = cx, cy - 0.3 * s
-    ops.append(op(rrect(vcx, vcy, vw, vh, 2), fill(visor_bg)))
-    gcx, gcy = vcx - vw * 0.22, vcy - 0.6
-    ops.append(op(rrect(gcx, gcy, vw * 0.32, vh * 0.5, 1), fill(glint_color, alpha=glint_alpha)))
-    return ops
 
 
 def wheel_grid(cx, cy, s, dxs, dys, w, h, r, color=0xFF0D0D0D):
@@ -182,66 +143,256 @@ def ally_aircraft():
     return jet(0xFFA9BCC6, 0xFF3F5660, HULL_DARK, ACCENT, 0xFF00E5FF)
 
 
-def ally_anti_air():
-    s = 48.0
+
+
+
+def soldier_model(light, hull, dark, role, accent=0xFFFFB300):
+    """Top-down infantryman, facing up: backpack, broad shoulders, arms
+    bringing the weapon forward, and a helmet with a chin strap and night-
+    vision mount. The legs are not part of the sprite - they are animated
+    separately at runtime (`HumanLimbsComponent`). `role` picks the kit:
+    `rifle`, `heavy` (armoured, cannon), `antitank` (rocket tube) or
+    `antiair` (missile tube with sight). Mirrors `paintSoldierModel` in
+    `lib/core/rendering/util/paint_soldier_model.dart`."""
+    heavy = role == "heavy"
+    s = 60.0 if heavy else 48.0
     cx = cy = s / 2
-    weapon = 0xFFFFB300
-    ops = [shadow(cx, cy + 0.3 * s, 0.5 * s, 0.18 * s, 0x59000000)]
-    ops += legs(cx, cy, s, HULL_DARK)
-    shape, style = torso(cx, cy, s, [HULL, HULL_DARK])
-    ops.append(op(shape, style))
-    ops.append(op(line_shape((cx, cy - 0.18 * s), (cx, cy + 0.18 * s)), stroke(weapon, 2, alpha=0.7)))
-    ops += shoulder_pads(cx, cy, s, HULL_DARK)
-    ops.append(op(line_shape((cx + 0.04 * s, cy - 0.12 * s), (cx + 0.36 * s, cy - 0.5 * s)),
-                  stroke(0xFF2B2B2B, 5, round_cap=True)))
-    ops.append(op(circle(cx + 0.36 * s, cy - 0.5 * s, 0.06 * s), fill(weapon)))
-    ops += helmet(cx, cy, s, HULL_DARK, HULL, 0xFF0D1A1E, weapon, glint_alpha=0.9)
+    k = 1.18 if heavy else 1.0
+    skin = 0xFFC9A27C
+    ops = [shadow(cx + 0.03 * s, cy + 0.05 * s, 0.56 * s, 0.46 * s, 0x33000000)]
+
+    # Backpack behind the shoulders.
+    ops.append(op(rrect(cx, cy + 0.13 * s, 0.27 * s * k, 0.22 * s, 3), gradient_fill([hull, dark], cx, cy, 0.27 * s, 0.22 * s, "vertical")))
+    ops.append(op(rrect(cx, cy + 0.13 * s, 0.27 * s * k, 0.22 * s, 3), stroke(dark, 0.9, alpha=0.9)))
+    ops.append(op(line_shape((cx - 0.05 * s, cy + 0.06 * s), (cx - 0.05 * s, cy + 0.2 * s)), stroke(dark, 1.0, alpha=0.8)))
+    ops.append(op(line_shape((cx + 0.05 * s, cy + 0.06 * s), (cx + 0.05 * s, cy + 0.2 * s)), stroke(dark, 1.0, alpha=0.8)))
+
+    # Launcher tube resting on the shoulder (specialists), drawn before the arms.
+    if role == "antitank":
+        ops.append(op(rrect(cx + 0.14 * s, cy - 0.12 * s, 0.075 * s, 0.7 * s, 2.5), gradient_fill([0xFF6A7078, 0xFF2C3036], cx, cy, 0.075 * s, 0.7 * s, "horizontal")))
+        ops.append(op(polygon([(cx + 0.14 * s, cy - 0.5 * s), (cx + 0.175 * s, cy - 0.44 * s), (cx + 0.105 * s, cy - 0.44 * s)]), fill(accent)))
+        ops.append(op(rrect(cx + 0.14 * s, cy + 0.22 * s, 0.1 * s, 0.05 * s, 1.5), fill(0xFF1A1C20)))
+    if role == "antiair":
+        ops.append(op(rrect(cx + 0.13 * s, cy - 0.1 * s, 0.07 * s, 0.62 * s, 2.5), gradient_fill([0xFFB9C4CD, 0xFF59646E], cx, cy, 0.07 * s, 0.62 * s, "horizontal")))
+        ops.append(op(polygon([(cx + 0.13 * s, cy - 0.46 * s), (cx + 0.165 * s, cy - 0.4 * s), (cx + 0.095 * s, cy - 0.4 * s)]), fill(0xFF263238)))
+        ops.append(op(rrect(cx + 0.205 * s, cy - 0.06 * s, 0.05 * s, 0.14 * s, 1.5), fill(0xFF1A1C20)))
+        ops.append(op(circle(cx + 0.205 * s, cy - 0.1 * s, 0.022 * s), fill(accent)))
+
+    # Shoulders.
+    shoulders = ellipse(cx, cy - 0.0 * s, 0.56 * s * k, 0.24 * s * k)
+    ops.append(op(shoulders, gradient_fill([light, hull, dark], cx, cy, 0.56 * s * k, 0.24 * s * k, "vertical")))
+    ops.append(op(shoulders, stroke(dark, 1.0, alpha=0.9)))
+    if heavy:
+        ops.append(op(rrect(cx, cy + 0.0 * s, 0.26 * s, 0.2 * s, 4), fill(0xFF222A1B)))
+        for sx in (-1, 1):
+            ops.append(op(rrect(cx + sx * 0.25 * s * k, cy - 0.04 * s, 0.1 * s, 0.1 * s, 3), fill(0xFFB71C1C)))
+
+    # Arms bringing the weapon forward, with gloved hands.
+    for (x1, y1, x2, y2) in ((cx - 0.25 * s * k, cy - 0.01 * s, cx - 0.07 * s, cy - 0.25 * s),
+                             (cx + 0.24 * s * k, cy - 0.01 * s, cx + 0.1 * s, cy - 0.15 * s)):
+        ops.append(op(line_shape((x1, y1), (x2, y2)), stroke(hull, 0.085 * s, round_cap=True)))
+        ops.append(op(line_shape((x1, y1), (x2, y2)), stroke(dark, 0.085 * s, alpha=0.25, round_cap=True)))
+        ops.append(op(circle(x2, y2, 0.04 * s), fill(skin)))
+
+    # Rifle / cannon along the right arm.
+    if role in ("rifle", "heavy"):
+        barrel_w = 0.075 * s if heavy else 0.05 * s
+        ops.append(op(rrect(cx + 0.05 * s, cy - 0.31 * s, barrel_w, 0.34 * s, 1.5), fill(0xFF1C1F23)))
+        ops.append(op(rrect(cx + 0.05 * s, cy - 0.16 * s, 0.075 * s, 0.2 * s, 2), gradient_fill([0xFF3C4147, 0xFF1A1C1F], cx, cy, 0.075 * s, 0.2 * s, "vertical")))
+        ops.append(op(rrect(cx + 0.05 * s, cy - 0.46 * s, barrel_w * 1.5, 0.045 * s, 1), fill(0xFF0E1012)))
+        ops.append(op(rrect(cx + 0.085 * s, cy - 0.1 * s, 0.035 * s, 0.08 * s, 1), fill(0xFF14171A)))
+        if heavy:
+            ops.append(op(rrect(cx + 0.22 * s, cy - 0.14 * s, 0.1 * s, 0.14 * s, 2), fill(0xFF3B4A2A)))
+
+    # Helmet: rim, shell, chin strap, night-vision mount, glint.
+    hr = 0.135 * s * k
+    ops.append(op(circle(cx, cy - 0.04 * s, hr), fill(dark)))
+    helmet = circle(cx, cy - 0.045 * s, hr * 0.9)
+    ops.append(op(helmet, gradient_fill([light, hull], cx, cy, 2 * hr, 2 * hr, "diagonal")))
+    ops.append(op(line_shape((cx - hr * 0.8, cy - 0.04 * s), (cx + hr * 0.8, cy - 0.04 * s)), stroke(dark, 0.9, alpha=0.7)))
+    ops.append(op(rrect(cx, cy - 0.04 * s - hr * 0.92, hr * 0.5, hr * 0.28, 1), fill(0xFF14171A)))
+    ops.append(op(circle(cx - hr * 0.3, cy - 0.04 * s - hr * 0.35, hr * 0.2), fill(0xFFFFFFFF, alpha=0.4)))
     return ops, s, s
 
 
-def ally_anti_tank():
-    s = 48.0
+def heli_model(light, hull, dark, rocket_tip):
+    """Top-down attack helicopter, nose up (it turns with its heading): a
+    tapered fuselage with tandem canopies, a chin gun, stub wings carrying
+    rocket pods, a tail boom with stabilisers and a tail rotor. The main rotor
+    is spun separately at runtime (`RotorComponent`) over the mast. Mirrors
+    `paintHelicopterModel` in `lib/core/rendering/util/paint_helicopter_model.dart`."""
+    s = 46.0
     cx = cy = s / 2
-    weapon = 0xFFFF5252
-    ops = [shadow(cx, cy + 0.3 * s, 0.5 * s, 0.18 * s, 0x59000000)]
-    ops += legs(cx, cy, s, HULL_DARK)
-    shape, style = torso(cx, cy, s, [HULL, HULL_DARK])
-    ops.append(op(shape, style))
-    ops.append(op(line_shape((cx, cy - 0.18 * s), (cx, cy + 0.18 * s)), stroke(weapon, 2, alpha=0.7)))
-    ops += shoulder_pads(cx, cy, s, HULL_DARK)
-    ops.append(op(line_shape((cx - 0.02 * s, cy - 0.14 * s), (cx + 0.44 * s, cy - 0.24 * s)),
-                  stroke(0xFF2B2B2B, 6, round_cap=True)))
-    ops.append(op(circle(cx + 0.44 * s, cy - 0.24 * s, 0.07 * s), fill(weapon)))
-    ops += helmet(cx, cy, s, HULL_DARK, HULL, 0xFF0D1A1E, weapon, glint_alpha=0.9)
+    ops = [shadow(cx + 0.05 * s, cy + 0.08 * s, 0.7 * s, 0.82 * s, 0x2A000000)]
+
+    # Tail boom, stabilisers, tail rotor.
+    boom = [(cx - 0.045 * s, cy + 0.1 * s), (cx + 0.045 * s, cy + 0.1 * s), (cx + 0.025 * s, cy + 0.47 * s), (cx - 0.025 * s, cy + 0.47 * s)]
+    ops.append(op(polygon(boom), gradient_fill([hull, dark], cx, cy, 0.09 * s, 0.37 * s, "horizontal")))
+    ops.append(op(rrect(cx, cy + 0.41 * s, 0.3 * s, 0.05 * s, 1.5), fill(dark)))
+    ops.append(op(rrect(cx, cy + 0.455 * s, 0.025 * s, 0.1 * s, 1), fill(0xFF14171A)))
+    ops.append(op(circle(cx + 0.06 * s, cy + 0.46 * s, 0.06 * s), stroke(0xFFB0BEC5, 1.2, alpha=0.5)))
+
+    # Stub wings with rocket pods and their tips.
+    for sx in (-1, 1):
+        wing = [(cx + sx * 0.09 * s, cy - 0.04 * s), (cx + sx * 0.36 * s, cy + 0.0 * s), (cx + sx * 0.36 * s, cy + 0.07 * s), (cx + sx * 0.09 * s, cy + 0.1 * s)]
+        ops.append(op(polygon(wing), gradient_fill([light, hull], cx, cy, 0.27 * s, 0.14 * s, "vertical")))
+        ops.append(op(polygon(wing), stroke(dark, 0.9, alpha=0.9)))
+        ops.append(op(rrect(cx + sx * 0.3 * s, cy + 0.01 * s, 0.075 * s, 0.24 * s, 2.5), gradient_fill([0xFF4A4F55, 0xFF1F2327], cx, cy, 0.075 * s, 0.24 * s, "horizontal")))
+        ops.append(op(circle(cx + sx * 0.3 * s, cy - 0.1 * s, 0.022 * s), fill(rocket_tip)))
+        ops.append(op(circle(cx + sx * 0.3 * s, cy + 0.12 * s, 0.018 * s), fill(0xFF0E1012)))
+
+    # Fuselage.
+    right = [(cx, cy - 0.4 * s), (cx + 0.07 * s, cy - 0.3 * s), (cx + 0.115 * s, cy - 0.08 * s), (cx + 0.1 * s, cy + 0.12 * s), (cx + 0.045 * s, cy + 0.26 * s)]
+    left = [(2 * cx - x, y) for (x, y) in reversed(right[1:])]
+    body = polygon(right + left)
+    ops.append(op(body, gradient_fill([dark, hull, light, hull, dark], cx, cy, 0.23 * s, 0.66 * s, "horizontal")))
+    ops.append(op(body, stroke(dark, 1.0, alpha=0.9)))
+
+    # Tandem canopies, intakes, exhaust.
+    for (cyy, h) in ((cy - 0.23 * s, 0.12 * s), (cy - 0.07 * s, 0.14 * s)):
+        ops.append(op(rrect(cx, cyy, 0.115 * s, h, 3), fill(0xFF11161B)))
+        ops.append(op(rrect(cx, cyy, 0.095 * s, h * 0.8, 2.5), fill(0xFF2F4350)))
+        ops.append(op(rrect(cx - 0.02 * s, cyy - h * 0.15, 0.03 * s, h * 0.35, 1), fill(0xFFFFFFFF, alpha=0.5)))
+    for sx in (-1, 1):
+        ops.append(op(rrect(cx + sx * 0.085 * s, cy + 0.1 * s, 0.04 * s, 0.1 * s, 1.5), fill(0xFF0E1012)))
+
+    # Rotor mast and the chin gun with its barrel.
+    ops.append(op(circle(cx, cy + 0.02 * s, 0.045 * s), fill(0xFF14171A)))
+    ops.append(op(rrect(cx, cy - 0.42 * s, 0.022 * s, 0.1 * s, 1), fill(0xFF0E1012)))
+    ops.append(op(circle(cx, cy - 0.35 * s, 0.035 * s), fill(0xFF1B1E22)))
     return ops, s, s
 
 
 def ally_soldier():
-    s = 48.0
+    return soldier_model(0xFF8FA07C, 0xFF58693F, 0xFF2C3722, "rifle")
+
+
+def ally_anti_tank():
+    return soldier_model(0xFF8FA07C, 0xFF58693F, 0xFF2C3722, "antitank", accent=0xFFFF7043)
+
+
+def ally_anti_air():
+    return soldier_model(0xFF8FA07C, 0xFF58693F, 0xFF2C3722, "antiair", accent=0xFF29B6F6)
+
+
+def enemy_infantry(heavy: bool):
+    return soldier_model(0xFFA48A78, 0xFF6C5040, 0xFF33241B, "heavy" if heavy else "rifle")
+
+
+def enemy_helicopter():
+    return heli_model(0xFF8C9A86, 0xFF4F5D4A, 0xFF262E24, 0xFFFF7043)
+
+
+def tank_model(light, hull, dark, track):
+    """Top-down main battle tank (barrel up): long tracked sides with tread
+    ticks, a wedge-fronted hull with a glacis plate and engine-deck grille,
+    a rounded turret with smoke dischargers, a hatch, and a barrel with a
+    bore evacuator and muzzle brake. Both sides use this design in their own
+    paint (the team colour is the glowing marker, added at runtime). Mirrors
+    `paintTankModel` in `lib/core/rendering/util/paint_tank_model.dart`."""
+    s = 54.0
     cx = cy = s / 2
-    ops = [shadow(cx, cy + 0.3 * s, 0.5 * s, 0.18 * s, 0x59000000)]
-    ops += legs(cx, cy, s, HULL_DARK)
-    shape, style = torso(cx, cy, s, [HULL, HULL_DARK])
-    ops.append(op(shape, style))
-    ops.append(op(line_shape((cx, cy - 0.18 * s), (cx, cy + 0.18 * s)), stroke(ACCENT, 2, alpha=0.7)))
-    ops += shoulder_pads(cx, cy, s, HULL_DARK)
-    ops.append(rifle(cx, cy, s, 3))
-    ops += helmet(cx, cy, s, HULL_DARK, HULL, 0xFF0D1A1E, ACCENT, glint_alpha=0.9)
+    ops = [shadow(cx + 0.03 * s, cy + 0.05 * s, 0.8 * s, 0.9 * s, 0x2A000000)]
+
+    # Tracks with tread ticks and a soft highlight.
+    for sx in (-1, 1):
+        x = cx + sx * 0.31 * s
+        ops.append(op(rrect(x, cy, 0.2 * s, 0.9 * s, 3.5), fill(track)))
+        for i in range(13):
+            y = cy - 0.41 * s + i * 0.068 * s
+            ops.append(op(line_shape((x - 0.085 * s, y), (x + 0.085 * s, y)), stroke(0xFF000000, 0.8, alpha=0.5)))
+        ops.append(op(rrect(x - sx * 0.05 * s, cy, 0.03 * s, 0.84 * s, 1), fill(0xFFFFFFFF, alpha=0.1)))
+
+    # Hull: wedge nose, straight flanks.
+    hull_pts = [
+        (cx - 0.12 * s, cy - 0.44 * s), (cx + 0.12 * s, cy - 0.44 * s),
+        (cx + 0.22 * s, cy - 0.31 * s), (cx + 0.22 * s, cy + 0.4 * s),
+        (cx - 0.22 * s, cy + 0.4 * s), (cx - 0.22 * s, cy - 0.31 * s),
+    ]
+    body = polygon(hull_pts)
+    ops.append(op(body, gradient_fill([light, hull, dark], cx, cy, 0.44 * s, 0.84 * s, "vertical")))
+    ops.append(op(body, stroke(dark, 1.0, alpha=0.9)))
+    # Glacis highlight.
+    ops.append(op(polygon([(cx - 0.12 * s, cy - 0.44 * s), (cx + 0.12 * s, cy - 0.44 * s), (cx + 0.2 * s, cy - 0.32 * s), (cx - 0.2 * s, cy - 0.32 * s)]), fill(0xFFFFFFFF, alpha=0.16)))
+    # Engine deck grille.
+    ops.append(op(rrect(cx, cy + 0.31 * s, 0.34 * s, 0.14 * s, 2), fill(dark, alpha=0.55)))
+    for i in range(4):
+        y = cy + 0.26 * s + i * 0.035 * s
+        ops.append(op(line_shape((cx - 0.15 * s, y), (cx + 0.15 * s, y)), stroke(0xFF000000, 0.8, alpha=0.5)))
+
+    # Barrel first (the turret overlaps its base): bore evacuator + muzzle brake.
+    ops.append(op(rrect(cx, cy - 0.29 * s, 0.07 * s, 0.4 * s, 1.5), gradient_fill([0xFF4A4F55, 0xFF1D2125], cx, cy, 0.07 * s, 0.4 * s, "horizontal")))
+    ops.append(op(rrect(cx, cy - 0.27 * s, 0.1 * s, 0.05 * s, 1.5), fill(0xFF2A2E33)))
+    ops.append(op(rrect(cx, cy - 0.49 * s, 0.11 * s, 0.05 * s, 1), fill(0xFF14171A)))
+
+    # Turret: bustle, rounded body, smoke dischargers, hatch.
+    ops.append(op(rrect(cx, cy + 0.15 * s, 0.26 * s, 0.09 * s, 3), fill(dark)))
+    turret = rrect(cx, cy - 0.01 * s, 0.38 * s, 0.34 * s, 0.13 * s)
+    ops.append(op(turret, gradient_fill([light, hull], cx, cy, 0.38 * s, 0.34 * s, "diagonal")))
+    ops.append(op(turret, stroke(dark, 1.0, alpha=0.9)))
+    for sx in (-1, 1):
+        for i in range(3):
+            ops.append(op(rrect(cx + sx * 0.2 * s, cy - 0.07 * s + i * 0.045 * s, 0.035 * s, 0.03 * s, 0.8), fill(dark)))
+    ops.append(op(circle(cx + 0.07 * s, cy + 0.04 * s, 0.05 * s), fill(dark)))
+    ops.append(op(circle(cx + 0.07 * s, cy + 0.04 * s, 0.05 * s), stroke(light, 0.8, alpha=0.8)))
+    ops.append(op(rrect(cx - 0.08 * s, cy - 0.1 * s, 0.05 * s, 0.025 * s, 0.6), fill(0xFF0E1417)))
+    return ops, s, s
+
+
+def artillery_model(light, hull, dark, track, accent):
+    """Top-down rocket-artillery truck (launcher forward): a six-wheel chassis,
+    a small cab at the front, and a raised launcher box on the rear deck with
+    three rocket tubes and a hydraulic stabiliser. Mirrors
+    `paintArtilleryModel` in `lib/core/rendering/util/paint_tank_model.dart`."""
+    s = 52.0
+    cx = cy = s / 2
+    ops = [shadow(cx + 0.03 * s, cy + 0.05 * s, 0.75 * s, 0.9 * s, 0x2A000000)]
+
+    # Three wheels per side.
+    for sx in (-1, 1):
+        for dy in (-0.28, 0.0, 0.28):
+            ops.append(op(rrect(cx + sx * 0.31 * s, cy + dy * s, 0.15 * s, 0.22 * s, 3), fill(track)))
+            ops.append(op(rrect(cx + sx * 0.31 * s, cy + dy * s, 0.07 * s, 0.14 * s, 2), fill(0xFF50555B)))
+
+    # Chassis.
+    chassis = rrect(cx, cy + 0.02 * s, 0.5 * s, 0.86 * s, 4)
+    ops.append(op(chassis, gradient_fill([light, hull, dark], cx, cy, 0.5 * s, 0.86 * s, "vertical")))
+    ops.append(op(chassis, stroke(dark, 1.0, alpha=0.9)))
+
+    # Cab with windscreen.
+    ops.append(op(rrect(cx, cy - 0.32 * s, 0.4 * s, 0.2 * s, 4), gradient_fill([light, hull], cx, cy, 0.4 * s, 0.2 * s, "vertical")))
+    ops.append(op(rrect(cx, cy - 0.38 * s, 0.3 * s, 0.06 * s, 2), fill(0xFF14202B)))
+    ops.append(op(rrect(cx - 0.06 * s, cy - 0.385 * s, 0.1 * s, 0.025 * s, 1), fill(0xFF9BC4E2, alpha=0.5)))
+
+    # Launcher box with three rocket tubes.
+    box = rrect(cx, cy + 0.12 * s, 0.42 * s, 0.4 * s, 4)
+    ops.append(op(box, gradient_fill([hull, dark], cx, cy, 0.42 * s, 0.4 * s, "vertical")))
+    ops.append(op(box, stroke(dark, 1.0, alpha=0.9)))
+    for dx in (-0.13 * s, 0.0, 0.13 * s):
+        ops.append(op(circle(cx + dx, cy + 0.1 * s, 0.065 * s), fill(0xFF101316)))
+        ops.append(op(circle(cx + dx, cy + 0.1 * s, 0.065 * s), stroke(accent, 0.9, alpha=0.8)))
+        ops.append(op(circle(cx + dx, cy + 0.1 * s, 0.03 * s), fill(0xFFE8ECEF)))
+        ops.append(op(circle(cx + dx, cy + 0.1 * s, 0.015 * s), fill(accent)))
+    # Stabiliser pads.
+    for sx in (-1, 1):
+        ops.append(op(rrect(cx + sx * 0.25 * s, cy + 0.36 * s, 0.07 * s, 0.07 * s, 1.5), fill(dark)))
     return ops, s, s
 
 
 def ally_tank():
-    s = 54.0
-    cx = cy = s / 2
-    ops = [shadow(cx, cy, 0.85 * s, 0.3 * s)]
-    ops += wheel_grid(cx, cy, s, (-0.36 * s, 0.36 * s), (0,), 0.14 * s, 0.66 * s, 3, 0xFF1A1C20)
-    ops.append(op(rrect(cx, cy, 0.68 * s, 0.46 * s, 8), gradient_fill([HULL, HULL_DARK], cx, cy, 0.68 * s, 0.46 * s, "vertical")))
-    ops.append(op(rrect(cx, cy, 0.68 * s, 0.46 * s, 8), stroke(ACCENT, 1.5, alpha=0.8)))
-    turret = circle(cx, cy - 0.04 * s, 0.2 * s)
-    ops.append(op(turret, gradient_fill([HULL, HULL_DARK], cx, cy, 0.4 * s, 0.4 * s, "horizontal")))
-    ops.append(op(turret, stroke(ACCENT, 1.5)))
-    ops.append(op(rrect(cx, cy - 0.34 * s, 0.1 * s, 0.4 * s, 3), fill(0xFF1A1C20)))
-    return ops, s, s
+    return tank_model(0xFF8FA07C, 0xFF58693F, 0xFF2C3722, 0xFF1B1D20)
+
+
+def enemy_tank():
+    return tank_model(0xFFA48A78, 0xFF6C5040, 0xFF33241B, 0xFF1B1D20)
+
+
+def ally_artillery_barrage():
+    return artillery_model(0xFF8FA07C, 0xFF58693F, 0xFF2C3722, 0xFF1B1D20, 0xFFFFB300)
+
+
+def enemy_artillery_barrage():
+    return artillery_model(0xFFA48A78, 0xFF6C5040, 0xFF33241B, 0xFF1B1D20, 0xFFFFB300)
 
 
 def ally_light_vehicle():
@@ -343,24 +494,6 @@ def ally_rocket_barrage():
 # --- enemy (green infantry / grey-brown vehicles) --------------------------
 
 
-def enemy_infantry(heavy: bool):
-    s = 60.0 if heavy else 48.0
-    cx = cy = s / 2
-    body = 0xFF33691E if heavy else 0xFF4C7A2A
-    dark = 0xFF1B3D0F if heavy else 0xFF2E4B18
-    ops = [shadow(cx, cy + 0.3 * s, 0.5 * s, 0.18 * s, 0x59000000)]
-    ops += legs(cx, cy, s, dark)
-    shape, style = torso(cx, cy, s, [body, dark])
-    ops.append(op(shape, style))
-    if heavy:
-        ops.append(op(rrect(cx, cy + 0.02 * s, 0.22 * s, 0.24 * s, 4), fill(0xFF263A17)))
-    ops.append(op(line_shape((cx, cy - 0.18 * s), (cx, cy + 0.18 * s)), stroke(dark, 2)))
-    pad = 0xFFB71C1C if heavy else dark
-    ops += shoulder_pads(cx, cy, s, pad)
-    ops.append(rifle(cx, cy, s, 4 if heavy else 3))
-    ops += helmet(cx, cy, s, dark, body, 0xFF0D1A06, 0xCCBEEFFF, r_back=0.17, r_front=0.15)
-    return ops, s, s
-
 
 def enemy_anti_air_vehicle():
     s = 52.0
@@ -377,89 +510,9 @@ def enemy_anti_air_vehicle():
     return ops, s, s
 
 
-def enemy_artillery_barrage():
-    s = 52.0
-    cx = cy = s / 2
-    ops = [shadow(cx, cy, 0.85 * s, 0.3 * s)]
-    ops += wheel_grid(cx, cy, s, (-0.3 * s, 0.3 * s), (0.08 * s,), 0.14 * s, 0.58 * s, 3, 0xFF1A1C20)
-    ops.append(op(rrect(cx, cy, 0.6 * s, 0.4 * s, 6),
-                  gradient_fill([0xFF5D4037, 0xFF2E1A16], cx, cy, 0.6 * s, 0.4 * s, "vertical")))
-    ops.append(op(rrect(cx, cy - 0.16 * s, 0.5 * s, 0.16 * s, 3), fill(0xFF3E2723)))
-    for dx in (-0.14 * s, 0.0, 0.14 * s):
-        ops.append(op(rrect(cx + dx, cy - 0.24 * s, 0.1 * s, 0.22 * s, 2), fill(0xFF3E2723)))
-    ops.append(op(circle(cx, cy + 0.02 * s, 0.05 * s), fill(0xFFE53935)))
-    return ops, s, s
-
-
 def enemy_attack_plane():
     return jet(0xFFB0BEC5, 0xFF78909C, 0xFF37474F, 0xFFFF5252, 0xFFFF7043)
 
-
-def enemy_helicopter():
-    """Apache/Black Hawk-style attack-helicopter gunship - mirrors
-    `EnemySpriteFactory._paintHelicopter`: a tapered pointed-nose fuselage,
-    chin gun turret, stepped tandem canopy, belly weapon-pylon pods, and an
-    upswept tail stabilizer fin alongside the tail rotor."""
-    s = 46.0
-    cx = cy = s / 2
-    ops = [shadow(cx, cy, 0.92 * s, 0.28 * s)]
-
-    boom_pts = [
-        (cx - 0.08 * s, cy - 0.09 * s),
-        (cx - 0.48 * s, cy - 0.03 * s),
-        (cx - 0.48 * s, cy + 0.04 * s),
-        (cx - 0.08 * s, cy + 0.1 * s),
-    ]
-    ops.append(op(polygon(boom_pts), fill(0xFF33383C)))
-
-    fin_pts = [
-        (cx - 0.46 * s, cy - 0.02 * s),
-        (cx - 0.58 * s, cy - 0.2 * s),
-        (cx - 0.36 * s, cy - 0.04 * s),
-    ]
-    ops.append(op(polygon(fin_pts), fill(0xFF1A1C20)))
-
-    ops.append(op(circle(cx - 0.5 * s, cy - 0.02 * s, 0.09 * s), stroke(0x99B0BEC5, 1.6)))
-
-    body_pts = [
-        (cx + 0.44 * s, cy),
-        (cx + 0.2 * s, cy - 0.14 * s),
-        (cx - 0.18 * s, cy - 0.15 * s),
-        (cx - 0.2 * s, cy - 0.02 * s),
-        (cx - 0.2 * s, cy + 0.1 * s),
-        (cx - 0.1 * s, cy + 0.16 * s),
-        (cx + 0.2 * s, cy + 0.14 * s),
-    ]
-    bx, by, bw, bh = bounds(body_pts)
-    ops.append(op(polygon(body_pts), gradient_fill([0xFF5A6560, 0xFF20262A], bx, by, bw, bh, "vertical")))
-
-    ops.append(op(rrect(cx - 0.08 * s, cy - 0.2 * s, 0.24 * s, 0.1 * s, 3), fill(0xFF1A1C20)))
-    ops.append(op(circle(cx - 0.18 * s, cy - 0.19 * s, 0.035 * s), fill(0xFF0D0F10)))
-
-    front_canopy = (cx + 0.22 * s, cy - 0.06 * s, 0.16 * s, 0.1 * s)
-    rear_canopy = (cx + 0.02 * s, cy - 0.12 * s, 0.16 * s, 0.1 * s)
-    for ccx, ccy, cw, ch in (rear_canopy, front_canopy):
-        ops.append(op(rrect(ccx, ccy, cw, ch, 2), fill(0xFF11151A)))
-        ops.append(op(rrect(ccx, ccy, cw * 0.86, ch * 0.72, 1), fill(0xFF37474F)))
-    ops.append(op(
-        rrect(front_canopy[0] - front_canopy[2] * 0.2, front_canopy[1] - 0.02 * s,
-              front_canopy[2] * 0.3, front_canopy[3] * 0.4, 1),
-        fill(0xFFFFFFFF, alpha=0.6),
-    ))
-
-    ops.append(op(circle(cx + 0.3 * s, cy + 0.08 * s, 0.06 * s), fill(0xFF1A1C20)))
-    ops.append(op(circle(cx + 0.3 * s, cy + 0.08 * s, 0.035 * s), fill(0xFF37474F)))
-
-    for dx in (-0.02 * s, 0.16 * s):
-        pod_cx, pod_cy, pod_w, pod_h = cx + dx, cy + 0.16 * s, 0.14 * s, 0.08 * s
-        ops.append(op(rrect(pod_cx, pod_cy, pod_w, pod_h, 2), fill(0xFF2B2F33)))
-        ops.append(op(circle(pod_cx + pod_w / 2, pod_cy, pod_h * 0.28), fill(0xFF0D0F10)))
-
-    for dy in (0.24 * s, 0.29 * s):
-        ops.append(op(line_shape((cx - 0.14 * s, cy + dy), (cx + 0.28 * s, cy + dy)), stroke(0xFF1A1C20, 1.6)))
-
-    ops.append(op(rrect(cx, cy - 0.24 * s, 0.06 * s, 0.14 * s, 2), fill(0xFF1A1C20)))
-    return ops, s, s
 
 
 def enemy_rocket_barrage():
@@ -476,23 +529,8 @@ def enemy_rocket_barrage():
     return ops, s, s
 
 
-def enemy_tank():
-    s = 54.0
-    cx = cy = s / 2
-    ops = [shadow(cx, cy, 0.85 * s, 0.3 * s)]
-    ops += wheel_grid(cx, cy, s, (-0.3 * s, 0.3 * s), (0.06 * s,), 0.13 * s, 0.6 * s, 3, 0xFF1A1C20)
-    ops.append(op(rrect(cx, cy, 0.58 * s, 0.4 * s, 6),
-                  gradient_fill([0xFF6D4C41, 0xFF3E2723], cx, cy, 0.58 * s, 0.4 * s, "vertical")))
-    turret = circle(cx, cy, 0.19 * s)
-    ops.append(op(turret, gradient_fill([0xFF8D6E63, 0xFF3E2723], cx, cy, 0.38 * s, 0.38 * s, "horizontal")))
-    ops.append(op(rrect(cx, cy - 0.28 * s, 0.09 * s, 0.34 * s, 2), fill(0xFF2B2F36)))
-    ops.append(op(rrect(cx, cy + 0.02 * s, 0.1 * s, 0.04 * s, 2), fill(0xFFE53935)))
-    ops.append(op(circle(cx, cy + 0.16 * s, 0.045 * s), fill(0xFFFFF59D)))
-    return ops, s, s
-
-
 # Flying-wing stealth bomber - one silhouette shared by both `ally_` and
-# `enemy_` keys (team ownership shown by `TeamStripeMarkerComponent`
+# `enemy_` keys (team ownership shown by `TeamGlowMarkerComponent`
 # instead of recoloring the model), mirroring
 # `AllySpriteFactory._paintStealthBomber`/`EnemySpriteFactory._paintStealthBomber`.
 def stealth_bomber():
@@ -557,6 +595,10 @@ UNITS = {
     "ally_antiAirSoldier": ally_anti_air,
     "ally_stealthBomber": stealth_bomber,
     "ally_drone": ally_drone,
+    "ally_artilleryBarrage": ally_artillery_barrage,
+    "ally_antiAirVehicle": enemy_anti_air_vehicle,
+    "ally_heavySoldier": lambda: enemy_infantry(True),
+    "ally_helicopter": enemy_helicopter,
     "enemy_soldier": lambda: enemy_infantry(False),
     "enemy_heavySoldier": lambda: enemy_infantry(True),
     "enemy_tank": enemy_tank,
@@ -571,12 +613,15 @@ UNITS = {
 
 
 def main():
+    export_svg = "--svg" in sys.argv
     os.makedirs(OUT_DIR, exist_ok=True)
-    os.makedirs(SVG_OUT_DIR, exist_ok=True)
+    if export_svg:
+        os.makedirs(SVG_OUT_DIR, exist_ok=True)
     for key, builder in UNITS.items():
         ops, w, h = builder()
         write_layer(ops, int(w), int(h), os.path.join(OUT_DIR, f"{key}.json"))
-        write_svg(ops, int(w), int(h), os.path.join(SVG_OUT_DIR, f"{key}.svg"))
+        if export_svg:
+            write_svg(ops, int(w), int(h), os.path.join(SVG_OUT_DIR, f"{key}.svg"))
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/combat/unit_kind.dart';
 import '../../../../generated/l10n.dart';
 import '../../../game_core/domain/models/game_scene.dart';
-import '../../../game_core/presentation/player_palette.dart';
+import '../../../game_core/extensions/game_mode_extensions.dart';
 import '../../../terrain/domain/models/biome.dart';
 import '../../../terrain/domain/models/obstacle_kind.dart';
 import '../../../waves/domain/models/wave_loadout.dart';
@@ -21,6 +21,7 @@ import '../../domain/models/tree_cell.dart';
 import '../../domain/models/water_path.dart';
 import '../../domain/models/weather_keyframe.dart';
 import '../../impl/editor_terrain_generator.dart';
+import '../../impl/water_path_hit_tester.dart';
 import 'map_editor_notice.dart';
 
 export '../../domain/enums/editor_tool.dart';
@@ -34,6 +35,14 @@ export '../../domain/enums/editor_tool.dart';
 /// `presentation-state-layer` instructions) and disposed when the page is
 /// disposed.
 class MapEditorDraftState {
+  static const _homeSiteRemoveRadius = 32.0;
+  static const _nodeRemoveRadius = 28.0;
+
+  /// Most resource nodes a map may have.
+  static const maxResourceNodes = 8;
+
+  final WaterPathHitTester _waterHitTester = const WaterPathHitTester();
+
   final ValueNotifier<MapDraft> _draft;
   final ValueNotifier<EditorTerrainPreview?> _preview = ValueNotifier(null);
   final ValueNotifier<EditorTool> _tool = ValueNotifier(EditorTool.mountain);
@@ -86,7 +95,7 @@ class MapEditorDraftState {
   ]);
 
   /// Wave Defense has exactly one player base; Skirmish supports up to one
-  /// per [PlayerPalette] slot.
+  /// per seat (see [GameMode.maxHomeSites]).
   int get maxHomeSites => _maxHomeSitesFor(_draft.value.mode);
   ValueListenable<MapEditorNotice?> get notice => _notice;
   ValueListenable<EditorTerrainPreview?> get preview => _preview;
@@ -165,6 +174,29 @@ class MapEditorDraftState {
     _activeStroke.value = const [];
   }
 
+  /// A plain tap (press and release without dragging) on the canvas. The
+  /// placement tools (home site, resource node) work only this way, and a
+  /// brush stamps a single cell; the water tools need a drag to draw.
+  void handleTap(Offset local, Size canvasSize) {
+    final point = toWorld(local, canvasSize);
+    switch (_tool.value) {
+      case EditorTool.mountain:
+      case EditorTool.dune:
+      case EditorTool.tree:
+      case EditorTool.erase:
+        _paintAt(point);
+      case EditorTool.homeSite:
+        toggleHomeSiteAt(point);
+      case EditorTool.resourceNode:
+        toggleResourceNodeAt(point);
+      case EditorTool.river:
+      case EditorTool.lake:
+      case EditorTool.lava:
+      case EditorTool.volcanicLake:
+        break; // a stroke needs a drag
+    }
+  }
+
   void handlePanStart(Offset local, Size canvasSize) {
     final point = toWorld(local, canvasSize);
     switch (_tool.value) {
@@ -180,6 +212,8 @@ class MapEditorDraftState {
         _activeStroke.value = [point];
       case EditorTool.homeSite:
         toggleHomeSiteAt(point);
+      case EditorTool.resourceNode:
+        toggleResourceNodeAt(point);
     }
   }
 
@@ -197,6 +231,7 @@ class MapEditorDraftState {
       case EditorTool.volcanicLake:
         _activeStroke.value = [..._activeStroke.value, point];
       case EditorTool.homeSite:
+      case EditorTool.resourceNode:
         break; // single-tap placement only, handled in handlePanStart
     }
   }
@@ -308,6 +343,43 @@ class MapEditorDraftState {
     );
   }
 
+  /// Places a resource node at [point], or removes the one it lands near.
+  void toggleResourceNodeAt(EditorPoint point) {
+    final nodes = _draft.value.resourceNodes;
+    final existing = nodes.indexWhere((n) => _isNodeAt(n, point));
+    if (existing == -1 && nodes.length >= maxResourceNodes) {
+      _notice.value = MapEditorNotice(
+        S.current.onlyResourceNodesSupportedEditorPage(maxResourceNodes),
+        icon: Icons.info_outline,
+      );
+      return;
+    }
+    _mutateDraft(
+      (d) => d.copyWith(
+        resourceNodes: existing == -1
+            ? [...d.resourceNodes, point]
+            : _withoutIndex(d.resourceNodes, existing),
+      ),
+    );
+  }
+
+  List<EditorPoint> _withoutIndex(List<EditorPoint> points, int index) => [
+    for (final (i, p) in points.indexed)
+      if (i != index) p,
+  ];
+
+  /// Whether the draft can be played as a skirmish: it needs a home site for
+  /// every side. When it cannot, shows a notice saying so and returns false.
+  bool canPlaySkirmish() {
+    final needed = GameMode.skirmish.requiredHomeSites;
+    if (_draft.value.homeSites.length >= needed) return true;
+    _notice.value = MapEditorNotice(
+      S.current.skirmishNeedsHomesEditorPage(needed),
+      icon: Icons.info_outline,
+    );
+    return false;
+  }
+
   /// Converts a canvas-local [Offset] into draft/world coordinates, given
   /// the canvas's current on-screen [canvasSize].
   EditorPoint toWorld(Offset local, Size canvasSize) {
@@ -346,14 +418,8 @@ class MapEditorDraftState {
     _mutateDraft((d) => d.copyWith(waterPaths: [...d.waterPaths, path]));
   }
 
-  int _findHomeSiteNear(EditorPoint point) {
-    const removeRadius = 32.0;
-    return _draft.value.homeSites.indexWhere(
-      (site) =>
-          (site.x - point.x).abs() < removeRadius &&
-          (site.y - point.y).abs() < removeRadius,
-    );
-  }
+  int _findHomeSiteNear(EditorPoint point) =>
+      _draft.value.homeSites.indexWhere((site) => _isHomeSiteAt(site, point));
 
   ObstacleKind? _kindForTool(EditorTool tool) => switch (tool) {
     EditorTool.mountain => ObstacleKind.mountain,
@@ -365,10 +431,10 @@ class MapEditorDraftState {
     EditorTool.lava ||
     EditorTool.volcanicLake => null,
     EditorTool.homeSite => null,
+    EditorTool.resourceNode => null,
   };
 
-  int _maxHomeSitesFor(GameMode mode) =>
-      mode == GameMode.skirmish ? PlayerPalette.colors.length : 1;
+  int _maxHomeSitesFor(GameMode mode) => mode.maxHomeSites;
 
   void _mutateDraft(MapDraft Function(MapDraft) update) {
     _draft.value = update(_draft.value);
@@ -387,11 +453,12 @@ class MapEditorDraftState {
       : (timeline.last.atProgress + 0.25).clamp(0.0, 1.0);
 
   void _paintAt(EditorPoint point) {
-    final preview = _preview.value;
-    if (preview == null) return;
-    final grid = preview.grid;
-    final col = (point.x / grid.cellSize).floor().clamp(0, grid.cols - 1);
-    final row = (point.y / grid.cellSize).floor().clamp(0, grid.rows - 1);
+    // Addressed from the draft's own size, never from the generated preview
+    // (which may not exist yet): placing/erasing must work immediately.
+    final draft = _draft.value;
+    final grid = editorGridSize(draft.arenaWidth, draft.arenaHeight);
+    final col = (point.x / kEditorCellSize).floor().clamp(0, grid.cols - 1);
+    final row = (point.y / kEditorCellSize).floor().clamp(0, grid.rows - 1);
     final tool = _tool.value;
 
     // Trees are purely decorative (never block movement/building) so they
@@ -407,6 +474,11 @@ class MapEditorDraftState {
       return;
     }
 
+    if (tool == EditorTool.erase) {
+      _mutateDraft((d) => _withEverythingErasedAt(d, point, col, row));
+      return;
+    }
+
     final kind = _kindForTool(tool);
     _mutateDraft((d) {
       final cells = [...d.paintedCells]
@@ -416,17 +488,50 @@ class MapEditorDraftState {
           PaintedCell(col: col, row: row, kind: kind, variant: _variant.value),
         );
       }
-      var next = d.copyWith(paintedCells: cells);
-      if (tool == EditorTool.erase) {
-        next = next.copyWith(
-          treeCells: next.treeCells
-              .where((c) => !(c.col == col && c.row == row))
-              .toList(),
-        );
-      }
-      return next;
+      return d.copyWith(paintedCells: cells);
     });
   }
+
+  /// The eraser removes anything the author set at [point]: painted terrain,
+  /// trees, river/lake/lava/volcanic-lake strokes and home sites.
+  MapDraft _withEverythingErasedAt(
+    MapDraft draft,
+    EditorPoint point,
+    int col,
+    int row,
+  ) {
+    final reach = kEditorCellSize * 0.5;
+    return draft.copyWith(
+      paintedCells: [
+        for (final c in draft.paintedCells)
+          if (!(c.col == col && c.row == row)) c,
+      ],
+      treeCells: [
+        for (final c in draft.treeCells)
+          if (!(c.col == col && c.row == row)) c,
+      ],
+      waterPaths: [
+        for (final path in draft.waterPaths)
+          if (!_waterHitTester.hits(path, point, reach: reach)) path,
+      ],
+      homeSites: [
+        for (final site in draft.homeSites)
+          if (!_isHomeSiteAt(site, point)) site,
+      ],
+      resourceNodes: [
+        for (final node in draft.resourceNodes)
+          if (!_isNodeAt(node, point)) node,
+      ],
+    );
+  }
+
+  bool _isNodeAt(EditorPoint node, EditorPoint point) =>
+      (node.x - point.x).abs() < _nodeRemoveRadius &&
+      (node.y - point.y).abs() < _nodeRemoveRadius;
+
+  bool _isHomeSiteAt(EditorPoint site, EditorPoint point) =>
+      (site.x - point.x).abs() < _homeSiteRemoveRadius &&
+      (site.y - point.y).abs() < _homeSiteRemoveRadius;
 
   double? _parseClampedDouble(String text, num min, num max) {
     final value = double.tryParse(text);

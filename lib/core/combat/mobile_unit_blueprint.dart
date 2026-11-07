@@ -1,4 +1,5 @@
 import 'movement_style.dart';
+import 'secondary_weapon.dart';
 import 'unit.dart';
 import 'unit_kind.dart';
 import 'weapon_type.dart';
@@ -91,6 +92,10 @@ class MobileUnitBlueprint with Unit {
   /// `isTargetDetectable` in `mobile_unit_component.dart`.
   final bool isStealth;
 
+  /// An optional second weapon firing independently of the primary one - a
+  /// helicopter's rockets next to its gun. Null for single-weapon units.
+  final SecondaryWeapon? secondary;
+
   const MobileUnitBlueprint({
     required this.kind,
     required this.name,
@@ -111,5 +116,12 @@ class MobileUnitBlueprint with Unit {
     this.cost = 0,
     this.prefersStructures = false,
     this.isStealth = false,
+    this.secondary,
   });
+
+  /// Combined damage per second of every weapon (primary plus secondary),
+  /// used wherever a single "how hard does it hit" number is needed.
+  double get totalDps =>
+      attackDamage / (attackInterval < 0.1 ? 0.1 : attackInterval) +
+      (secondary?.dps ?? 0);
 }

@@ -20,6 +20,7 @@ class TrainingCenterComponent extends TowerComponent {
     UnitKind.soldier,
     UnitKind.antiTankSoldier,
     UnitKind.antiAirSoldier,
+    UnitKind.heavySoldier,
   ];
 
   /// Seconds left before another soldier can be queued - starts ready.

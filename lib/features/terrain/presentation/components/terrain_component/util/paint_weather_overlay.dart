@@ -18,6 +18,7 @@ void paintWeatherOverlay(
   required double width,
   required double height,
   required double weatherPhase,
+  double windOpacityScale = 1,
 }) {
   final rect = ui.Rect.fromLTWH(0, 0, width, height);
 
@@ -28,6 +29,7 @@ void paintWeatherOverlay(
     width: width,
     height: height,
     weatherPhase: weatherPhase,
+    opacityScale: windOpacityScale,
   );
 
   if (weather.cloudCover > 0) {

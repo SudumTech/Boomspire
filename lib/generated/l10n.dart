@@ -1669,6 +1669,146 @@ class S {
     );
   }
 
+  /// `Drag to paint mountains`
+  String get mountainHintEditorPage {
+    return Intl.message(
+      'Drag to paint mountains',
+      name: 'mountainHintEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drag to paint dunes`
+  String get duneHintEditorPage {
+    return Intl.message(
+      'Drag to paint dunes',
+      name: 'duneHintEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drag to plant trees`
+  String get treeHintEditorPage {
+    return Intl.message(
+      'Drag to plant trees',
+      name: 'treeHintEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drag to remove terrain, trees, water, lava and home sites`
+  String get eraseHintEditorPage {
+    return Intl.message(
+      'Drag to remove terrain, trees, water, lava and home sites',
+      name: 'eraseHintEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drag to draw a river`
+  String get riverHintEditorPage {
+    return Intl.message(
+      'Drag to draw a river',
+      name: 'riverHintEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drag a loop to make a lake`
+  String get lakeHintEditorPage {
+    return Intl.message(
+      'Drag a loop to make a lake',
+      name: 'lakeHintEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drag to draw a lava flow`
+  String get lavaHintEditorPage {
+    return Intl.message(
+      'Drag to draw a lava flow',
+      name: 'lavaHintEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drag a loop to make a lava lake`
+  String get volcanicLakeHintEditorPage {
+    return Intl.message(
+      'Drag a loop to make a lava lake',
+      name: 'volcanicLakeHintEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to place or remove a home site`
+  String get homeSiteHintEditorPage {
+    return Intl.message(
+      'Tap to place or remove a home site',
+      name: 'homeSiteHintEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Resource node`
+  String get resourceNodeLabelEditorPage {
+    return Intl.message(
+      'Resource node',
+      name: 'resourceNodeLabelEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to place or remove a resource node`
+  String get resourceNodeHintEditorPage {
+    return Intl.message(
+      'Tap to place or remove a resource node',
+      name: 'resourceNodeHintEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only {max} resource nodes supported`
+  String onlyResourceNodesSupportedEditorPage(int max) {
+    return Intl.message(
+      'Only $max resource nodes supported',
+      name: 'onlyResourceNodesSupportedEditorPage',
+      desc: '',
+      args: [max],
+    );
+  }
+
+  /// `A skirmish map needs {count} home sites - place them with the Home tool`
+  String skirmishNeedsHomesEditorPage(int count) {
+    return Intl.message(
+      'A skirmish map needs $count home sites - place them with the Home tool',
+      name: 'skirmishNeedsHomesEditorPage',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `This mode uses up to {max} home site(s)`
+  String modeHomesHintEditorPage(int max) {
+    return Intl.message(
+      'This mode uses up to $max home site(s)',
+      name: 'modeHomesHintEditorPage',
+      desc: '',
+      args: [max],
+    );
+  }
+
   /// `Dust`
   String get dustLabelEditorPage {
     return Intl.message(

@@ -26,9 +26,9 @@ class AmbientWeatherAudioComponent extends Component
   TerrainAmbience _terrain = TerrainAmbience.none;
   double _untilTerrainSample = 0;
 
-  AmbientWeatherAudioComponent({
-    TerrainAmbienceSampler sampler = const TerrainAmbienceSampler(),
-  }) : _sampler = sampler;
+  AmbientWeatherAudioComponent([
+    this._sampler = const TerrainAmbienceSampler(),
+  ]);
 
   @override
   void update(double dt) {

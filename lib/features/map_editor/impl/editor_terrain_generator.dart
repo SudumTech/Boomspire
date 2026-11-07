@@ -8,7 +8,17 @@ import '../domain/models/editor_terrain_preview.dart';
 import '../domain/models/map_draft.dart';
 import '../domain/models/water_path.dart';
 
-const _cellSize = 40.0;
+/// Edge of one editor grid cell, in arena units - the same grid the terrain
+/// is rasterized on, so the editor can address cells without waiting for a
+/// generated preview.
+const kEditorCellSize = 40.0;
+
+/// Grid size (cols, rows) the editor uses for an arena of this size.
+({int cols, int rows}) editorGridSize(double arenaWidth, double arenaHeight) =>
+    (
+      cols: (arenaWidth / kEditorCellSize).round().clamp(4, 4096),
+      rows: (arenaHeight / kEditorCellSize).round().clamp(4, 4096),
+    );
 
 double _distanceToSegment(Vector2 p, Vector2 a, Vector2 b) {
   final ab = b - a;
@@ -21,9 +31,9 @@ double _distanceToSegment(Vector2 p, Vector2 a, Vector2 b) {
 }
 
 EditorTerrainPreview _generatePreview(MapDraft draft) {
-  final cols = (draft.arenaWidth / _cellSize).round().clamp(4, 4096);
-  final rows = (draft.arenaHeight / _cellSize).round().clamp(4, 4096);
-  final grid = Grid(cols: cols, rows: rows, cellSize: _cellSize);
+  final cols = (draft.arenaWidth / kEditorCellSize).round().clamp(4, 4096);
+  final rows = (draft.arenaHeight / kEditorCellSize).round().clamp(4, 4096);
+  final grid = Grid(cols: cols, rows: rows, cellSize: kEditorCellSize);
   final obstacleKinds = List.generate(
     rows,
     (_) => List<ObstacleKind?>.filled(cols, null),
@@ -96,8 +106,8 @@ void _rasterizeWaterPath(
       for (var col = 0; col < cols; col++) {
         for (var row = 0; row < rows; row++) {
           final center = Vector2(
-            col * _cellSize + _cellSize / 2,
-            row * _cellSize + _cellSize / 2,
+            col * kEditorCellSize + kEditorCellSize / 2,
+            row * kEditorCellSize + kEditorCellSize / 2,
           );
           for (var i = 0; i < points.length - 1; i++) {
             if (_distanceToSegment(center, points[i], points[i + 1]) <=
@@ -116,8 +126,8 @@ void _rasterizeWaterPath(
       for (var col = 0; col < cols; col++) {
         for (var row = 0; row < rows; row++) {
           final center = Vector2(
-            col * _cellSize + _cellSize / 2,
-            row * _cellSize + _cellSize / 2,
+            col * kEditorCellSize + kEditorCellSize / 2,
+            row * kEditorCellSize + kEditorCellSize / 2,
           );
           if (_pointInPolygon(center, points)) {
             paint(col, row, kind, path.variant);

@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 
 /// Paints `HumanLimbsComponent`'s scissoring leg strokes plus (while
-/// [fireFlash] is active) the brief arm/weapon kick stroke.
+/// [fireFlash] is active) a brief muzzle flash at the weapon tip.
 void paintHumanLimbs(
   Canvas canvas, {
   required Vector2 size,
@@ -38,16 +38,21 @@ void paintHumanLimbs(
   );
 
   if (fireFlash > 0) {
-    final armPaint = Paint()
-      ..color = accent.withValues(
-        alpha: (fireFlash / fireFlashDuration).clamp(0.0, 1.0),
-      )
-      ..strokeWidth = size.x * 0.08
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(
-      Offset(cx + size.x * 0.12, cy - size.y * 0.05),
-      Offset(cx + size.x * 0.42, cy - size.y * 0.22),
-      armPaint,
+    // Muzzle flash at the tip of the weapon (the arms themselves are part of
+    // the sprite).
+    final fade = (fireFlash / fireFlashDuration).clamp(0.0, 1.0);
+    final muzzle = Offset(cx + size.x * 0.05, cy - size.y * 0.5);
+    canvas.drawCircle(
+      muzzle,
+      size.x * 0.1,
+      Paint()
+        ..color = accent.withValues(alpha: 0.55 * fade)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2),
+    );
+    canvas.drawCircle(
+      muzzle,
+      size.x * 0.045,
+      Paint()..color = const Color(0xFFFFF3C4).withValues(alpha: fade),
     );
   }
 }

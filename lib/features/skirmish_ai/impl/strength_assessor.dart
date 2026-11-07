@@ -24,10 +24,7 @@ class StrengthAssessor {
   ArmyStrength _ofBlueprint(
     MobileUnitBlueprint blueprint, {
     required double health,
-  }) => ArmyStrength.single(
-    health: health,
-    dps: blueprint.attackDamage / max(blueprint.attackInterval, 0.1),
-  );
+  }) => ArmyStrength.single(health: health, dps: blueprint.totalDps);
 
   ArmyStrength ofUnits(Iterable<MobileUnitComponent> units) =>
       units.fold(ArmyStrength.zero, (sum, unit) => sum + ofUnit(unit));

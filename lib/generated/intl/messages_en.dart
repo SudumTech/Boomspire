@@ -56,25 +56,32 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m10(name) => "Imported \"${name}\"";
 
-  static String m11(max) => "Only ${max} home sites supported";
+  static String m11(max) => "This mode uses up to ${max} home site(s)";
 
-  static String m12(percent) => "Preview weather at: ${percent}% of match";
+  static String m12(max) => "Only ${max} home sites supported";
 
-  static String m13(count) => "Randomize all ${count} waves";
+  static String m13(max) => "Only ${max} resource nodes supported";
 
-  static String m14(width) => "River width: ${width}";
+  static String m14(percent) => "Preview weather at: ${percent}% of match";
 
-  static String m15(name) => "Saved \"${name}\"";
+  static String m15(count) => "Randomize all ${count} waves";
 
-  static String m16(percent) => "Sun angle: ${percent}%";
+  static String m16(width) => "River width: ${width}";
 
-  static String m17(tier) => "Tier ${tier}";
+  static String m17(name) => "Saved \"${name}\"";
 
-  static String m18(current, total) => "Wave ${current} / ${total}";
+  static String m18(count) =>
+      "A skirmish map needs ${count} home sites - place them with the Home tool";
 
-  static String m19(count) => "${count} WAVES";
+  static String m19(percent) => "Sun angle: ${percent}%";
 
-  static String m20(percent) => "${percent}%";
+  static String m20(tier) => "Tier ${tier}";
+
+  static String m21(current, total) => "Wave ${current} / ${total}";
+
+  static String m22(count) => "${count} WAVES";
+
+  static String m23(percent) => "${percent}%";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -184,6 +191,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "difficultyLabelNormal": MessageLookupByLibrary.simpleMessage("Normal"),
     "downloadLabelEditorPage": MessageLookupByLibrary.simpleMessage("Download"),
     "downloadedMapEditorPage": m3,
+    "duneHintEditorPage": MessageLookupByLibrary.simpleMessage(
+      "Drag to paint dunes",
+    ),
     "duneLabelEditorPage": MessageLookupByLibrary.simpleMessage("Dune"),
     "dustLabelEditorPage": MessageLookupByLibrary.simpleMessage("Dust"),
     "dynamicWeatherLabelEditorPage": MessageLookupByLibrary.simpleMessage(
@@ -194,6 +204,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "environmentLabelEditorPage": MessageLookupByLibrary.simpleMessage(
       "Environment",
+    ),
+    "eraseHintEditorPage": MessageLookupByLibrary.simpleMessage(
+      "Drag to remove terrain, trees, water, lava and home sites",
     ),
     "eraseLabelEditorPage": MessageLookupByLibrary.simpleMessage("Erase"),
     "exitConfirmBody": MessageLookupByLibrary.simpleMessage(
@@ -212,12 +225,21 @@ class MessageLookup extends MessageLookupByLibrary {
     "goldMinePayoutIn": m5,
     "heightLabelEditorPage": MessageLookupByLibrary.simpleMessage("Height"),
     "homeLabelEditorPage": MessageLookupByLibrary.simpleMessage("Home"),
+    "homeSiteHintEditorPage": MessageLookupByLibrary.simpleMessage(
+      "Tap to place or remove a home site",
+    ),
     "homeSitesHintEditorPage": m6,
     "hpLabelEntityPanel": m7,
     "hudAiBaseLabel": m8,
     "hudWaveLabel": m9,
     "importedMapEditorPage": m10,
+    "lakeHintEditorPage": MessageLookupByLibrary.simpleMessage(
+      "Drag a loop to make a lake",
+    ),
     "lakeLabelEditorPage": MessageLookupByLibrary.simpleMessage("Lake"),
+    "lavaHintEditorPage": MessageLookupByLibrary.simpleMessage(
+      "Drag to draw a lava flow",
+    ),
     "lavaLabelEditorPage": MessageLookupByLibrary.simpleMessage("Lava"),
     "levelSelectSubtitle": MessageLookupByLibrary.simpleMessage(
       "Choose a campaign",
@@ -234,6 +256,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "mapEditorTooltip": MessageLookupByLibrary.simpleMessage("Map Editor"),
     "mapLabelEditorPage": MessageLookupByLibrary.simpleMessage("Map"),
+    "modeHomesHintEditorPage": m11,
     "modeLabelEditorPage": MessageLookupByLibrary.simpleMessage("Mode"),
     "modeSelectSubtitle": MessageLookupByLibrary.simpleMessage(
       "Choose how you want to fight",
@@ -250,14 +273,18 @@ class MessageLookup extends MessageLookupByLibrary {
       "Tower Defense",
     ),
     "moreTooltipEditorPage": MessageLookupByLibrary.simpleMessage("More"),
+    "mountainHintEditorPage": MessageLookupByLibrary.simpleMessage(
+      "Drag to paint mountains",
+    ),
     "mountainLabelEditorPage": MessageLookupByLibrary.simpleMessage("Mountain"),
     "nextWaveTooltipEditorPage": MessageLookupByLibrary.simpleMessage(
       "Next wave",
     ),
-    "onlyHomeSitesSupportedEditorPage": m11,
+    "onlyHomeSitesSupportedEditorPage": m12,
+    "onlyResourceNodesSupportedEditorPage": m13,
     "playAgain": MessageLookupByLibrary.simpleMessage("PLAY AGAIN"),
     "playLabelEditorPage": MessageLookupByLibrary.simpleMessage("Play"),
-    "previewWeatherLabelEditorPage": m12,
+    "previewWeatherLabelEditorPage": m14,
     "previousWaveTooltipEditorPage": MessageLookupByLibrary.simpleMessage(
       "Previous wave",
     ),
@@ -265,7 +292,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "PRODUCE UNITS",
     ),
     "rainLabelEditorPage": MessageLookupByLibrary.simpleMessage("Rain"),
-    "randomizeAllWavesLabelEditorPage": m13,
+    "randomizeAllWavesLabelEditorPage": m15,
     "randomizeWaveLabelEditorPage": MessageLookupByLibrary.simpleMessage(
       "Randomize",
     ),
@@ -275,14 +302,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "resetZoomTooltipEditorPage": MessageLookupByLibrary.simpleMessage(
       "Reset zoom",
     ),
+    "resourceNodeHintEditorPage": MessageLookupByLibrary.simpleMessage(
+      "Tap to place or remove a resource node",
+    ),
+    "resourceNodeLabelEditorPage": MessageLookupByLibrary.simpleMessage(
+      "Resource node",
+    ),
+    "riverHintEditorPage": MessageLookupByLibrary.simpleMessage(
+      "Drag to draw a river",
+    ),
     "riverLabelEditorPage": MessageLookupByLibrary.simpleMessage("River"),
-    "riverWidthLabelEditorPage": m14,
+    "riverWidthLabelEditorPage": m16,
     "saveLabelEditorPage": MessageLookupByLibrary.simpleMessage("Save"),
-    "savedMapEditorPage": m15,
+    "savedMapEditorPage": m17,
     "sceneCompleted": MessageLookupByLibrary.simpleMessage("COMPLETED"),
     "singleKeyframeHintEditorPage": MessageLookupByLibrary.simpleMessage(
       "Only the first keyframe applies while Dynamic Weather is off",
     ),
+    "skirmishNeedsHomesEditorPage": m18,
     "skirmishOptionEditorPage": MessageLookupByLibrary.simpleMessage(
       "Skirmish",
     ),
@@ -334,7 +371,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "startingGoldLabelEditorPage": MessageLookupByLibrary.simpleMessage(
       "Starting gold",
     ),
-    "sunAngleLabelEditorPage": m16,
+    "sunAngleLabelEditorPage": m19,
     "testingHandDrawnMapBriefingEditorPage":
         MessageLookupByLibrary.simpleMessage(
           "Testing your hand-drawn map draft.",
@@ -352,7 +389,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "towerNameRocket": MessageLookupByLibrary.simpleMessage("Rocket Battery"),
     "towerNameRocketSilo": MessageLookupByLibrary.simpleMessage("Rocket Silo"),
     "towerNameSam": MessageLookupByLibrary.simpleMessage("SAM Site"),
-    "towerTier": m17,
+    "towerTier": m20,
+    "treeHintEditorPage": MessageLookupByLibrary.simpleMessage(
+      "Drag to plant trees",
+    ),
     "treeLabelEditorPage": MessageLookupByLibrary.simpleMessage("Tree"),
     "treesOffHintEditorPage": MessageLookupByLibrary.simpleMessage(
       "This biome has no automatic trees - use the Tree tool to add your own",
@@ -376,6 +416,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Untitled Map",
     ),
     "uploadLabelEditorPage": MessageLookupByLibrary.simpleMessage("Upload"),
+    "volcanicLakeHintEditorPage": MessageLookupByLibrary.simpleMessage(
+      "Drag a loop to make a lava lake",
+    ),
     "volcanicLakeLabelEditorPage": MessageLookupByLibrary.simpleMessage(
       "Volcanic Lake",
     ),
@@ -385,8 +428,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "waveDefenseOptionEditorPage": MessageLookupByLibrary.simpleMessage(
       "Wave Defense",
     ),
-    "waveHeaderEditorPage": m18,
-    "wavesCount": m19,
+    "waveHeaderEditorPage": m21,
+    "wavesCount": m22,
     "wavesLabelEditorPage": MessageLookupByLibrary.simpleMessage("Waves"),
     "weaponLabelBullet": MessageLookupByLibrary.simpleMessage("Bullets"),
     "weaponLabelCannon": MessageLookupByLibrary.simpleMessage("Cannon Shells"),
@@ -417,6 +460,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "zoomOutTooltipEditorPage": MessageLookupByLibrary.simpleMessage(
       "Zoom out",
     ),
-    "zoomPercentEditorPage": m20,
+    "zoomPercentEditorPage": m23,
   };
 }

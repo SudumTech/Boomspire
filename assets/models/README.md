@@ -36,6 +36,13 @@ into static (single-frame) Lottie/Bodymovin JSON. Regenerate with:
 tool/lottie_gen/.venv/bin/python3 tool/lottie_gen/gen_units.py
 ```
 
+The `.json` files here are the only art format the game loads (see
+`LottieUnitRenderRepositoryImpl`). The generator can also write plain SVGs
+(`gen_units.py --svg`, into `assets/models_svg/`) as source material for an
+external tool such as Rive - those are not bundled or used by the game, so
+they are not kept in the repo.
+
+
 These files are static - all per-frame motion (bobbing, rotor spin,
 recoil) stays owned by Flame, not the Lottie timeline. Since a live
 `LottieComponent` would repaint the whole vector shape tree every frame

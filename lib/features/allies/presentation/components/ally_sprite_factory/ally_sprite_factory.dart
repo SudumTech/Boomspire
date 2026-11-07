@@ -4,6 +4,7 @@ import '../../../../../core/combat/unit_kind.dart';
 import '../../../../../core/rendering/procedural_image.dart';
 import 'util/paint_aircraft.dart';
 import 'util/paint_anti_air.dart';
+import 'util/paint_artillery_barrage.dart';
 import 'util/paint_anti_tank.dart';
 import 'util/paint_drone.dart';
 import 'util/paint_light_vehicle.dart';
@@ -26,6 +27,7 @@ class AllySpriteFactory {
   static Sprite? _antiAir;
   static Sprite? _stealthBomber;
   static Sprite? _drone;
+  static Sprite? _artilleryBarrage;
   AllySpriteFactory._();
 
   static Future<Sprite> aircraft() async {
@@ -47,6 +49,13 @@ class AllySpriteFactory {
     if (cached != null) return cached;
     final image = await renderToImage(48, 48, paintAntiTank);
     return _antiTank = Sprite(image);
+  }
+
+  static Future<Sprite> artilleryBarrage() async {
+    final cached = _artilleryBarrage;
+    if (cached != null) return cached;
+    final image = await renderToImage(52, 52, paintArtilleryBarrage);
+    return _artilleryBarrage = Sprite(image);
   }
 
   static Future<Sprite> drone() async {
@@ -87,6 +96,7 @@ class AllySpriteFactory {
     UnitKind.antiAirSoldier => antiAir(),
     UnitKind.stealthBomber => stealthBomber(),
     UnitKind.drone => drone(),
+    UnitKind.artilleryBarrage => artilleryBarrage(),
     _ => throw ArgumentError('No ally sprite for $kind'),
   };
 
@@ -109,6 +119,7 @@ class AllySpriteFactory {
     UnitKind.antiTankSoldier ||
     UnitKind.antiAirSoldier ||
     UnitKind.stealthBomber ||
+    UnitKind.artilleryBarrage ||
     UnitKind.drone => true,
     _ => false,
   };

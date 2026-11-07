@@ -41,7 +41,7 @@ enum UnitKind {
   /// bomb per pass instead of a machine-gun-style burst. Shares one Lottie
   /// model (`ally_stealthBomber`/`enemy_stealthBomber` are the same
   /// silhouette) between both sides - team ownership is shown purely by the
-  /// stripe overlay (see `TeamStripeMarkerComponent`), not by recoloring
+  /// glow marker (see `TeamGlowMarkerComponent`), not by recoloring
   /// the model itself.
   stealthBomber,
 

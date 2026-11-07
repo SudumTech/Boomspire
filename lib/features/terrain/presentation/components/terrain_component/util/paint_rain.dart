@@ -26,7 +26,11 @@ void paintRain(
   final paint = ui.Paint()
     ..strokeCap = ui.StrokeCap.round
     ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 0.9);
-  for (var i = 0; i < (weather.rainIntensity * 160).round(); i++) {
+  // A fractional particle count: the last drop fades in/out with the
+  // remainder instead of popping when the intensity changes.
+  final exactCount = weather.rainIntensity * 160;
+  for (var i = 0; i < exactCount.ceil(); i++) {
+    final presence = (exactCount - i).clamp(0.0, 1.0);
     final drop = rainDropMetrics(
       randX: rnd.nextDouble(),
       randBaseY: rnd.nextDouble(),
@@ -40,7 +44,7 @@ void paintRain(
       fallSpeed: fallSpeed,
     );
     paint
-      ..color = Colors.lightBlueAccent.withValues(alpha: drop.alpha)
+      ..color = Colors.lightBlueAccent.withValues(alpha: drop.alpha * presence)
       ..strokeWidth = drop.strokeWidth;
     canvas.drawLine(
       ui.Offset(drop.x, drop.y),

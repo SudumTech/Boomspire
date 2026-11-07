@@ -10,7 +10,6 @@ void paintMobileUnitOverlay(
   required bool selected,
   required double idlePhase,
   required Color accent,
-  required Color teamColor,
   required double attackRange,
   required double health,
   required double effectiveMaxHealth,
@@ -18,22 +17,6 @@ void paintMobileUnitOverlay(
   required Vector2 size,
 }) {
   final center = Offset(size.x / 2, size.y / 2);
-
-  // Always-on team ring under the unit, so every unit reads as belonging to
-  // a side at a glance regardless of its sprite.
-  canvas.drawCircle(
-    center,
-    size.x * 0.55,
-    Paint()..color = teamColor.withValues(alpha: 0.2),
-  );
-  canvas.drawCircle(
-    center,
-    size.x * 0.55,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..color = teamColor.withValues(alpha: 0.9),
-  );
 
   if (selected) {
     final pulse = 0.5 + 0.5 * sin(idlePhase * 1.6);

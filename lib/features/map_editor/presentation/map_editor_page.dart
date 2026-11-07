@@ -15,14 +15,18 @@ import '../../terrain/domain/models/biome.dart';
 import '../../terrain/extensions/biome_extensions.dart';
 import '../domain/models/map_draft.dart';
 import '../domain/repos/map_draft_repository.dart';
-import '../extensions/editor_tool_extensions.dart';
 import 'state/map_editor_draft_state.dart';
 import 'state/map_editor_persistence_state.dart';
 import 'widgets/map_editor_app_bar_button_widget.dart';
+import 'widgets/map_editor_brush_options_widget.dart';
 import 'widgets/map_editor_canvas_painter.dart';
+import 'widgets/map_editor_mode_selector_widget.dart';
 import 'widgets/map_editor_sidebar_section_widget.dart';
+import 'widgets/map_editor_tool_hint_widget.dart';
+import 'widgets/map_editor_tool_palette_widget.dart';
 import 'widgets/map_editor_toast_widget.dart';
 import 'widgets/map_editor_weather_keyframe_editor_widget.dart';
+import 'widgets/map_editor_zoom_bar_widget.dart';
 
 /// The map editor: paint terrain obstacles, draw freehand rivers/lakes,
 /// size the arena, and author the scene's sun/weather timeline.
@@ -124,66 +128,12 @@ class _MapEditorPageState extends State<MapEditorPage> {
           body: Row(
             children: [
               Expanded(
-                child: Column(
+                child: Stack(
                   children: [
-                    Padding(
-                      padding: AppThemePaddings.ltrb16_8_16_0,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Container(
-                          padding: AppThemePaddings.h8v2,
-                          decoration: BoxDecoration(
-                            color: AppThemeColors.glassPill,
-                            borderRadius: AppThemeBorders.radius20,
-                            border: Border.all(
-                              color: AppThemeColors.borderSubtle,
-                              width: AppThemeBorders.width1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                tooltip: S.current.zoomOutTooltipEditorPage,
-                                icon: const Icon(
-                                  Icons.remove,
-                                  color: AppThemeColors.textMuted,
-                                ),
-                                onPressed: () => _zoomBy(1 / 1.25),
-                              ),
-                              Text(
-                                S.current.zoomPercentEditorPage(
-                                  (currentZoom * 100).round(),
-                                ),
-                                style: const TextStyle(
-                                  color: AppThemeColors.textMuted,
-                                ),
-                              ),
-                              IconButton(
-                                tooltip: S.current.zoomInTooltipEditorPage,
-                                icon: const Icon(
-                                  Icons.add,
-                                  color: AppThemeColors.textMuted,
-                                ),
-                                onPressed: () => _zoomBy(1.25),
-                              ),
-                              IconButton(
-                                tooltip: S.current.resetZoomTooltipEditorPage,
-                                icon: const Icon(
-                                  Icons.center_focus_weak,
-                                  color: AppThemeColors.textMuted,
-                                ),
-                                onPressed: _resetZoom,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
+                    Positioned.fill(
                       child: Center(
                         child: Padding(
-                          padding: AppThemePaddings.all24,
+                          padding: const EdgeInsets.fromLTRB(88, 24, 24, 24),
                           child: LayoutBuilder(
                             builder: (context, constraints) {
                               final aspect =
@@ -234,6 +184,10 @@ class _MapEditorPageState extends State<MapEditorPage> {
                                               .getMaxScaleOnAxis(),
                                         ),
                                     child: GestureDetector(
+                                      onTapUp: (d) => _draftState.handleTap(
+                                        d.localPosition,
+                                        _canvasSize,
+                                      ),
                                       onPanStart: (d) =>
                                           _draftState.handlePanStart(
                                             d.localPosition,
@@ -259,6 +213,8 @@ class _MapEditorPageState extends State<MapEditorPage> {
                                               currentPreviewProgress,
                                           homeSites: currentDraft.homeSites,
                                           treeCells: currentDraft.treeCells,
+                                          resourceNodes:
+                                              currentDraft.resourceNodes,
                                         ),
                                       ),
                                     ),
@@ -268,6 +224,29 @@ class _MapEditorPageState extends State<MapEditorPage> {
                             },
                           ),
                         ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 16,
+                      top: 24,
+                      child: MapEditorToolPaletteWidget(
+                        selected: currentTool,
+                        onSelected: _draftState.setTool,
+                      ),
+                    ),
+                    Positioned(
+                      left: 88,
+                      bottom: 28,
+                      child: MapEditorToolHintWidget(tool: currentTool),
+                    ),
+                    Positioned(
+                      right: 28,
+                      bottom: 28,
+                      child: MapEditorZoomBarWidget(
+                        zoom: currentZoom,
+                        onZoomOut: () => _zoomBy(1 / 1.25),
+                        onZoomIn: () => _zoomBy(1.25),
+                        onReset: _resetZoom,
                       ),
                     ),
                   ],
@@ -294,105 +273,15 @@ class _MapEditorPageState extends State<MapEditorPage> {
                           icon: Icons.brush,
                           title: S.current.brushLabelEditorPage,
                           children: [
-                            Wrap(
-                              spacing: AppThemeSpacing.space8,
-                              runSpacing: AppThemeSpacing.space8,
-                              children: [
-                                for (final tool in EditorTool.values)
-                                  ChoiceChip(
-                                    label: Text(tool.label),
-                                    selected: currentTool == tool,
-                                    onSelected: (_) =>
-                                        _draftState.setTool(tool),
-                                    backgroundColor:
-                                        AppThemeColors.surfacePanel,
-                                    selectedColor: AppThemeColors.accentCyan
-                                        .withValues(alpha: 0.22),
-                                    side: BorderSide(
-                                      color: currentTool == tool
-                                          ? AppThemeColors.accentCyan
-                                          : AppThemeColors.borderSubtle,
-                                    ),
-                                    labelStyle: TextStyle(
-                                      color: currentTool == tool
-                                          ? AppThemeColors.accentCyan
-                                          : AppThemeColors.textSecondary,
-                                      fontWeight: currentTool == tool
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                    ),
-                                  ),
-                              ],
+                            MapEditorBrushOptionsWidget(
+                              tool: currentTool,
+                              homeSiteCount: currentDraft.homeSites.length,
+                              maxHomeSites: _draftState.maxHomeSites,
+                              riverWidth: currentRiverWidth,
+                              onRiverWidthChanged: _draftState.setRiverWidth,
+                              variant: currentVariant,
+                              onVariantChanged: _draftState.setVariant,
                             ),
-                            if (currentTool == EditorTool.homeSite) ...[
-                              SizedBox(height: AppThemeSpacing.space8),
-                              Text(
-                                S.current.homeSitesHintEditorPage(
-                                  currentDraft.homeSites.length,
-                                  _draftState.maxHomeSites,
-                                ),
-                                style: const TextStyle(
-                                  color: AppThemeColors.textMuted,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                            if (currentTool == EditorTool.river ||
-                                currentTool == EditorTool.lava) ...[
-                              SizedBox(height: AppThemeSpacing.space8),
-                              Text(
-                                S.current.riverWidthLabelEditorPage(
-                                  currentRiverWidth.round(),
-                                ),
-                                style: const TextStyle(
-                                  color: AppThemeColors.textMuted,
-                                ),
-                              ),
-                              Slider(
-                                value: currentRiverWidth,
-                                min: 16,
-                                max: 160,
-                                onChanged: (value) =>
-                                    _draftState.setRiverWidth(value),
-                              ),
-                            ],
-                            if (currentTool == EditorTool.mountain ||
-                                currentTool == EditorTool.dune ||
-                                currentTool == EditorTool.river ||
-                                currentTool == EditorTool.lake ||
-                                currentTool == EditorTool.lava ||
-                                currentTool == EditorTool.volcanicLake ||
-                                currentTool == EditorTool.tree) ...[
-                              SizedBox(height: AppThemeSpacing.space8),
-                              Text(
-                                S.current.brushTypeLabelEditorPage,
-                                style: const TextStyle(
-                                  color: AppThemeColors.textMuted,
-                                ),
-                              ),
-                              SizedBox(height: AppThemeSpacing.space8),
-                              Wrap(
-                                spacing: AppThemeSpacing.space8,
-                                runSpacing: AppThemeSpacing.space8,
-                                children: [
-                                  ChoiceChip(
-                                    label: Text(
-                                      S.current.brushTypeMatchBiomeEditorPage,
-                                    ),
-                                    selected: currentVariant == null,
-                                    onSelected: (_) =>
-                                        _draftState.setVariant(null),
-                                  ),
-                                  for (final biome in Biome.values)
-                                    ChoiceChip(
-                                      label: Text(biome.displayName),
-                                      selected: currentVariant == biome,
-                                      onSelected: (_) =>
-                                          _draftState.setVariant(biome),
-                                    ),
-                                ],
-                              ),
-                            ],
                           ],
                         ),
                         MapEditorSidebarSectionWidget(
@@ -448,33 +337,11 @@ class _MapEditorPageState extends State<MapEditorPage> {
                                 ],
                               ),
                             ),
-                            DropdownButtonFormField<GameMode>(
-                              initialValue: currentDraft.mode,
-                              dropdownColor: AppThemeColors.surfacePanel,
-                              style: const TextStyle(
-                                color: AppThemeColors.textPrimary,
-                              ),
-                              decoration: InputDecoration(
-                                labelText: S.current.modeLabelEditorPage,
-                              ),
-                              items: [
-                                DropdownMenuItem(
-                                  value: GameMode.waveDefense,
-                                  child: Text(
-                                    S.current.waveDefenseOptionEditorPage,
-                                  ),
-                                ),
-                                DropdownMenuItem(
-                                  value: GameMode.skirmish,
-                                  child: Text(
-                                    S.current.skirmishOptionEditorPage,
-                                  ),
-                                ),
-                              ],
-                              onChanged: (mode) {
-                                if (mode != null) _draftState.setMode(mode);
-                              },
+                            MapEditorModeSelectorWidget(
+                              mode: currentDraft.mode,
+                              onChanged: _draftState.setMode,
                             ),
+                            SizedBox(height: AppThemeSpacing.space8),
                             Row(
                               children: [
                                 Expanded(
@@ -489,6 +356,7 @@ class _MapEditorPageState extends State<MapEditorPage> {
                                     ),
                                     onSubmitted: (_) => _applyArenaSize(),
                                     onEditingComplete: _applyArenaSize,
+                                    onTapOutside: (_) => _applyArenaSize(),
                                   ),
                                 ),
                                 SizedBox(width: AppThemeSpacing.space12),
@@ -505,6 +373,7 @@ class _MapEditorPageState extends State<MapEditorPage> {
                                     ),
                                     onSubmitted: (_) => _applyArenaSize(),
                                     onEditingComplete: _applyArenaSize,
+                                    onTapOutside: (_) => _applyArenaSize(),
                                   ),
                                 ),
                               ],
@@ -520,8 +389,10 @@ class _MapEditorPageState extends State<MapEditorPage> {
                                 labelText:
                                     S.current.startingGoldLabelEditorPage,
                               ),
+                              onChanged: (_) => _applyStartingGold(),
                               onSubmitted: (_) => _applyStartingGold(),
                               onEditingComplete: _applyStartingGold,
+                              onTapOutside: (_) => _applyStartingGold(),
                             ),
                           ],
                         ),
@@ -539,8 +410,10 @@ class _MapEditorPageState extends State<MapEditorPage> {
                                 decoration: InputDecoration(
                                   labelText: S.current.waveCountLabelEditorPage,
                                 ),
+                                onChanged: (_) => _applyWaveCount(),
                                 onSubmitted: (_) => _applyWaveCount(),
                                 onEditingComplete: _applyWaveCount,
+                                onTapOutside: (_) => _applyWaveCount(),
                               ),
                               SizedBox(height: AppThemeSpacing.space8),
                               OutlinedButton.icon(
@@ -847,7 +720,10 @@ class _MapEditorPageState extends State<MapEditorPage> {
   /// back up, share, or hand-edit - opens the platform's native save/
   /// download dialog (a browser download on web, a save-as dialog on
   /// desktop).
-  Future<void> _downloadDraft() => _persistenceState.download();
+  Future<void> _downloadDraft() {
+    _flushFields();
+    return _persistenceState.download();
+  }
 
   /// Surfaces a one-shot notice from [_draftState] as a toast, then clears
   /// it - the state decided WHAT to say, this only performs the
@@ -873,6 +749,18 @@ class _MapEditorPageState extends State<MapEditorPage> {
   /// home site if one was set (falls back to the default east-edge base,
   /// single western approach, otherwise).
   Future<void> _play() async {
+    _flushFields();
+    final draft = _draftState.draft.value;
+    if (draft.mode == GameMode.skirmish) {
+      // A skirmish is set up on the placement screen (pick your seat and the
+      // difficulty) exactly like a saved map from the list.
+      if (!_draftState.canPlaySkirmish()) return;
+      await context.push(
+        Routes.skirmishPlacement.route,
+        extra: SkirmishPlacementArgs(draft: draft),
+      );
+      return;
+    }
     final args = await _persistenceState.preparePlay();
     if (!mounted) return;
     await context.push(Routes.game.route, extra: args);
@@ -883,7 +771,19 @@ class _MapEditorPageState extends State<MapEditorPage> {
     _viewerController.value = Matrix4.identity();
   }
 
-  Future<void> _save() => _persistenceState.save();
+  Future<void> _save() {
+    _flushFields();
+    return _persistenceState.save();
+  }
+
+  /// Applies whatever is typed in the numeric fields right now. A value only
+  /// used to count once Enter was pressed, so typing a starting gold and then
+  /// pressing Play/Save silently kept the old number.
+  void _flushFields() {
+    _applyArenaSize();
+    _applyStartingGold();
+    _applyWaveCount();
+  }
 
   /// Floats a brief glass-styled confirmation over the editor - matches the
   /// game's [showGlassMessage] look but is non-modal and auto-dismisses.

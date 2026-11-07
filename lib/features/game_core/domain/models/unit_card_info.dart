@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import '../../../../core/combat/mobile_unit_blueprint.dart';
 import '../../../../core/combat/unit_domain.dart';
 
@@ -31,10 +29,10 @@ class UnitCardInfo {
     final armed = blueprint.attackDamage > 0;
     return UnitCardInfo(
       name: blueprint.name,
-      targets: armed ? blueprint.attackDomains : const {},
-      power: armed
-          ? blueprint.attackDamage / max(blueprint.attackInterval, 0.1)
-          : 0,
+      targets: armed
+          ? {...blueprint.attackDomains, ...?blueprint.secondary?.attackDomains}
+          : const {},
+      power: armed ? blueprint.totalDps : 0,
       health: blueprint.maxHealth,
       speed: blueprint.speed,
       range: blueprint.attackRange,

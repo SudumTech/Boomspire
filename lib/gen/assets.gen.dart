@@ -24,6 +24,9 @@ class $AssetsAudioGen {
   /// File path: assets/audio/defeat.wav
   String get defeat => 'assets/audio/defeat.wav';
 
+  /// Directory path: assets/audio/effects
+  $AssetsAudioEffectsGen get effects => const $AssetsAudioEffectsGen();
+
   /// File path: assets/audio/enemy_death.wav
   String get enemyDeath => 'assets/audio/enemy_death.wav';
 
@@ -135,11 +138,23 @@ class $AssetsModelsGen {
   /// File path: assets/models/ally_antiAirSoldier.json
   String get allyAntiAirSoldier => 'assets/models/ally_antiAirSoldier.json';
 
+  /// File path: assets/models/ally_antiAirVehicle.json
+  String get allyAntiAirVehicle => 'assets/models/ally_antiAirVehicle.json';
+
   /// File path: assets/models/ally_antiTankSoldier.json
   String get allyAntiTankSoldier => 'assets/models/ally_antiTankSoldier.json';
 
+  /// File path: assets/models/ally_artilleryBarrage.json
+  String get allyArtilleryBarrage => 'assets/models/ally_artilleryBarrage.json';
+
   /// File path: assets/models/ally_drone.json
   String get allyDrone => 'assets/models/ally_drone.json';
+
+  /// File path: assets/models/ally_heavySoldier.json
+  String get allyHeavySoldier => 'assets/models/ally_heavySoldier.json';
+
+  /// File path: assets/models/ally_helicopter.json
+  String get allyHelicopter => 'assets/models/ally_helicopter.json';
 
   /// File path: assets/models/ally_lightVehicle.json
   String get allyLightVehicle => 'assets/models/ally_lightVehicle.json';
@@ -192,8 +207,12 @@ class $AssetsModelsGen {
     readme,
     allyAircraft,
     allyAntiAirSoldier,
+    allyAntiAirVehicle,
     allyAntiTankSoldier,
+    allyArtilleryBarrage,
     allyDrone,
+    allyHeavySoldier,
+    allyHelicopter,
     allyLightVehicle,
     allyRocketBarrage,
     allySoldier,
@@ -209,6 +228,89 @@ class $AssetsModelsGen {
     enemySoldier,
     enemyStealthBomber,
     enemyTank,
+  ];
+}
+
+class $AssetsAudioEffectsGen {
+  const $AssetsAudioEffectsGen();
+
+  /// File path: assets/audio/effects/danevaer-vinyl-dust-noise-2-434728.mp3
+  String get danevaerVinylDustNoise2434728 =>
+      'assets/audio/effects/danevaer-vinyl-dust-noise-2-434728.mp3';
+
+  /// File path: assets/audio/effects/dragon-studio-dry-leaves-rustling-482874.mp3
+  String get dragonStudioDryLeavesRustling482874 =>
+      'assets/audio/effects/dragon-studio-dry-leaves-rustling-482874.mp3';
+
+  /// File path: assets/audio/effects/dragon-studio-harsh-wind-515272.mp3
+  String get dragonStudioHarshWind515272 =>
+      'assets/audio/effects/dragon-studio-harsh-wind-515272.mp3';
+
+  /// File path: assets/audio/effects/dragon-studio-soothing-river-flow-372456.mp3
+  String get dragonStudioSoothingRiverFlow372456 =>
+      'assets/audio/effects/dragon-studio-soothing-river-flow-372456.mp3';
+
+  /// File path: assets/audio/effects/dragon-studio-winter-wind-402331.mp3
+  String get dragonStudioWinterWind402331 =>
+      'assets/audio/effects/dragon-studio-winter-wind-402331.mp3';
+
+  /// File path: assets/audio/effects/feedthestraycats-real-rain-sound-379215.mp3
+  String get feedthestraycatsRealRainSound379215 =>
+      'assets/audio/effects/feedthestraycats-real-rain-sound-379215.mp3';
+
+  /// File path: assets/audio/effects/freesound_community-birds-chirping-75156.mp3
+  String get freesoundCommunityBirdsChirping75156 =>
+      'assets/audio/effects/freesound_community-birds-chirping-75156.mp3';
+
+  /// File path: assets/audio/effects/freesound_community-lava-loop-2-67306.mp3
+  String get freesoundCommunityLavaLoop267306 =>
+      'assets/audio/effects/freesound_community-lava-loop-2-67306.mp3';
+
+  /// File path: assets/audio/effects/freesound_community-snowing-in-dresden-heide-57670.mp3
+  String get freesoundCommunitySnowingInDresdenHeide57670 =>
+      'assets/audio/effects/freesound_community-snowing-in-dresden-heide-57670.mp3';
+
+  /// File path: assets/audio/effects/freesound_community-wind-during-snow-storm-2-17562.mp3
+  String get freesoundCommunityWindDuringSnowStorm217562 =>
+      'assets/audio/effects/freesound_community-wind-during-snow-storm-2-17562.mp3';
+
+  /// File path: assets/audio/effects/kokoreli777-sea-waves-169411.mp3
+  String get kokoreli777SeaWaves169411 =>
+      'assets/audio/effects/kokoreli777-sea-waves-169411.mp3';
+
+  /// File path: assets/audio/effects/loswin23-raining-537715.mp3
+  String get loswin23Raining537715 =>
+      'assets/audio/effects/loswin23-raining-537715.mp3';
+
+  /// File path: assets/audio/effects/oxidvideos-chirping-birds-ambience-217410.mp3
+  String get oxidvideosChirpingBirdsAmbience217410 =>
+      'assets/audio/effects/oxidvideos-chirping-birds-ambience-217410.mp3';
+
+  /// File path: assets/audio/effects/soundsforyou-wind-in-trees-117477.mp3
+  String get soundsforyouWindInTrees117477 =>
+      'assets/audio/effects/soundsforyou-wind-in-trees-117477.mp3';
+
+  /// File path: assets/audio/effects/storegraphic-soft-wind-477404.mp3
+  String get storegraphicSoftWind477404 =>
+      'assets/audio/effects/storegraphic-soft-wind-477404.mp3';
+
+  /// List of all assets
+  List<String> get values => [
+    danevaerVinylDustNoise2434728,
+    dragonStudioDryLeavesRustling482874,
+    dragonStudioHarshWind515272,
+    dragonStudioSoothingRiverFlow372456,
+    dragonStudioWinterWind402331,
+    feedthestraycatsRealRainSound379215,
+    freesoundCommunityBirdsChirping75156,
+    freesoundCommunityLavaLoop267306,
+    freesoundCommunitySnowingInDresdenHeide57670,
+    freesoundCommunityWindDuringSnowStorm217562,
+    kokoreli777SeaWaves169411,
+    loswin23Raining537715,
+    oxidvideosChirpingBirdsAmbience217410,
+    soundsforyouWindInTrees117477,
+    storegraphicSoftWind477404,
   ];
 }
 

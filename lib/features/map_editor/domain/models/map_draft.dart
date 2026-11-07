@@ -39,6 +39,10 @@ abstract class MapDraft with _$MapDraft {
     @Default([]) List<TreeCell> treeCells,
     @Default([]) List<WaterPath> waterPaths,
     @Default([]) List<EditorPoint> homeSites,
+
+    /// Capturable resource nodes (the skirmish second-resource economy),
+    /// placed by the editor's resource-node tool.
+    @Default([]) List<EditorPoint> resourceNodes,
     @Default(EnvironmentSettings()) EnvironmentSettings environment,
     @Default(3000) int startingGold,
     @Default(10) int waveCount,

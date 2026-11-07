@@ -20,7 +20,9 @@ void paintSnow(
 }) {
   final rnd = math.Random(9);
   const fallSpeed = 60.0;
-  for (var i = 0; i < (weather.snowIntensity * 110).round(); i++) {
+  final exactCount = weather.snowIntensity * 110;
+  for (var i = 0; i < exactCount.ceil(); i++) {
+    final presence = (exactCount - i).clamp(0.0, 1.0);
     final flake = snowFlakeMetrics(
       randBaseX: rnd.nextDouble(),
       randBaseY: rnd.nextDouble(),
@@ -38,7 +40,8 @@ void paintSnow(
     canvas.drawCircle(
       ui.Offset(flake.x, flake.y),
       flake.radius,
-      ui.Paint()..color = Colors.white.withValues(alpha: flake.alpha),
+      ui.Paint()
+        ..color = Colors.white.withValues(alpha: flake.alpha * presence),
     );
   }
 }

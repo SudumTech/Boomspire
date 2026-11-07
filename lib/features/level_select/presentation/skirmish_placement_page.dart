@@ -16,6 +16,7 @@ import '../../game_core/domain/models/game_scene.dart';
 import '../../map_editor/domain/models/editor_point.dart';
 import '../../map_editor/domain/models/editor_terrain_preview.dart';
 import '../../map_editor/domain/models/map_draft.dart';
+import '../../map_editor/impl/map_draft_scene_factory.dart';
 import '../../map_editor/impl/map_draft_terrain_repository.dart';
 import 'biome_preview.dart';
 import 'state/skirmish_placement_state.dart';
@@ -308,20 +309,7 @@ class _SkirmishPlacementPageState extends State<SkirmishPlacementPage> {
         else
           site,
     ];
-    return GameScene(
-      id: scene.id,
-      name: scene.name,
-      briefing: scene.briefing,
-      biome: scene.biome,
-      mode: scene.mode,
-      waveCount: scene.waveCount,
-      aggressionBias: scene.aggressionBias,
-      homeLayout: scene.homeLayout,
-      spawnLayout: scene.spawnLayout,
-      homeSites: sites,
-      resourceNodeSites: scene.resourceNodeSites,
-      startingGold: scene.startingGold,
-    );
+    return scene.withHomeSites(sites);
   }
 
   void _selectSlot(int index) {
@@ -378,15 +366,10 @@ class _SkirmishPlacementPageState extends State<SkirmishPlacementPage> {
       Routes.game.route,
       extra: GameRouteArgs(
         difficulty: widget.difficulty,
-        scene: GameScene(
-          id: 'draft-${draft.id}',
-          name: draft.name.isEmpty
-              ? S.current.untitledMapEditorPage
-              : draft.name,
-          briefing: S.current.skirmishPlacementTestBriefing,
-          biome: draft.biome,
+        scene: const MapDraftSceneFactory().sceneFor(
+          draft,
           mode: aiSite != null ? GameMode.skirmish : GameMode.waveDefense,
-          startingGold: draft.startingGold,
+          briefing: S.current.skirmishPlacementTestBriefing,
         ),
         terrainRepository: MapDraftTerrainRepository(
           draft: draft,

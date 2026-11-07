@@ -59,6 +59,14 @@ class MapDraftTerrainRepository implements TerrainRepository {
 
     clearCell(baseCell);
     clearCell(spawnCell);
+
+    // Resource nodes sit on open ground: carve their cell clear, and never
+    // let one land on top of a base.
+    final nodeCells = <Point<int>>{
+      for (final node in draft.resourceNodes) cellFor(node),
+    }..removeAll({baseCell, spawnCell, ?secondaryBaseCell});
+    nodeCells.forEach(clearCell);
+
     _ensureReachable(grid, obstacleKinds, spawnCell, baseCell);
 
     return TerrainMap(
@@ -80,6 +88,10 @@ class MapDraftTerrainRepository implements TerrainRepository {
               grid.cellCenter(secondaryBaseCell).x,
               grid.cellCenter(secondaryBaseCell).y,
             ),
+      resourceNodePoints: [
+        for (final cell in nodeCells)
+          PathPoint(grid.cellCenter(cell).x, grid.cellCenter(cell).y),
+      ],
       treeCells: [
         for (final tree in draft.treeCells)
           if (Point(tree.col, tree.row) != baseCell &&

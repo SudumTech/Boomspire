@@ -96,6 +96,25 @@ class GameScene {
     this.environment = const EnvironmentSettings(),
   });
 
+  /// A copy of this scene with different [homeSites] and everything else
+  /// (weather, starting gold, nodes, ...) carried over unchanged.
+  GameScene withHomeSites(List<HomeSite> sites) => GameScene(
+    id: id,
+    name: name,
+    briefing: briefing,
+    biome: biome,
+    mode: mode,
+    waveCount: waveCount,
+    aggressionBias: aggressionBias,
+    version: version,
+    homeLayout: homeLayout,
+    spawnLayout: spawnLayout,
+    homeSites: sites,
+    resourceNodeSites: resourceNodeSites,
+    startingGold: startingGold,
+    environment: environment,
+  );
+
   factory GameScene.fromJson(Map<String, dynamic> json) => GameScene(
     id: json['id'] as String,
     name: json['name'] as String,

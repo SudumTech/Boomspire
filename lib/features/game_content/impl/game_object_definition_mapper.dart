@@ -50,6 +50,9 @@ MobileUnitBlueprint applyMobileUnitOverride(
   bounty: override.bounty,
   cost: override.cost,
   prefersStructures: override.prefersStructures,
+  // Not part of a synced definition - keep what the unit already has.
+  isStealth: base.isStealth,
+  secondary: base.secondary,
 );
 
 /// Returns [base] with combat/cost stats replaced by [override]'s - `name`/

@@ -11,6 +11,7 @@ import '../../../waves/impl/wave_repository_impl.dart';
 import '../../domain/models/editor_terrain_preview.dart';
 import '../../domain/models/map_draft.dart';
 import '../../domain/repos/map_draft_repository.dart';
+import '../../impl/map_draft_scene_factory.dart';
 import '../../impl/draft_wave_repository.dart';
 import '../../impl/editor_terrain_generator.dart';
 import '../../impl/map_draft_terrain_repository.dart';
@@ -147,14 +148,10 @@ class MapEditorPersistenceState {
 
   GameRouteArgs _buildLaunchArgs(MapDraft draft, EditorTerrainPreview preview) {
     return GameRouteArgs(
-      scene: GameScene(
-        id: 'draft-${draft.id}',
-        name: draft.name.isEmpty ? S.current.untitledMapEditorPage : draft.name,
+      scene: const MapDraftSceneFactory().sceneFor(
+        draft,
+        mode: GameMode.waveDefense,
         briefing: S.current.testingHandDrawnMapBriefingEditorPage,
-        biome: draft.biome,
-        waveCount: draft.waveCount,
-        startingGold: draft.startingGold,
-        environment: draft.environment,
       ),
       terrainRepository: MapDraftTerrainRepository(
         draft: draft,

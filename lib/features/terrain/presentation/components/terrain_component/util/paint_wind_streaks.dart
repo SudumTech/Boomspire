@@ -25,7 +25,12 @@ void paintWindStreaks(
   required double width,
   required double height,
   required double weatherPhase,
+
+  /// Extra fade (0..1) for the whole effect - used to crossfade between wind
+  /// styles when the weather's style changes.
+  double opacityScale = 1,
 }) {
+  if (opacityScale <= 0) return;
   if (resolvedType == WindType.ash) {
     paintSkyFlames(
       canvas,
@@ -37,9 +42,11 @@ void paintWindStreaks(
   if (weather.windStrength <= 0) return;
 
   final rnd = math.Random(13);
-  final strength = weather.windStrength.clamp(0, 1);
+  final strength = weather.windStrength.clamp(0, 1) * opacityScale;
   final streakLength = 18 + weather.windStrength * 40;
-  final count = (weather.windStrength * 40).round();
+  // Fractional: the last particle fades with the remainder, never pops.
+  final exactCount = weather.windStrength * 40;
+  final count = exactCount.ceil();
   final drift = windStreakDrift(
     weatherPhase: weatherPhase,
     windStrength: weather.windStrength,
@@ -47,6 +54,7 @@ void paintWindStreaks(
 
   if (resolvedType == WindType.ash) {
     for (var i = 0; i < count; i++) {
+      final presence = (exactCount - i).clamp(0.0, 1.0);
       final pos = ashParticlePosition(
         randBaseX: rnd.nextDouble(),
         randBaseY: rnd.nextDouble(),
@@ -66,7 +74,7 @@ void paintWindStreaks(
               const ui.Color(0xFF9e9e9e),
               const ui.Color(0xFF2b2b2b),
               rnd.nextDouble(),
-            )!.withValues(alpha: 0.3 * strength),
+            )!.withValues(alpha: 0.3 * strength * presence),
         );
       } else {
         // A drifting burnt-leaf smudge - short, dark, slightly curved.
@@ -75,7 +83,7 @@ void paintWindStreaks(
           ui.Offset(pos.x + streakLength * 0.5, pos.y - streakLength * 0.12),
           ui.Paint()
             ..color = const ui.Color(0xFF4a3524)
-                .withValues(alpha: 0.22 * strength)
+                .withValues(alpha: 0.22 * strength * presence)
             ..strokeWidth = 1.6
             ..strokeCap = ui.StrokeCap.round,
         );
@@ -103,7 +111,9 @@ void paintWindStreaks(
       drift: drift,
     );
     final baseY = rnd.nextDouble() * height;
-    paint.color = color.withValues(alpha: 0.18 * strength);
+    paint.color = color.withValues(
+      alpha: 0.18 * strength * (exactCount - i).clamp(0.0, 1.0),
+    );
     canvas.drawLine(
       ui.Offset(x, baseY),
       ui.Offset(x + streakLength, baseY - streakLength * 0.18),

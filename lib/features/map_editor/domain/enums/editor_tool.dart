@@ -9,4 +9,7 @@ enum EditorTool {
   lava,
   volcanicLake,
   homeSite,
+
+  /// A capturable resource node (skirmish economy).
+  resourceNode,
 }

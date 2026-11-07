@@ -8,7 +8,7 @@ import 'dart:ui';
 
 import 'package:boomspire/core/combat/unit_kind.dart';
 import 'package:boomspire/features/game_core/domain/models/game_scene.dart';
-import 'package:boomspire/features/game_core/presentation/player_palette.dart';
+import 'package:boomspire/features/game_core/extensions/game_mode_extensions.dart';
 import 'package:boomspire/features/map_editor/domain/models/map_draft.dart';
 import 'package:boomspire/features/map_editor/domain/models/water_path.dart';
 import 'package:boomspire/features/map_editor/domain/models/weather_keyframe.dart';
@@ -105,6 +105,14 @@ void main() {
               EditorTool.volcanicLake => WaterFeatureKind.volcanicLake,
               _ => WaterFeatureKind.river,
             });
+          case EditorTool.resourceNode:
+            state.setTool(EditorTool.resourceNode);
+            final before = state.draft.value.resourceNodes.length;
+            state.handlePanStart(const Offset(640, 360), canvasSize);
+            expect(state.draft.value.resourceNodes.length, before + 1);
+            // Tapping the same spot again removes it.
+            state.handlePanStart(const Offset(640, 360), canvasSize);
+            expect(state.draft.value.resourceNodes.length, before);
           case EditorTool.homeSite:
             state.setTool(EditorTool.homeSite);
             final before = state.draft.value.homeSites.length;
@@ -115,6 +123,164 @@ void main() {
             expect(state.draft.value.homeSites.length, before);
         }
       }
+    });
+
+    test('the eraser removes rivers, lakes, lava, volcanic lakes and home '
+        'sites, not just painted cells and trees', () async {
+      final state = newState();
+      addTearDown(state.dispose);
+      await state.initialize();
+
+      void drag(EditorTool tool, List<Offset> points) {
+        state.setTool(tool);
+        state.handlePanStart(points.first, canvasSize);
+        for (final p in points.skip(1)) {
+          state.handlePanUpdate(p, canvasSize);
+        }
+        state.handlePanEnd();
+      }
+
+      // A river along y=100, lava along y=300, a lake and a volcanic lake as
+      // closed loops, plus a home site.
+      drag(EditorTool.river, const [Offset(100, 100), Offset(500, 100)]);
+      drag(EditorTool.lava, const [Offset(100, 300), Offset(500, 300)]);
+      drag(EditorTool.lake, const [
+        Offset(700, 100),
+        Offset(900, 100),
+        Offset(900, 250),
+        Offset(700, 250),
+      ]);
+      drag(EditorTool.volcanicLake, const [
+        Offset(700, 400),
+        Offset(900, 400),
+        Offset(900, 550),
+        Offset(700, 550),
+      ]);
+      state.setTool(EditorTool.homeSite);
+      state.handlePanStart(const Offset(200, 600), canvasSize);
+      expect(state.draft.value.waterPaths, hasLength(4));
+      expect(state.draft.value.homeSites, hasLength(1));
+
+      void eraseAt(Offset at) {
+        state.setTool(EditorTool.erase);
+        state.handlePanStart(at, canvasSize);
+        state.handlePanEnd();
+      }
+
+      // Touching the middle of a river stroke removes just that river.
+      eraseAt(const Offset(300, 100));
+      expect(
+        state.draft.value.waterPaths.map((p) => p.kind),
+        isNot(contains(WaterFeatureKind.river)),
+      );
+      expect(state.draft.value.waterPaths, hasLength(3));
+
+      eraseAt(const Offset(300, 300)); // lava
+      eraseAt(const Offset(800, 175)); // inside the lake
+      eraseAt(const Offset(800, 475)); // inside the volcanic lake
+      expect(state.draft.value.waterPaths, isEmpty);
+
+      eraseAt(const Offset(200, 600)); // the home site
+      expect(state.draft.value.homeSites, isEmpty);
+    });
+
+    test('the eraser leaves water it does not touch alone', () async {
+      final state = newState();
+      addTearDown(state.dispose);
+      await state.initialize();
+
+      state.setTool(EditorTool.river);
+      state.handlePanStart(const Offset(100, 100), canvasSize);
+      state.handlePanUpdate(const Offset(500, 100), canvasSize);
+      state.handlePanEnd();
+
+      state.setTool(EditorTool.erase);
+      state.handlePanStart(const Offset(300, 600), canvasSize); // far away
+      state.handlePanEnd();
+      expect(state.draft.value.waterPaths, hasLength(1));
+    });
+
+    group('modes and home sites', () {
+      test('tower defense has one home, skirmish has two (for now)', () async {
+        final state = newState();
+        addTearDown(state.dispose);
+        await state.initialize();
+
+        expect(GameMode.waveDefense.maxHomeSites, 1);
+        expect(GameMode.skirmish.maxHomeSites, 2);
+
+        state.setTool(EditorTool.homeSite);
+        state.handlePanStart(const Offset(100, 100), canvasSize);
+        state.handlePanStart(const Offset(300, 100), canvasSize);
+        expect(
+          state.draft.value.homeSites,
+          hasLength(1),
+          reason: 'tower defense',
+        );
+        expect(state.notice.value, isNotNull);
+
+        state.setMode(GameMode.skirmish);
+        state.handlePanStart(const Offset(300, 100), canvasSize);
+        state.handlePanStart(const Offset(500, 100), canvasSize); // a third
+        expect(state.draft.value.homeSites, hasLength(2), reason: 'skirmish');
+      });
+
+      test('going back to tower defense keeps only the first home', () async {
+        final state = newState();
+        addTearDown(state.dispose);
+        await state.initialize();
+        state.setMode(GameMode.skirmish);
+        state.setTool(EditorTool.homeSite);
+        state.handlePanStart(const Offset(100, 100), canvasSize);
+        state.handlePanStart(const Offset(400, 400), canvasSize);
+        expect(state.draft.value.homeSites, hasLength(2));
+
+        state.setMode(GameMode.waveDefense);
+        expect(state.draft.value.homeSites, hasLength(1));
+        expect(state.draft.value.homeSites.single.x, closeTo(100, 1));
+      });
+
+      test(
+        'a skirmish can only be played with a home for every side',
+        () async {
+          final state = newState();
+          addTearDown(state.dispose);
+          await state.initialize();
+          state.setMode(GameMode.skirmish);
+          expect(state.canPlaySkirmish(), isFalse);
+          expect(state.notice.value, isNotNull);
+
+          state.setTool(EditorTool.homeSite);
+          state.handlePanStart(const Offset(100, 100), canvasSize);
+          expect(state.canPlaySkirmish(), isFalse);
+          state.handlePanStart(const Offset(900, 500), canvasSize);
+          expect(state.canPlaySkirmish(), isTrue);
+        },
+      );
+
+      test(
+        'resource nodes are capped, saved in the draft and erasable',
+        () async {
+          final state = newState();
+          addTearDown(state.dispose);
+          await state.initialize();
+
+          state.setTool(EditorTool.resourceNode);
+          for (var i = 0; i < MapEditorDraftState.maxResourceNodes + 3; i++) {
+            state.handlePanStart(Offset(60.0 + i * 120, 200), canvasSize);
+          }
+          expect(
+            state.draft.value.resourceNodes,
+            hasLength(MapEditorDraftState.maxResourceNodes),
+          );
+          final json = state.draft.value.toJson();
+          expect(MapDraft.fromJson(json).resourceNodes, hasLength(8));
+
+          state.setTool(EditorTool.erase);
+          state.handlePanStart(const Offset(60, 200), canvasSize);
+          expect(state.draft.value.resourceNodes, hasLength(7));
+        },
+      );
     });
 
     test('a brush type (Biome) can be set for every obstacle/water tool and '
@@ -253,7 +419,7 @@ void main() {
       expect(state.draft.value.waveCount, 7);
 
       state.setMode(GameMode.skirmish);
-      expect(state.maxHomeSites, PlayerPalette.colors.length);
+      expect(state.maxHomeSites, 2);
       state.setMode(GameMode.waveDefense);
       expect(state.maxHomeSites, 1);
 

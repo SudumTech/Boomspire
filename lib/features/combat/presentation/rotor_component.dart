@@ -10,11 +10,14 @@ import 'util/paint_rotor.dart';
 class RotorComponent extends PositionComponent {
   double _spin = 0;
 
-  RotorComponent({required Vector2 position})
+  /// Mounted over the main-rotor mast of a top-down, nose-up helicopter
+  /// sprite (a little behind the middle of the fuselage); the blur disc is
+  /// wider than the fuselage, like a real rotor.
+  RotorComponent({required Vector2 hullSize})
     : super(
-        position: position + Vector2(0, -position.y * 0.7),
+        position: Vector2(hullSize.x * 0.5, hullSize.y * 0.52),
         anchor: Anchor.center,
-        size: Vector2.all(position.x * 1.9),
+        size: Vector2.all(hullSize.x * 1.3),
         priority: 5,
       );
 

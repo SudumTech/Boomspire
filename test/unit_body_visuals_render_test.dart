@@ -12,11 +12,12 @@
 // Expected offsets are computed with the exact same arithmetic as the
 // production code (rather than baked-in decimal literals) so the
 // comparisons are bit-exact instead of fighting floating-point rounding.
+import 'package:boomspire/core/combat/extensions/unit_marker_extensions.dart';
 import 'package:boomspire/core/combat/team.dart';
+import 'package:boomspire/core/combat/unit_kind.dart';
 import 'package:boomspire/features/combat/presentation/fire_component.dart';
 import 'package:boomspire/features/combat/presentation/human_limbs_component.dart';
-import 'package:boomspire/features/combat/presentation/team_stripe_marker_component.dart';
-import 'package:boomspire/features/combat/presentation/vehicle_player_marker_component.dart';
+import 'package:boomspire/features/combat/presentation/team_glow_marker_component.dart';
 import 'package:boomspire/features/combat/presentation/vehicle_tread_component.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
@@ -60,35 +61,55 @@ void main() {
       final limbs = HumanLimbsComponent(hullSize: hullSize, accent: Colors.red)
         ..pulseFire();
 
+      // Two legs, then (because it just fired) a muzzle flash at the weapon
+      // tip - the arms are part of the sprite now, not drawn here.
       expect(
         (Canvas canvas) => limbs.render(canvas),
         paints
           ..line() // left leg, checked separately above
           ..line() // right leg, checked separately above
-          ..line(
-            p1: Offset(cx + hullSize.x * 0.12, cy - hullSize.y * 0.05),
-            p2: Offset(cx + hullSize.x * 0.42, cy - hullSize.y * 0.22),
-          ),
+          ..circle(x: cx + hullSize.x * 0.05, y: cy - hullSize.y * 0.5)
+          ..circle(x: cx + hullSize.x * 0.05, y: cy - hullSize.y * 0.5),
       );
     });
   });
 
-  group('VehiclePlayerMarkerComponent render position', () {
-    test('the team-color badge sits centered on the hull', () {
-      final hullSize = Vector2(40, 40);
-      final marker = VehiclePlayerMarkerComponent(
-        hullSize: hullSize,
+  group('TeamGlowMarkerComponent', () {
+    test('sits at the kind\'s anchor point on the sprite', () {
+      final hull = Vector2(50, 50);
+      final marker = TeamGlowMarkerComponent(
+        hullSize: hull,
         team: Team.defaultPlayer,
+        anchorFraction: UnitKind.tank.markerAnchor,
       );
-      final radius = (hullSize.x * 0.3) / 2;
-      final center = Offset(radius, radius);
+      expect(marker.position.x, closeTo(hull.x * 0.5, 1e-6));
+      expect(marker.position.y, closeTo(hull.y * 0.5, 1e-6));
+    });
 
+    test('is a glowing point in the team colour, with no badge behind it', () {
+      final marker = TeamGlowMarkerComponent(
+        hullSize: Vector2(40, 40),
+        team: Team.aiOpponent,
+        anchorFraction: UnitKind.soldier.markerAnchor,
+      );
+      final center = Offset(marker.size.x / 2, marker.size.y / 2);
+      final core = marker.size.x / 2;
       expect(
         (Canvas canvas) => marker.render(canvas),
         paints
-          ..circle(x: center.dx, y: center.dy, radius: radius)
-          ..circle(x: center.dx, y: center.dy, radius: radius * 0.68),
+          ..circle(x: center.dx, y: center.dy) // soft halo
+          ..circle(x: center.dx, y: center.dy, radius: core) // team colour
+          ..circle(x: center.dx, y: center.dy, radius: core * 0.45), // hot spot
       );
+      expect(marker.color, Team.aiOpponent.color);
+    });
+
+    test('every unit kind has a marker anchor inside its sprite', () {
+      for (final kind in UnitKind.values) {
+        final a = kind.markerAnchor;
+        expect(a.dx, inInclusiveRange(0.0, 1.0), reason: '$kind');
+        expect(a.dy, inInclusiveRange(0.0, 1.0), reason: '$kind');
+      }
     });
   });
 
@@ -140,35 +161,6 @@ void main() {
 
         // Freshly spawned: age is 0, so fade is 1.
         expect((Canvas canvas) => fire.render(canvas), paints..path());
-      },
-    );
-  });
-
-  group('TeamStripeMarkerComponent render', () {
-    test(
-      'a plane\'s team marker is a pulsing light, not a static line/stripe',
-      () {
-        final hullSize = Vector2(40, 40);
-        final marker = TeamStripeMarkerComponent(
-          hullSize: hullSize,
-          team: Team.defaultPlayer,
-        );
-        final center = Offset(marker.size.x / 2, marker.size.y / 2);
-        final radius = marker.size.x * 0.5;
-
-        // No update() has run yet, so `_phase` is still 0.
-        expect(
-          (Canvas canvas) => marker.render(canvas),
-          paints
-            ..circle(x: center.dx, y: center.dy, radius: radius * 1.5)
-            ..circle(x: center.dx, y: center.dy, radius: radius * 0.85),
-        );
-        // The old implementation drew a rounded-rect stripe - assert that
-        // shape is gone, not just that circles happen to also be present.
-        expect(
-          (Canvas canvas) => marker.render(canvas),
-          isNot(paints..rrect()),
-        );
       },
     );
   });

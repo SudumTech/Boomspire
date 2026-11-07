@@ -8,6 +8,10 @@
 // the component tree mounted so tap handling and pathfinding work.
 import 'dart:math';
 
+import 'package:boomspire/core/combat/enums/unit_domain.dart';
+import 'package:boomspire/features/combat/presentation/bullet_component.dart';
+import 'package:boomspire/features/combat/presentation/rocket_component.dart';
+import 'package:boomspire/features/game_core/domain/models/unit_card_info.dart';
 import 'package:boomspire/core/combat/mobile_unit_blueprint.dart';
 import 'package:boomspire/core/combat/mobile_unit_repository_impl.dart';
 import 'package:boomspire/core/combat/team.dart';
@@ -26,6 +30,8 @@ import 'package:boomspire/features/game_core/domain/models/game_config.dart';
 import 'package:boomspire/features/game_core/domain/models/game_difficulty.dart';
 import 'package:boomspire/features/game_core/domain/models/game_scene.dart';
 import 'package:boomspire/features/map_editor/domain/models/environment_settings.dart';
+import 'package:boomspire/features/map_editor/domain/models/map_draft.dart';
+import 'package:boomspire/features/map_editor/impl/map_draft_scene_factory.dart';
 import 'package:boomspire/features/map_editor/domain/models/weather_keyframe.dart';
 import 'package:boomspire/features/terrain/presentation/components/bird_flock_component/bird_flock_component.dart';
 import 'package:boomspire/features/skirmish_ai/domain/enums/army_stance.dart';
@@ -1813,6 +1819,182 @@ void main() {
 
     test('no flocks in heavy rain', () async {
       expect(await flocksAfter(birdyScene(1)), 0);
+    });
+  });
+
+  group('helicopter', () {
+    const dummyHealth = 1e7;
+
+    Future<void> settle(BoomspireGame game) async {
+      await Future<void>.delayed(Duration.zero);
+      game.update(0);
+    }
+
+    MobileUnitComponent spawnDummy(
+      BoomspireGame game,
+      Vector2 at, {
+      required UnitDomain domain,
+    }) {
+      final unit = MobileUnitComponent(
+        blueprint: MobileUnitBlueprint(
+          kind: domain == UnitDomain.air
+              ? UnitKind.helicopter
+              : UnitKind.soldier,
+          name: 'Dummy',
+          maxHealth: dummyHealth,
+          speed: 0,
+          size: 30,
+          domain: domain,
+        ),
+        team: game.aiTeam!,
+        objective: UnitObjective.assaultBase,
+        position: at,
+      );
+      game.world.spawnUnit(unit);
+      return unit;
+    }
+
+    Future<MobileUnitComponent> spawnHeli(
+      BoomspireGame game,
+      Vector2 at,
+    ) async {
+      final heli = MobileUnitComponent(
+        blueprint: game.unitRepository.blueprintFor(
+          game.playerTeam,
+          UnitKind.helicopter,
+        ),
+        team: game.playerTeam,
+        objective: UnitObjective.assaultBase,
+        position: at,
+      );
+      game.world.spawnUnit(heli);
+      await Future<void>.delayed(Duration.zero);
+      game.update(0);
+      heli.issueMoveOrder(at.clone()); // hold here
+      return heli;
+    }
+
+    /// Runs [seconds] and reports whether a gun bullet / a rocket was ever in
+    /// flight.
+    Future<({bool bullets, bool rockets})> fireFor(
+      BoomspireGame game,
+      double seconds,
+    ) async {
+      var bullets = false;
+      var rockets = false;
+      for (var t = 0.0; t < seconds; t += 0.05) {
+        game.update(0.05);
+        // Let freshly spawned projectiles finish mounting.
+        await Future<void>.delayed(Duration.zero);
+        final children = game.world.children;
+        bullets |= children.whereType<BulletComponent>().isNotEmpty;
+        rockets |= children.whereType<RocketComponent>().isNotEmpty;
+      }
+      return (bullets: bullets, rockets: rockets);
+    }
+
+    test('fires its gun AND its rockets at a ground target', () async {
+      final game = await _bootGame(GameScenes.skirmishes.first);
+      await spawnHeli(game, Vector2(600, 400));
+      spawnDummy(game, Vector2(600, 260), domain: UnitDomain.ground);
+      await settle(game);
+
+      final fired = await fireFor(game, 8);
+      expect(fired.bullets, isTrue, reason: 'primary gun');
+      expect(fired.rockets, isTrue, reason: 'secondary rockets');
+    });
+
+    test('its ground-only rockets stay holstered against an aircraft; the '
+        'gun still fires', () async {
+      final game = await _bootGame(GameScenes.skirmishes.first);
+      await spawnHeli(game, Vector2(600, 400));
+      spawnDummy(game, Vector2(600, 260), domain: UnitDomain.air);
+      await settle(game);
+
+      final fired = await fireFor(game, 8);
+      expect(fired.bullets, isTrue);
+      expect(fired.rockets, isFalse);
+    });
+
+    test(
+      'it has to turn its nose toward a target behind it before firing',
+      () async {
+        final game = await _bootGame(GameScenes.skirmishes.first);
+        await spawnHeli(game, Vector2(600, 300));
+        // Directly south; the helicopter starts nose-up (north).
+        spawnDummy(game, Vector2(600, 450), domain: UnitDomain.ground);
+        await settle(game);
+
+        final early = await fireFor(game, 0.3);
+        expect(
+          early.bullets || early.rockets,
+          isFalse,
+          reason: 'still turning',
+        );
+        final later = await fireFor(game, 6);
+        expect(later.bullets, isTrue, reason: 'fires once facing the target');
+      },
+    );
+
+    test('the unit card counts both weapons in its power', () {
+      final blueprint = MobileUnitRepositoryImpl().blueprintFor(
+        Team.defaultPlayer,
+        UnitKind.helicopter,
+      );
+      final primary = blueprint.attackDamage / blueprint.attackInterval;
+      expect(blueprint.secondary, isNotNull);
+      expect(UnitCardInfo.fromBlueprint(blueprint).power, greaterThan(primary));
+    });
+  });
+
+  group('map draft to match', () {
+    test('the draft\'s starting gold goes to the player AND the AI, and its '
+        'weather comes along', () async {
+      const environment = EnvironmentSettings(
+        timeline: [
+          WeatherKeyframe(atProgress: 0, rainIntensity: 0.8),
+          WeatherKeyframe(atProgress: 1, snowIntensity: 0.6),
+        ],
+      );
+      final draft = MapDraft(
+        id: 'gold',
+        name: 'Gold',
+        mode: GameMode.skirmish,
+        startingGold: 421,
+        environment: environment,
+      );
+      final scene = const MapDraftSceneFactory().sceneFor(
+        draft,
+        mode: GameMode.skirmish,
+        briefing: 'test',
+      );
+      expect(scene.environment, environment);
+      expect(scene.startingGold, 421);
+
+      final game = await _bootGame(scene);
+      expect(game.gameState.gold, 421, reason: 'the human player');
+      expect(game.aiEconomy!.gold, 421, reason: 'the AI opponent');
+      expect(game.scene.environment.timeline, hasLength(2));
+    });
+
+    test('tower defense drafts use the same factory and gold', () {
+      final draft = MapDraft(id: 'td', name: 'TD', startingGold: 650);
+      final scene = const MapDraftSceneFactory().sceneFor(
+        draft,
+        mode: GameMode.waveDefense,
+        briefing: 'test',
+      );
+      expect(scene.startingGold, 650);
+      expect(scene.waveCount, draft.waveCount);
+    });
+
+    test('picking a different home keeps the built-in map\'s weather and '
+        'gold', () {
+      final base = GameScenes.skirmishes.first;
+      final swapped = base.withHomeSites(base.homeSites.reversed.toList());
+      expect(swapped.environment, base.environment);
+      expect(swapped.startingGold, base.startingGold);
+      expect(swapped.resourceNodeSites, base.resourceNodeSites);
     });
   });
 

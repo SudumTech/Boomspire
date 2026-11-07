@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import '../../../../game_core/presentation/boomspire_game.dart';
 import '../../../domain/enums/biome.dart';
 import '../../../domain/enums/wind_type.dart';
+import '../../../domain/models/style_crossfade.dart';
 import 'util/paint_ash_particle.dart';
 import 'util/paint_autumn_leaf_particle.dart';
 import 'util/paint_dust_particle.dart';
@@ -35,6 +36,10 @@ class WindEffectComponent extends PositionComponent
   final Biome _biome;
 
   WindType? _currentType;
+
+  /// Fades the old particle style out and the new one in when the live
+  /// weather moves to another wind style (instead of swapping instantly).
+  late StyleCrossfade<WindType> _fade;
   final List<_WindParticle> _particles = [];
 
   WindEffectComponent({required Vector2 arenaSize, required Biome biome})
@@ -51,6 +56,7 @@ class WindEffectComponent extends PositionComponent
 
   @override
   Future<void> onLoad() async {
+    _fade = StyleCrossfade(_resolvedType);
     _restyle(_resolvedType);
   }
 
@@ -70,7 +76,7 @@ class WindEffectComponent extends PositionComponent
             x: x,
             y: y,
             scale: p.scale,
-            opacity: p.opacity,
+            opacity: p.opacity * _fade.opacity,
           );
         case WindType.snow:
           paintSnowParticle(
@@ -78,7 +84,7 @@ class WindEffectComponent extends PositionComponent
             x: x,
             y: y,
             scale: p.scale,
-            opacity: p.opacity,
+            opacity: p.opacity * _fade.opacity,
           );
         case WindType.sand:
           paintSandParticle(
@@ -86,7 +92,7 @@ class WindEffectComponent extends PositionComponent
             x: x,
             y: y,
             scale: p.scale,
-            opacity: p.opacity,
+            opacity: p.opacity * _fade.opacity,
           );
         case WindType.dust:
           paintDustParticle(
@@ -94,7 +100,7 @@ class WindEffectComponent extends PositionComponent
             x: x,
             y: y,
             scale: p.scale,
-            opacity: p.opacity,
+            opacity: p.opacity * _fade.opacity,
           );
         case WindType.autumnLeaves:
           paintAutumnLeafParticle(
@@ -102,7 +108,7 @@ class WindEffectComponent extends PositionComponent
             x: x,
             y: y,
             scale: p.scale,
-            opacity: p.opacity,
+            opacity: p.opacity * _fade.opacity,
             rotation: p.rotation,
             colorIndex: p.colorIndex,
           );
@@ -112,7 +118,7 @@ class WindEffectComponent extends PositionComponent
             x: x,
             y: y,
             scale: p.scale,
-            opacity: p.opacity,
+            opacity: p.opacity * _fade.opacity,
             colorIndex: p.colorIndex,
           );
         case WindType.automatic:
@@ -124,8 +130,8 @@ class WindEffectComponent extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
-    final resolved = _resolvedType;
-    if (resolved != _currentType) _restyle(resolved);
+    _fade.update(_resolvedType, dt);
+    if (_fade.style != _currentType) _restyle(_fade.style);
 
     for (final p in _particles) {
       p.gustPhase += dt * 0.6;

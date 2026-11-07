@@ -1,3 +1,7 @@
+import '../../../domain/models/style_crossfade.dart';
+import '../../../../map_editor/domain/models/weather_keyframe.dart';
+import '../../../extensions/biome_extensions.dart';
+
 import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
@@ -32,6 +36,9 @@ class TerrainComponent extends PositionComponent
   double _riverPhase = 0;
   double _treeSwayPhase = 0;
   double _weatherPhase = 0;
+  late final StyleCrossfade<WindType> _windStyle = StyleCrossfade(
+    terrainMap.biome.defaultWindType,
+  );
   TerrainComponent({required this.terrainMap})
     : super(
         position: Vector2.zero(),
@@ -130,7 +137,11 @@ class TerrainComponent extends PositionComponent
     _riverPhase += dt;
     _treeSwayPhase += dt;
     _weatherPhase += dt;
+    _windStyle.update(_liveWeather().resolvedWindType(game.scene.biome), dt);
   }
+
+  WeatherKeyframe _liveWeather() =>
+      game.scene.environment.sampleBlend(game.weatherFocus.weights);
 
   void _paintBase(ui.Canvas canvas) {
     // Trees are never baked by [TerrainPainter.paint] - they're painted
@@ -146,7 +157,9 @@ class TerrainComponent extends PositionComponent
   void _paintEnvironment(ui.Canvas canvas) {
     final environment = game.scene.environment;
     final weather = environment.sampleBlend(game.weatherFocus.weights);
-    final resolvedType = weather.resolvedWindType(game.scene.biome);
+    // The wind style crossfades through nothing instead of snapping when the
+    // blended weather crosses into another style.
+    final resolvedType = _windStyle.style;
     paintSunLight(canvas, environment.sunAngle, width: size.x, height: size.y);
     paintWeatherOverlay(
       canvas,
@@ -155,6 +168,7 @@ class TerrainComponent extends PositionComponent
       width: size.x,
       height: size.y,
       weatherPhase: _weatherPhase,
+      windOpacityScale: _windStyle.opacity,
     );
   }
 

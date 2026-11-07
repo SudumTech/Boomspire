@@ -2,6 +2,7 @@ import '../../features/game_content/domain/models/game_object_definition.dart';
 import '../../features/game_content/impl/game_object_definition_mapper.dart';
 import 'mobile_unit_blueprint.dart';
 import 'mobile_unit_repository.dart';
+import 'secondary_weapon.dart';
 import 'movement_style.dart';
 import 'team.dart';
 import 'unit.dart';
@@ -39,6 +40,8 @@ class MobileUnitRepositoryImpl implements MobileUnitRepository {
       attackInterval: 1.4,
       weaponType: WeaponType.cannon,
     ),
+    // Gunship with two weapons: a rapid chin gun (primary - hits ground and
+    // air) and rocket pods (secondary - heavy, ground only, slow reload).
     UnitKind.helicopter: MobileUnitBlueprint(
       kind: UnitKind.helicopter,
       name: 'Helicopter',
@@ -49,11 +52,21 @@ class MobileUnitRepositoryImpl implements MobileUnitRepository {
       domain: UnitDomain.air,
       attackDomains: {UnitDomain.ground, UnitDomain.air},
       isVehicle: true,
-      attackDamage: 6,
-      attackRange: 160,
-      attackInterval: 0.9,
+      attackDamage: 9,
+      attackRange: 190,
+      attackInterval: 1.1,
+      projectileCount: 5,
+      clipShotInterval: 0.08,
       movementStyle: MovementStyle.hover,
-      weaponType: WeaponType.rocket,
+      weaponType: WeaponType.bullet,
+      secondary: SecondaryWeapon(
+        damage: 36,
+        range: 190,
+        interval: 3.6,
+        projectileCount: 2,
+        clipShotInterval: 0.25,
+        weaponType: WeaponType.rocket,
+      ),
     ),
     // Stronger than before (was 280/14/150) - a deliberate ask to make
     // enemy armor a real threat once it's in engagement range. One shot per
@@ -360,6 +373,86 @@ class MobileUnitRepositoryImpl implements MobileUnitRepository {
       clipShotInterval: 0.3,
       movementStyle: MovementStyle.swoop,
       weaponType: WeaponType.rocket,
+    ),
+    // Tower-defense units the skirmish roster was missing - the same
+    // machines the invaders field, now buildable (and so usable by the AI
+    // opponent too).
+    UnitKind.artilleryBarrage: MobileUnitBlueprint(
+      kind: UnitKind.artilleryBarrage,
+      name: 'Ally Artillery Barrage',
+      cost: 320,
+      maxHealth: 170,
+      speed: 26,
+      bounty: 85,
+      size: 52,
+      isVehicle: true,
+      attackDamage: 40,
+      attackRange: 270,
+      attackInterval: 2.4,
+      projectileCount: 3,
+      clipShotInterval: 0.15,
+      movementStyle: MovementStyle.roll,
+      weaponType: WeaponType.rocket,
+      prefersStructures: true,
+    ),
+    UnitKind.antiAirVehicle: MobileUnitBlueprint(
+      kind: UnitKind.antiAirVehicle,
+      name: 'Ally Anti-Air Vehicle',
+      cost: 240,
+      maxHealth: 150,
+      speed: 48,
+      bounty: 55,
+      size: 46,
+      attackDomains: {UnitDomain.ground, UnitDomain.air},
+      isVehicle: true,
+      attackDamage: 9,
+      projectileCount: 2,
+      clipShotInterval: 0.12,
+      attackRange: 215,
+      attackInterval: 1.0,
+      movementStyle: MovementStyle.roll,
+      weaponType: WeaponType.cannon,
+    ),
+    UnitKind.helicopter: MobileUnitBlueprint(
+      kind: UnitKind.helicopter,
+      name: 'Ally Helicopter',
+      cost: 280,
+      maxHealth: 70,
+      speed: 100,
+      bounty: 40,
+      size: 38,
+      domain: UnitDomain.air,
+      attackDomains: {UnitDomain.ground, UnitDomain.air},
+      isVehicle: true,
+      attackDamage: 10,
+      attackRange: 195,
+      attackInterval: 1.1,
+      projectileCount: 5,
+      clipShotInterval: 0.08,
+      movementStyle: MovementStyle.hover,
+      weaponType: WeaponType.bullet,
+      secondary: SecondaryWeapon(
+        damage: 42,
+        range: 195,
+        interval: 3.4,
+        projectileCount: 2,
+        clipShotInterval: 0.25,
+        weaponType: WeaponType.rocket,
+      ),
+    ),
+    // Infantry heavy: mustered from the Training Center.
+    UnitKind.heavySoldier: MobileUnitBlueprint(
+      kind: UnitKind.heavySoldier,
+      name: 'Ally Heavy Soldier',
+      cost: 110,
+      maxHealth: 140,
+      speed: 42,
+      bounty: 35,
+      size: 46,
+      attackDamage: 10,
+      attackRange: 140,
+      attackInterval: 1.4,
+      weaponType: WeaponType.cannon,
     ),
   };
 
