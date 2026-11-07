@@ -1,3 +1,5 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import '../../../map_editor/domain/models/environment_settings.dart';
 import '../../../terrain/domain/models/biome.dart';
 import '../enums/game_mode.dart';
@@ -9,6 +11,9 @@ export '../enums/game_mode.dart';
 export '../enums/home_layout.dart';
 export '../enums/home_site_owner.dart';
 export '../enums/spawn_layout.dart';
+
+part 'game_scene.freezed.dart';
+part 'game_scene.g.dart';
 
 /// Pure version comparison - mirrors `GameObjectDefinition`'s `needsUpdate`
 /// so a server-served [GameScene] only replaces a cached/built-in one when
@@ -23,179 +28,91 @@ bool sceneNeedsUpdate({
 /// scene is a full, self-contained mission rather than just a re-skinned
 /// map.
 ///
-/// Scenes round-trip through [toJson]/[fromJson] so they can be authored as
-/// data (see `assets/scenes/`) rather than only as Dart literals in
-/// [GameScenes] - the foundation a future in-game scene/map builder writes
-/// to.
-class GameScene {
-  final String id;
+/// This is the single shape of a map everywhere it exists: the bundled
+/// `assets/scenes/scenes.json` (the source of truth the game loads), the
+/// server copy, the on-device cache and maps made in the editor all
+/// serialize through [toJson]/[fromJson].
+@freezed
+abstract class GameScene with _$GameScene {
+  const factory GameScene({
+    required String id,
+    required String name,
 
-  final String name;
+    /// Flavor text describing the terrain and the incoming strategy.
+    required String briefing,
+    required Biome biome,
+    @Default(GameMode.waveDefense) GameMode mode,
 
-  /// Flavor text describing the terrain and the incoming strategy.
-  final String briefing;
+    /// Total number of waves in this scene's campaign. Unused by
+    /// [GameMode.skirmish] scenes.
+    @Default(0) int waveCount,
 
-  final Biome biome;
+    /// Added on top of the AI director's computed aggression each wave (0 =
+    /// no change, higher = a harder-fought campaign from the start). Unused
+    /// by [GameMode.skirmish] scenes.
+    @Default(0.0) double aggressionBias,
 
-  final GameMode mode;
+    /// Bumped whenever any field changes for this [id] - see
+    /// [sceneNeedsUpdate]/`SceneSyncService`, which uses it to decide whether
+    /// a server-served scene should replace a cached/built-in one.
+    @Default(1) int version,
 
-  /// Total number of waves in this scene's campaign. Unused by
-  /// [GameMode.skirmish] scenes.
-  final int waveCount;
+    /// Unused by [GameMode.skirmish] scenes (see [homeSites] instead).
+    @Default(HomeLayout.eastEdge) HomeLayout homeLayout,
 
-  /// Added on top of the AI director's computed aggression each wave (0 =
-  /// no change, higher = a harder-fought campaign from the start). Unused
-  /// by [GameMode.skirmish] scenes.
-  final double aggressionBias;
+    /// Unused by [GameMode.skirmish] scenes.
+    @Default(SpawnLayout.single) SpawnLayout spawnLayout,
 
-  /// Unused by [GameMode.skirmish] scenes (see [homeSites] instead).
-  final HomeLayout homeLayout;
+    /// One entry per team seat, for [GameMode.skirmish] scenes - empty for
+    /// [GameMode.waveDefense] scenes, which always use [homeLayout] instead.
+    @Default(<HomeSite>[]) List<HomeSite> homeSites,
 
-  /// Unused by [GameMode.skirmish] scenes.
-  final SpawnLayout spawnLayout;
+    /// Capturable second-resource nodes on this scene's map - placed as a
+    /// fraction of the arena size so the same scene definition still makes
+    /// sense at any arena size. Empty for scenes with no capturable economy.
+    @Default(<ResourceNodeSite>[]) List<ResourceNodeSite> resourceNodeSites,
 
-  /// One entry per team seat, for [GameMode.skirmish] scenes - empty for
-  /// [GameMode.waveDefense] scenes, which always use [homeLayout] instead.
-  final List<HomeSite> homeSites;
+    /// Starting gold for this scene, or null to fall back to
+    /// `GameConfig.startingGold`/`GameConfig.startingSkirmishGold` (picked by
+    /// `mode`) - lets a scene/map draft author a different economy.
+    @JsonKey(includeIfNull: false) int? startingGold,
 
-  /// Capturable second-resource nodes on this scene's map - placed as a
-  /// fraction of the arena size so the same scene definition still makes
-  /// sense at any arena size. Empty for scenes with no capturable economy.
-  final List<ResourceNodeSite> resourceNodeSites;
+    /// This scene's lighting, weather and environment sound - defaults to a
+    /// static, weather-free look with the natural sound mix.
+    @Default(EnvironmentSettings()) EnvironmentSettings environment,
+  }) = _GameScene;
 
-  /// Starting gold for this scene, or null to fall back to
-  /// `GameConfig.startingGold`/`GameConfig.startingSkirmishGold` (picked by
-  /// `mode`) - lets a scene/map draft author a different economy (e.g. the
-  /// map editor's arena-size field) instead of only a single global constant.
-  final int? startingGold;
+  factory GameScene.fromJson(Map<String, dynamic> json) =>
+      _$GameSceneFromJson(json);
 
-  /// This scene's lighting/weather setup, authored in the map editor -
-  /// defaults to a static, weather-free look for hand-written [GameScenes]
-  /// entries that never set one.
-  final EnvironmentSettings environment;
-
-  /// Bumped whenever any field above changes for this [id] - see
-  /// [sceneNeedsUpdate]/`SceneSyncService`, which uses it to decide whether
-  /// a server-served scene should replace a cached/built-in one.
-  final int version;
-
-  const GameScene({
-    required this.id,
-    required this.name,
-    required this.briefing,
-    required this.biome,
-    this.mode = GameMode.waveDefense,
-    this.waveCount = 0,
-    this.aggressionBias = 0,
-    this.version = 1,
-    this.homeLayout = HomeLayout.eastEdge,
-    this.spawnLayout = SpawnLayout.single,
-    this.homeSites = const [],
-    this.resourceNodeSites = const [],
-    this.startingGold,
-    this.environment = const EnvironmentSettings(),
-  });
+  const GameScene._();
 
   /// A copy of this scene with different [homeSites] and everything else
-  /// (weather, starting gold, nodes, ...) carried over unchanged.
-  GameScene withHomeSites(List<HomeSite> sites) => GameScene(
-    id: id,
-    name: name,
-    briefing: briefing,
-    biome: biome,
-    mode: mode,
-    waveCount: waveCount,
-    aggressionBias: aggressionBias,
-    version: version,
-    homeLayout: homeLayout,
-    spawnLayout: spawnLayout,
-    homeSites: sites,
-    resourceNodeSites: resourceNodeSites,
-    startingGold: startingGold,
-    environment: environment,
-  );
-
-  factory GameScene.fromJson(Map<String, dynamic> json) => GameScene(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    briefing: json['briefing'] as String,
-    biome: Biome.values.byName(json['biome'] as String),
-    mode: GameMode.values.byName(
-      json['mode'] as String? ?? GameMode.waveDefense.name,
-    ),
-    waveCount: json['waveCount'] as int? ?? 0,
-    aggressionBias: (json['aggressionBias'] as num?)?.toDouble() ?? 0,
-    homeLayout: HomeLayout.values.byName(
-      json['homeLayout'] as String? ?? HomeLayout.eastEdge.name,
-    ),
-    spawnLayout: SpawnLayout.values.byName(
-      json['spawnLayout'] as String? ?? SpawnLayout.single.name,
-    ),
-    homeSites: (json['homeSites'] as List<dynamic>? ?? const [])
-        .map((site) => HomeSite.fromJson(site as Map<String, dynamic>))
-        .toList(),
-    resourceNodeSites: (json['resourceNodeSites'] as List<dynamic>? ?? const [])
-        .map((site) => ResourceNodeSite.fromJson(site as Map<String, dynamic>))
-        .toList(),
-    startingGold: json['startingGold'] as int?,
-    version: json['version'] as int? ?? 1,
-    environment: json['environment'] == null
-        ? const EnvironmentSettings()
-        : EnvironmentSettings.fromJson(
-            json['environment'] as Map<String, dynamic>,
-          ),
-  );
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'briefing': briefing,
-    'biome': biome.name,
-    'mode': mode.name,
-    'waveCount': waveCount,
-    'aggressionBias': aggressionBias,
-    'homeLayout': homeLayout.name,
-    'spawnLayout': spawnLayout.name,
-    'homeSites': homeSites.map((site) => site.toJson()).toList(),
-    'resourceNodeSites': resourceNodeSites
-        .map((site) => site.toJson())
-        .toList(),
-    if (startingGold != null) 'startingGold': startingGold,
-    'version': version,
-    'environment': environment.toJson(),
-  };
+  /// (weather, sound, starting gold, nodes, ...) carried over unchanged.
+  GameScene withHomeSites(List<HomeSite> sites) => copyWith(homeSites: sites);
 }
 
 /// One buildable home site on a skirmish map - a scene lists one per team
 /// seat that can fight in that match.
-class HomeSite {
-  final HomeLayout layout;
-  final HomeSiteOwner owner;
+@freezed
+abstract class HomeSite with _$HomeSite {
+  const factory HomeSite({
+    required HomeLayout layout,
+    required HomeSiteOwner owner,
+  }) = _HomeSite;
 
-  const HomeSite({required this.layout, required this.owner});
-
-  factory HomeSite.fromJson(Map<String, dynamic> json) => HomeSite(
-    layout: HomeLayout.values.byName(json['layout'] as String),
-    owner: HomeSiteOwner.values.byName(json['owner'] as String),
-  );
-
-  Map<String, dynamic> toJson() => {'layout': layout.name, 'owner': owner.name};
+  factory HomeSite.fromJson(Map<String, dynamic> json) =>
+      _$HomeSiteFromJson(json);
 }
 
 /// A capturable resource node's placement on a scene's map, as a fraction of
 /// the arena size (0,0 = top-left, 1,1 = bottom-right) so the same scene
 /// definition still makes sense at any arena size.
-class ResourceNodeSite {
-  final double dx;
-  final double dy;
-
-  const ResourceNodeSite({required this.dx, required this.dy});
+@freezed
+abstract class ResourceNodeSite with _$ResourceNodeSite {
+  const factory ResourceNodeSite({required double dx, required double dy}) =
+      _ResourceNodeSite;
 
   factory ResourceNodeSite.fromJson(Map<String, dynamic> json) =>
-      ResourceNodeSite(
-        dx: (json['dx'] as num).toDouble(),
-        dy: (json['dy'] as num).toDouble(),
-      );
-
-  Map<String, dynamic> toJson() => {'dx': dx, 'dy': dy};
+      _$ResourceNodeSiteFromJson(json);
 }

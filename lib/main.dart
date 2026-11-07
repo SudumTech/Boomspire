@@ -14,6 +14,7 @@ import 'features/game_content/impl/game_content_sync_service.dart';
 import 'features/game_content/impl/http_game_content_repository_impl.dart';
 import 'features/game_content/impl/local_game_content_cache_repository_impl.dart';
 import 'features/game_core/domain/models/game_scenes.dart';
+import 'features/game_core/impl/bundled_scenes_seed.dart';
 import 'features/game_core/impl/http_scene_repository_impl.dart';
 import 'features/game_core/impl/local_scene_cache_repository_impl.dart';
 import 'features/game_core/impl/scene_sync_service.dart';
@@ -35,7 +36,7 @@ Future<void> main() async {
   final sceneOverrides = await SceneSyncService(
     HttpSceneRepositoryImpl(),
     LocalSceneCacheRepositoryImpl(),
-  ).resolveScenes(const []);
+  ).resolveScenes(await loadBundledScenesSeed());
   GameScenes.applyOverrides(sceneOverrides);
   setupServiceLocator(gameContentOverrides: gameContentOverrides);
   if (!kIsWeb &&

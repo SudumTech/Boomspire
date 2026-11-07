@@ -10,6 +10,7 @@ import 'package:boomspire/features/audio/domain/models/ambient_target.dart';
 import 'package:boomspire/features/audio/impl/ambient_clip_player.dart';
 import 'package:boomspire/features/audio/impl/ambient_mix_planner.dart';
 import 'package:boomspire/features/audio/impl/ambient_sound_engine.dart';
+import 'package:boomspire/features/map_editor/domain/models/ambience_settings.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _FakeClip implements AmbientClip {
@@ -302,6 +303,43 @@ void main() {
     test('the new fields survive a JSON round trip', () {
       final round = WeatherKeyframe.fromJson(lively.toJson());
       expect(round, lively);
+    });
+  });
+
+  group('a map\'s own sound mix', () {
+    const world = AmbientEnvironment(
+      windStrength: 0.5,
+      birdActivity: 0.6,
+      treeDensity: 0.4,
+      combatIntensity: 0.7,
+    );
+
+    test('the default mix leaves the world untouched', () {
+      final heard = const AmbienceSettings().applyTo(world);
+      expect(heard.windStrength, 0.5);
+      expect(heard.birdActivity, 0.6);
+      expect(heard.combatIntensity, 0.7);
+    });
+
+    test('layers scale independently, clamped to 0..1', () {
+      final heard = const AmbienceSettings(
+        wind: 1.5,
+        birds: 0,
+        leaves: 2,
+      ).applyTo(world);
+      expect(heard.windStrength, closeTo(0.75, 1e-9));
+      expect(heard.birdActivity, 0);
+      expect(heard.treeDensity, closeTo(0.8, 1e-9));
+      expect(
+        const AmbienceSettings(wind: 2, volume: 2).applyTo(world).windStrength,
+        1,
+      );
+    });
+
+    test('a muted map is silent', () {
+      final heard = const AmbienceSettings(enabled: false).applyTo(world);
+      expect(heard.windStrength, 0);
+      expect(heard.birdActivity, 0);
     });
   });
 }

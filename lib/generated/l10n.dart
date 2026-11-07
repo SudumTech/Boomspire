@@ -1494,6 +1494,136 @@ class S {
     );
   }
 
+  /// `Environment sound`
+  String get ambienceLabelEditorPage {
+    return Intl.message(
+      'Environment sound',
+      name: 'ambienceLabelEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Play environment sound`
+  String get ambienceEnabledLabelEditorPage {
+    return Intl.message(
+      'Play environment sound',
+      name: 'ambienceEnabledLabelEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{layer}: {percent}%`
+  String ambienceLayerLabelEditorPage(String layer, int percent) {
+    return Intl.message(
+      '$layer: $percent%',
+      name: 'ambienceLayerLabelEditorPage',
+      desc: '',
+      args: [layer, percent],
+    );
+  }
+
+  /// `Overall`
+  String get ambienceVolumeEditorPage {
+    return Intl.message(
+      'Overall',
+      name: 'ambienceVolumeEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Wind`
+  String get ambienceWindEditorPage {
+    return Intl.message(
+      'Wind',
+      name: 'ambienceWindEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rain`
+  String get ambienceRainEditorPage {
+    return Intl.message(
+      'Rain',
+      name: 'ambienceRainEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Snow`
+  String get ambienceSnowEditorPage {
+    return Intl.message(
+      'Snow',
+      name: 'ambienceSnowEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dust`
+  String get ambienceDustEditorPage {
+    return Intl.message(
+      'Dust',
+      name: 'ambienceDustEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Birds`
+  String get ambienceBirdsEditorPage {
+    return Intl.message(
+      'Birds',
+      name: 'ambienceBirdsEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Leaves`
+  String get ambienceLeavesEditorPage {
+    return Intl.message(
+      'Leaves',
+      name: 'ambienceLeavesEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rivers & lakes`
+  String get ambienceWaterEditorPage {
+    return Intl.message(
+      'Rivers & lakes',
+      name: 'ambienceWaterEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sea`
+  String get ambienceSeaEditorPage {
+    return Intl.message(
+      'Sea',
+      name: 'ambienceSeaEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Lava`
+  String get ambienceLavaEditorPage {
+    return Intl.message(
+      'Lava',
+      name: 'ambienceLavaEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Sun angle: {percent}%`
   String sunAngleLabelEditorPage(int percent) {
     return Intl.message(

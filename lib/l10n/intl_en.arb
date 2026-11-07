@@ -395,6 +395,41 @@
   "@environmentLabelEditorPage": {},
   "dynamicWeatherLabelEditorPage": "Dynamic weather over match",
   "@dynamicWeatherLabelEditorPage": {},
+  "ambienceLabelEditorPage": "Environment sound",
+  "@ambienceLabelEditorPage": {},
+  "ambienceEnabledLabelEditorPage": "Play environment sound",
+  "@ambienceEnabledLabelEditorPage": {},
+  "ambienceLayerLabelEditorPage": "{layer}: {percent}%",
+  "@ambienceLayerLabelEditorPage": {
+    "placeholders": {
+      "layer": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "ambienceVolumeEditorPage": "Overall",
+  "@ambienceVolumeEditorPage": {},
+  "ambienceWindEditorPage": "Wind",
+  "@ambienceWindEditorPage": {},
+  "ambienceRainEditorPage": "Rain",
+  "@ambienceRainEditorPage": {},
+  "ambienceSnowEditorPage": "Snow",
+  "@ambienceSnowEditorPage": {},
+  "ambienceDustEditorPage": "Dust",
+  "@ambienceDustEditorPage": {},
+  "ambienceBirdsEditorPage": "Birds",
+  "@ambienceBirdsEditorPage": {},
+  "ambienceLeavesEditorPage": "Leaves",
+  "@ambienceLeavesEditorPage": {},
+  "ambienceWaterEditorPage": "Rivers & lakes",
+  "@ambienceWaterEditorPage": {},
+  "ambienceSeaEditorPage": "Sea",
+  "@ambienceSeaEditorPage": {},
+  "ambienceLavaEditorPage": "Lava",
+  "@ambienceLavaEditorPage": {},
   "sunAngleLabelEditorPage": "Sun angle: {percent}%",
   "@sunAngleLabelEditorPage": {
     "placeholders": {

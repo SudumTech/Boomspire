@@ -15,6 +15,9 @@ _EnvironmentSettings _$EnvironmentSettingsFromJson(Map<String, dynamic> json) =>
               ?.map((e) => WeatherKeyframe.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [_defaultKeyframe],
+      ambience: json['ambience'] == null
+          ? const AmbienceSettings()
+          : AmbienceSettings.fromJson(json['ambience'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$EnvironmentSettingsToJson(
@@ -23,4 +26,5 @@ Map<String, dynamic> _$EnvironmentSettingsToJson(
   'dynamicWeather': instance.dynamicWeather,
   'sunAngle': instance.sunAngle,
   'timeline': instance.timeline.map((e) => e.toJson()).toList(),
+  'ambience': instance.ambience.toJson(),
 };

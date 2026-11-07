@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'ambience_settings.dart';
 import 'weather_keyframe.dart';
 
 part 'environment_settings.freezed.dart';
@@ -23,6 +24,9 @@ abstract class EnvironmentSettings with _$EnvironmentSettings {
     /// angle wherever that's rendered.
     @Default(0.5) double sunAngle,
     @Default([_defaultKeyframe]) List<WeatherKeyframe> timeline,
+
+    /// This map's environment-sound mix (see [AmbienceSettings]).
+    @Default(AmbienceSettings()) AmbienceSettings ambience,
   }) = _EnvironmentSettings;
 
   factory EnvironmentSettings.fromJson(Map<String, dynamic> json) =>

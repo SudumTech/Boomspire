@@ -1,0 +1,1073 @@
+[
+  {
+    "id": "green-line",
+    "name": "Green Line",
+    "briefing": "Open fields, a single dirt road in from the west. A clean, standard defense to learn the ropes.",
+    "biome": "grassPlains",
+    "mode": "waveDefense",
+    "waveCount": 6,
+    "aggressionBias": 0.0,
+    "version": 1,
+    "homeLayout": "eastEdge",
+    "spawnLayout": "single",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.45,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.3,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.5,
+          "windStrength": 0.35,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.6,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.2,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.2,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.9,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.0,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "frozen-pincer",
+    "name": "Frozen Pincer",
+    "briefing": "Your base sits exposed in the open tundra - the enemy splits its assault across two fronts at once.",
+    "biome": "snowTundra",
+    "mode": "waveDefense",
+    "waveCount": 7,
+    "aggressionBias": 0.05,
+    "version": 1,
+    "homeLayout": "center",
+    "spawnLayout": "twoSided",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.35,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.4,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.3,
+          "fogDensity": 0.2,
+          "cloudCover": 0.6,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.5,
+          "windStrength": 0.5,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.6,
+          "fogDensity": 0.3,
+          "cloudCover": 0.7,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.2,
+          "fogDensity": 0.15,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.2,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "dune-siege",
+    "name": "Dune Siege",
+    "briefing": "A dug-in corner outpost under siege from every direction across the dunes. No safe side.",
+    "biome": "desertDunes",
+    "mode": "waveDefense",
+    "waveCount": 8,
+    "aggressionBias": 0.1,
+    "version": 1,
+    "homeLayout": "northEastCorner",
+    "spawnLayout": "surround",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.55,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.25,
+          "birdActivity": 0.15,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.6,
+          "windStrength": 0.45,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.4,
+          "birdActivity": 0.1,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.2,
+          "birdActivity": 0.15,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.3,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "forest-gauntlet",
+    "name": "Forest Gauntlet",
+    "briefing": "The longest campaign - full encirclement through dense mountain forest, escalating wave after wave.",
+    "biome": "mountainForest",
+    "mode": "waveDefense",
+    "waveCount": 9,
+    "aggressionBias": 0.15,
+    "version": 1,
+    "homeLayout": "southWestCorner",
+    "spawnLayout": "surround",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.4,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.4,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.55,
+          "windStrength": 0.4,
+          "rainIntensity": 0.4,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.75,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.3,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.4,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.1,
+        "leaves": 1.2,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "ruined-downtown",
+    "name": "Ruined Downtown",
+    "briefing": "A collapsed skyline hems in your outpost - the enemy pushes in from two shattered avenues at once.",
+    "biome": "cityRuins",
+    "mode": "waveDefense",
+    "waveCount": 7,
+    "aggressionBias": 0.1,
+    "version": 1,
+    "homeLayout": "center",
+    "spawnLayout": "twoSided",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.5,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.25,
+          "cloudCover": 0.6,
+          "dustIntensity": 0.25,
+          "birdActivity": 0.1,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.4,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.3,
+          "cloudCover": 0.7,
+          "dustIntensity": 0.3,
+          "birdActivity": 0.05,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.3,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "savanna-crossing",
+    "name": "Savanna Crossing",
+    "briefing": "Wide open grassland with nowhere to hide - a single dusty trail carries every assault straight for the base.",
+    "biome": "savanna",
+    "mode": "waveDefense",
+    "waveCount": 6,
+    "aggressionBias": 0.05,
+    "version": 1,
+    "homeLayout": "eastEdge",
+    "spawnLayout": "single",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.6,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.2,
+          "dustIntensity": 0.15,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.35,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.3,
+          "dustIntensity": 0.2,
+          "birdActivity": 0.7,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.1,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "frozen-summit",
+    "name": "Frozen Summit",
+    "briefing": "A dug-in summit outpost above the ice line, besieged from every ridge line around it.",
+    "biome": "frozenPeaks",
+    "mode": "waveDefense",
+    "waveCount": 8,
+    "aggressionBias": 0.12,
+    "version": 1,
+    "homeLayout": "northEastCorner",
+    "spawnLayout": "surround",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.4,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.8,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.5,
+          "fogDensity": 0.3,
+          "cloudCover": 0.7,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.6,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.3,
+          "fogDensity": 0.2,
+          "cloudCover": 0.6,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.3,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.0,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "coastal-blockade",
+    "name": "Coastal Blockade",
+    "briefing": "A sea platform under blockade - armored landing forces shell the base from both open flanks across the water.",
+    "biome": "sea",
+    "mode": "waveDefense",
+    "waveCount": 8,
+    "aggressionBias": 0.1,
+    "version": 1,
+    "homeLayout": "center",
+    "spawnLayout": "twoSided",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.5,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.6,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.6,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.6,
+          "windStrength": 0.75,
+          "rainIntensity": 0.3,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.75,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.3,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.5,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.6,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.9,
+        "leaves": 1.0,
+        "water": 1.2,
+        "sea": 1.3,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "windy-lowlands",
+    "name": "Windy Lowlands",
+    "briefing": "Gusts never stop rolling across this open grassland, bending the fields sideways in long green waves.",
+    "biome": "grassPlains",
+    "mode": "waveDefense",
+    "waveCount": 6,
+    "aggressionBias": 0.05,
+    "version": 1,
+    "homeLayout": "eastEdge",
+    "spawnLayout": "single",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.5,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.8,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.3,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.9,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.6,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.2,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.3,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.7,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "howling-icefield",
+    "name": "Howling Icefield",
+    "briefing": "A relentless polar wind drives sheets of snow sideways across the ice - visibility is the enemy as much as the assault.",
+    "biome": "snowTundra",
+    "mode": "waveDefense",
+    "waveCount": 7,
+    "aggressionBias": 0.08,
+    "version": 1,
+    "homeLayout": "center",
+    "spawnLayout": "twoSided",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.3,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.9,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.7,
+          "fogDensity": 0.3,
+          "cloudCover": 0.8,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.7,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.5,
+          "fogDensity": 0.25,
+          "cloudCover": 0.7,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.4,
+        "rain": 1.0,
+        "snow": 1.2,
+        "dust": 1.0,
+        "birds": 0.0,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "dust-devil-flats",
+    "name": "Dust Devil Flats",
+    "briefing": "Hot desert wind whips loose sand into stinging clouds across the flats, surrounding a lone dug-in outpost.",
+    "biome": "desertDunes",
+    "mode": "waveDefense",
+    "waveCount": 7,
+    "aggressionBias": 0.08,
+    "version": 1,
+    "homeLayout": "southWestCorner",
+    "spawnLayout": "surround",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.6,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.8,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.3,
+          "dustIntensity": 0.8,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.6,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.2,
+          "dustIntensity": 0.6,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.2,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.3,
+        "birds": 0.0,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "amber-canopy",
+    "name": "Amber Canopy",
+    "briefing": "A steady wind strips the mountain canopy bare, filling the air with a constant fall of gold, red and brown leaves.",
+    "biome": "mountainForest",
+    "mode": "waveDefense",
+    "waveCount": 6,
+    "aggressionBias": 0.05,
+    "version": 1,
+    "homeLayout": "eastEdge",
+    "spawnLayout": "single",
+    "homeSites": [],
+    "resourceNodeSites": [],
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.35,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.6,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.4,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.5,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.5,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.4,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.0,
+        "leaves": 1.4,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "twin-outposts",
+    "name": "Twin Outposts",
+    "briefing": "Home against home across open grassland - build up and strike before the AI commander finishes theirs.",
+    "biome": "grassPlains",
+    "mode": "skirmish",
+    "waveCount": 0,
+    "aggressionBias": 0.0,
+    "version": 1,
+    "homeLayout": "eastEdge",
+    "spawnLayout": "single",
+    "homeSites": [
+      {
+        "layout": "southWestCorner",
+        "owner": "player"
+      },
+      {
+        "layout": "northEastCorner",
+        "owner": "ai"
+      }
+    ],
+    "resourceNodeSites": [
+      {
+        "dx": 0.5,
+        "dy": 0.5
+      },
+      {
+        "dx": 0.25,
+        "dy": 0.7
+      },
+      {
+        "dx": 0.75,
+        "dy": 0.3
+      }
+    ],
+    "startingGold": 3000,
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.45,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.3,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.5,
+          "windStrength": 0.35,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.6,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.2,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.2,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.9,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.0,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "frostbite-duel",
+    "name": "Frostbite Duel",
+    "briefing": "Home against home in a snow-blind tundra whiteout - the wind never lets either commander see far past their own walls.",
+    "biome": "snowTundra",
+    "mode": "skirmish",
+    "waveCount": 0,
+    "aggressionBias": 0.0,
+    "version": 1,
+    "homeLayout": "eastEdge",
+    "spawnLayout": "single",
+    "homeSites": [
+      {
+        "layout": "southWestCorner",
+        "owner": "player"
+      },
+      {
+        "layout": "northEastCorner",
+        "owner": "ai"
+      }
+    ],
+    "resourceNodeSites": [
+      {
+        "dx": 0.5,
+        "dy": 0.5
+      },
+      {
+        "dx": 0.25,
+        "dy": 0.7
+      },
+      {
+        "dx": 0.75,
+        "dy": 0.3
+      }
+    ],
+    "startingGold": 3000,
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.35,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.4,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.3,
+          "fogDensity": 0.2,
+          "cloudCover": 0.6,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.5,
+          "windStrength": 0.5,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.6,
+          "fogDensity": 0.3,
+          "cloudCover": 0.7,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.2,
+          "fogDensity": 0.15,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.2,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "dust-bowl-duel",
+    "name": "Dust Bowl Duel",
+    "briefing": "Home against home across a wind-scoured dune field - stinging blown sand covers whichever side pushes out first.",
+    "biome": "desertDunes",
+    "mode": "skirmish",
+    "waveCount": 0,
+    "aggressionBias": 0.0,
+    "version": 1,
+    "homeLayout": "eastEdge",
+    "spawnLayout": "single",
+    "homeSites": [
+      {
+        "layout": "southWestCorner",
+        "owner": "player"
+      },
+      {
+        "layout": "northEastCorner",
+        "owner": "ai"
+      }
+    ],
+    "resourceNodeSites": [
+      {
+        "dx": 0.5,
+        "dy": 0.5
+      },
+      {
+        "dx": 0.25,
+        "dy": 0.7
+      },
+      {
+        "dx": 0.75,
+        "dy": 0.3
+      }
+    ],
+    "startingGold": 3000,
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.55,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.25,
+          "birdActivity": 0.15,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.6,
+          "windStrength": 0.45,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.4,
+          "birdActivity": 0.1,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.2,
+          "birdActivity": 0.15,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.3,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  },
+  {
+    "id": "russet-woods-duel",
+    "name": "Russet Woods Duel",
+    "briefing": "Home against home in a windblown mountain forest - drifting autumn leaves cover the ground between the two camps.",
+    "biome": "mountainForest",
+    "mode": "skirmish",
+    "waveCount": 0,
+    "aggressionBias": 0.0,
+    "version": 1,
+    "homeLayout": "eastEdge",
+    "spawnLayout": "single",
+    "homeSites": [
+      {
+        "layout": "southWestCorner",
+        "owner": "player"
+      },
+      {
+        "layout": "northEastCorner",
+        "owner": "ai"
+      }
+    ],
+    "resourceNodeSites": [
+      {
+        "dx": 0.5,
+        "dy": 0.5
+      },
+      {
+        "dx": 0.25,
+        "dy": 0.7
+      },
+      {
+        "dx": 0.75,
+        "dy": 0.3
+      }
+    ],
+    "startingGold": 3000,
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.4,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.4,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.55,
+          "windStrength": 0.4,
+          "rainIntensity": 0.4,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.75,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.3,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.4,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.1,
+        "leaves": 1.2,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
+  }
+]

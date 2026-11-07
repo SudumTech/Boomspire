@@ -38,17 +38,21 @@ class AmbientWeatherAudioComponent extends Component
       game.weatherFocus.weights,
     );
     game.audioRepository.updateAmbience(
-      AmbientEnvironment(
-        windStrength: weather.windStrength,
-        rainIntensity: weather.rainIntensity,
-        snowIntensity: weather.snowIntensity,
-        dustIntensity: weather.dustIntensity,
-        birdActivity: weather.birdActivity,
-        treeDensity: _terrain.treeDensity,
-        waterShare: _terrain.waterShare,
-        seaShare: _terrain.seaShare,
-        lavaShare: _terrain.lavaShare,
-        combatIntensity: game.combatIntensity,
+      // The map's own sound mix (muted birds, louder wind...) shapes what
+      // the weather and terrain ask for.
+      game.scene.environment.ambience.applyTo(
+        AmbientEnvironment(
+          windStrength: weather.windStrength,
+          rainIntensity: weather.rainIntensity,
+          snowIntensity: weather.snowIntensity,
+          dustIntensity: weather.dustIntensity,
+          birdActivity: weather.birdActivity,
+          treeDensity: _terrain.treeDensity,
+          waterShare: _terrain.waterShare,
+          seaShare: _terrain.seaShare,
+          lavaShare: _terrain.lavaShare,
+          combatIntensity: game.combatIntensity,
+        ),
       ),
       dt,
     );

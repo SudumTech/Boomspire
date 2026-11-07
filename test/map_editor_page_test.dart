@@ -133,9 +133,15 @@ void main() {
       );
       expect(find.text(S.current.addKeyframeLabelEditorPage), findsOneWidget);
 
-      // Sun angle + preview-progress sliders, plus one Wind/Rain/Snow/Fog/
-      // Cloud/Dust/Birds slider each for the single default keyframe.
-      expect(find.byType(Slider), findsNWidgets(9));
+      // Sun angle + preview-progress sliders, one Wind/Rain/Snow/Fog/Cloud/
+      // Dust/Birds slider each for the single default keyframe (9), plus the
+      // environment-sound panel's ten level sliders.
+      expect(find.byType(Slider), findsNWidgets(19));
+      expect(find.text(S.current.ambienceLabelEditorPage), findsOneWidget);
+      expect(
+        find.text(S.current.ambienceEnabledLabelEditorPage),
+        findsOneWidget,
+      );
 
       expect(find.text(S.current.windLabelEditorPage), findsOneWidget);
       expect(find.text(S.current.rainLabelEditorPage), findsOneWidget);

@@ -7,11 +7,63 @@
     "mode": "waveDefense",
     "waveCount": 6,
     "aggressionBias": 0.0,
+    "version": 1,
     "homeLayout": "eastEdge",
     "spawnLayout": "single",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.45,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.3,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.5,
+          "windStrength": 0.35,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.6,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.2,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.2,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.9,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.0,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "frozen-pincer",
@@ -21,11 +73,63 @@
     "mode": "waveDefense",
     "waveCount": 7,
     "aggressionBias": 0.05,
+    "version": 1,
     "homeLayout": "center",
     "spawnLayout": "twoSided",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.35,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.4,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.3,
+          "fogDensity": 0.2,
+          "cloudCover": 0.6,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.5,
+          "windStrength": 0.5,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.6,
+          "fogDensity": 0.3,
+          "cloudCover": 0.7,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.2,
+          "fogDensity": 0.15,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.2,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "dune-siege",
@@ -35,11 +139,63 @@
     "mode": "waveDefense",
     "waveCount": 8,
     "aggressionBias": 0.1,
+    "version": 1,
     "homeLayout": "northEastCorner",
     "spawnLayout": "surround",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.55,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.25,
+          "birdActivity": 0.15,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.6,
+          "windStrength": 0.45,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.4,
+          "birdActivity": 0.1,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.2,
+          "birdActivity": 0.15,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.3,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "forest-gauntlet",
@@ -49,11 +205,63 @@
     "mode": "waveDefense",
     "waveCount": 9,
     "aggressionBias": 0.15,
+    "version": 1,
     "homeLayout": "southWestCorner",
     "spawnLayout": "surround",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.4,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.4,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.55,
+          "windStrength": 0.4,
+          "rainIntensity": 0.4,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.75,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.3,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.4,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.1,
+        "leaves": 1.2,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "ruined-downtown",
@@ -63,11 +271,52 @@
     "mode": "waveDefense",
     "waveCount": 7,
     "aggressionBias": 0.1,
+    "version": 1,
     "homeLayout": "center",
     "spawnLayout": "twoSided",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.5,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.25,
+          "cloudCover": 0.6,
+          "dustIntensity": 0.25,
+          "birdActivity": 0.1,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.4,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.3,
+          "cloudCover": 0.7,
+          "dustIntensity": 0.3,
+          "birdActivity": 0.05,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.3,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "savanna-crossing",
@@ -77,11 +326,52 @@
     "mode": "waveDefense",
     "waveCount": 6,
     "aggressionBias": 0.05,
+    "version": 1,
     "homeLayout": "eastEdge",
     "spawnLayout": "single",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.6,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.2,
+          "dustIntensity": 0.15,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.35,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.3,
+          "dustIntensity": 0.2,
+          "birdActivity": 0.7,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.1,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "frozen-summit",
@@ -91,11 +381,52 @@
     "mode": "waveDefense",
     "waveCount": 8,
     "aggressionBias": 0.12,
+    "version": 1,
     "homeLayout": "northEastCorner",
     "spawnLayout": "surround",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.4,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.8,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.5,
+          "fogDensity": 0.3,
+          "cloudCover": 0.7,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.6,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.3,
+          "fogDensity": 0.2,
+          "cloudCover": 0.6,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.3,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.0,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "coastal-blockade",
@@ -105,11 +436,63 @@
     "mode": "waveDefense",
     "waveCount": 8,
     "aggressionBias": 0.1,
+    "version": 1,
     "homeLayout": "center",
     "spawnLayout": "twoSided",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.5,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.6,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.6,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.6,
+          "windStrength": 0.75,
+          "rainIntensity": 0.3,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.75,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.3,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.5,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.6,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.9,
+        "leaves": 1.0,
+        "water": 1.2,
+        "sea": 1.3,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "windy-lowlands",
@@ -119,11 +502,52 @@
     "mode": "waveDefense",
     "waveCount": 6,
     "aggressionBias": 0.05,
+    "version": 1,
     "homeLayout": "eastEdge",
     "spawnLayout": "single",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.5,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.8,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.3,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.9,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.6,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.2,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.3,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.7,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "howling-icefield",
@@ -133,11 +557,52 @@
     "mode": "waveDefense",
     "waveCount": 7,
     "aggressionBias": 0.08,
+    "version": 1,
     "homeLayout": "center",
     "spawnLayout": "twoSided",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.3,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.9,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.7,
+          "fogDensity": 0.3,
+          "cloudCover": 0.8,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.7,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.5,
+          "fogDensity": 0.25,
+          "cloudCover": 0.7,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.4,
+        "rain": 1.0,
+        "snow": 1.2,
+        "dust": 1.0,
+        "birds": 0.0,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "dust-devil-flats",
@@ -147,11 +612,52 @@
     "mode": "waveDefense",
     "waveCount": 7,
     "aggressionBias": 0.08,
+    "version": 1,
     "homeLayout": "southWestCorner",
     "spawnLayout": "surround",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.6,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.8,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.3,
+          "dustIntensity": 0.8,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.6,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.2,
+          "dustIntensity": 0.6,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.2,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.3,
+        "birds": 0.0,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "amber-canopy",
@@ -161,11 +667,52 @@
     "mode": "waveDefense",
     "waveCount": 6,
     "aggressionBias": 0.05,
+    "version": 1,
     "homeLayout": "eastEdge",
     "spawnLayout": "single",
     "homeSites": [],
     "resourceNodeSites": [],
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.35,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.6,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.4,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.5,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.5,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.4,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.0,
+        "leaves": 1.4,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "twin-outposts",
@@ -175,19 +722,86 @@
     "mode": "skirmish",
     "waveCount": 0,
     "aggressionBias": 0.0,
+    "version": 1,
     "homeLayout": "eastEdge",
     "spawnLayout": "single",
     "homeSites": [
-      { "layout": "southWestCorner", "owner": "player" },
-      { "layout": "northEastCorner", "owner": "ai" }
+      {
+        "layout": "southWestCorner",
+        "owner": "player"
+      },
+      {
+        "layout": "northEastCorner",
+        "owner": "ai"
+      }
     ],
     "resourceNodeSites": [
-      { "dx": 0.5, "dy": 0.5 },
-      { "dx": 0.25, "dy": 0.7 },
-      { "dx": 0.75, "dy": 0.3 }
+      {
+        "dx": 0.5,
+        "dy": 0.5
+      },
+      {
+        "dx": 0.25,
+        "dy": 0.7
+      },
+      {
+        "dx": 0.75,
+        "dy": 0.3
+      }
     ],
     "startingGold": 3000,
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.45,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.3,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.5,
+          "windStrength": 0.35,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.6,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.2,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.2,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.9,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.0,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "frostbite-duel",
@@ -197,19 +811,86 @@
     "mode": "skirmish",
     "waveCount": 0,
     "aggressionBias": 0.0,
+    "version": 1,
     "homeLayout": "eastEdge",
     "spawnLayout": "single",
     "homeSites": [
-      { "layout": "southWestCorner", "owner": "player" },
-      { "layout": "northEastCorner", "owner": "ai" }
+      {
+        "layout": "southWestCorner",
+        "owner": "player"
+      },
+      {
+        "layout": "northEastCorner",
+        "owner": "ai"
+      }
     ],
     "resourceNodeSites": [
-      { "dx": 0.5, "dy": 0.5 },
-      { "dx": 0.25, "dy": 0.7 },
-      { "dx": 0.75, "dy": 0.3 }
+      {
+        "dx": 0.5,
+        "dy": 0.5
+      },
+      {
+        "dx": 0.25,
+        "dy": 0.7
+      },
+      {
+        "dx": 0.75,
+        "dy": 0.3
+      }
     ],
     "startingGold": 3000,
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.35,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.4,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.3,
+          "fogDensity": 0.2,
+          "cloudCover": 0.6,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.5,
+          "windStrength": 0.5,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.6,
+          "fogDensity": 0.3,
+          "cloudCover": 0.7,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.2,
+          "fogDensity": 0.15,
+          "cloudCover": 0.5,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.0,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.2,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "dust-bowl-duel",
@@ -219,19 +900,86 @@
     "mode": "skirmish",
     "waveCount": 0,
     "aggressionBias": 0.0,
+    "version": 1,
     "homeLayout": "eastEdge",
     "spawnLayout": "single",
     "homeSites": [
-      { "layout": "southWestCorner", "owner": "player" },
-      { "layout": "northEastCorner", "owner": "ai" }
+      {
+        "layout": "southWestCorner",
+        "owner": "player"
+      },
+      {
+        "layout": "northEastCorner",
+        "owner": "ai"
+      }
     ],
     "resourceNodeSites": [
-      { "dx": 0.5, "dy": 0.5 },
-      { "dx": 0.25, "dy": 0.7 },
-      { "dx": 0.75, "dy": 0.3 }
+      {
+        "dx": 0.5,
+        "dy": 0.5
+      },
+      {
+        "dx": 0.25,
+        "dy": 0.7
+      },
+      {
+        "dx": 0.75,
+        "dy": 0.3
+      }
     ],
     "startingGold": 3000,
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.55,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.25,
+          "birdActivity": 0.15,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.6,
+          "windStrength": 0.45,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.4,
+          "birdActivity": 0.1,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.0,
+          "dustIntensity": 0.2,
+          "birdActivity": 0.15,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 0.3,
+        "leaves": 1.0,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   },
   {
     "id": "russet-woods-duel",
@@ -241,18 +989,85 @@
     "mode": "skirmish",
     "waveCount": 0,
     "aggressionBias": 0.0,
+    "version": 1,
     "homeLayout": "eastEdge",
     "spawnLayout": "single",
     "homeSites": [
-      { "layout": "southWestCorner", "owner": "player" },
-      { "layout": "northEastCorner", "owner": "ai" }
+      {
+        "layout": "southWestCorner",
+        "owner": "player"
+      },
+      {
+        "layout": "northEastCorner",
+        "owner": "ai"
+      }
     ],
     "resourceNodeSites": [
-      { "dx": 0.5, "dy": 0.5 },
-      { "dx": 0.25, "dy": 0.7 },
-      { "dx": 0.75, "dy": 0.3 }
+      {
+        "dx": 0.5,
+        "dy": 0.5
+      },
+      {
+        "dx": 0.25,
+        "dy": 0.7
+      },
+      {
+        "dx": 0.75,
+        "dy": 0.3
+      }
     ],
     "startingGold": 3000,
-    "version": 1
+    "environment": {
+      "dynamicWeather": true,
+      "sunAngle": 0.4,
+      "timeline": [
+        {
+          "atProgress": 0.0,
+          "windStrength": 0.3,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.4,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 0.55,
+          "windStrength": 0.4,
+          "rainIntensity": 0.4,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.75,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.3,
+          "windType": "automatic"
+        },
+        {
+          "atProgress": 1.0,
+          "windStrength": 0.25,
+          "rainIntensity": 0.0,
+          "snowIntensity": 0.0,
+          "fogDensity": 0.0,
+          "cloudCover": 0.4,
+          "dustIntensity": 0.0,
+          "birdActivity": 0.8,
+          "windType": "automatic"
+        }
+      ],
+      "ambience": {
+        "enabled": true,
+        "volume": 1.0,
+        "wind": 1.0,
+        "rain": 1.0,
+        "snow": 1.0,
+        "dust": 1.0,
+        "birds": 1.1,
+        "leaves": 1.2,
+        "water": 1.0,
+        "sea": 1.0,
+        "lava": 1.0
+      }
+    }
   }
 ]

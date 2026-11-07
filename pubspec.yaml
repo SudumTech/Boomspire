@@ -88,6 +88,7 @@ flutter:
     - assets/audio/effects/
     - assets/models/
     - assets/game_content/
+    - assets/scenes/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

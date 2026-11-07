@@ -16,7 +16,7 @@ import '../../map_editor/domain/models/map_draft.dart';
 import '../../map_editor/domain/repos/map_draft_repository.dart';
 import 'state/skirmish_level_select_state.dart';
 import 'widgets/level_select_difficulty_selector_widget.dart';
-import 'widgets/skirmish_level_select_draft_tile_widget.dart';
+import '../../map_editor/presentation/widgets/map_draft_card_widget.dart';
 import 'widgets/skirmish_level_select_scene_card_widget.dart';
 
 /// Skirmish map picker: lists the built-in "Featured" skirmish scenes plus
@@ -164,19 +164,22 @@ class _SkirmishLevelSelectPageState extends State<SkirmishLevelSelectPage> {
                               ),
                             );
                           }
-                          return Column(
+                          return GridView.count(
+                            shrinkWrap: true,
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                            childAspectRatio: 1.4,
+                            physics: const NeverScrollableScrollPhysics(),
                             children: [
                               for (final draft in drafts)
-                                Padding(
-                                  padding: AppThemePaddings.bottom12,
-                                  child: SkirmishLevelSelectDraftTileWidget(
-                                    draft: draft,
-                                    onTap: () => context.push(
-                                      Routes.skirmishPlacement.route,
-                                      extra: SkirmishPlacementArgs(
-                                        draft: draft,
-                                        difficulty: _state.difficulty.value,
-                                      ),
+                                MapDraftCardWidget(
+                                  draft: draft,
+                                  onTap: () => context.push(
+                                    Routes.skirmishPlacement.route,
+                                    extra: SkirmishPlacementArgs(
+                                      draft: draft,
+                                      difficulty: _state.difficulty.value,
                                     ),
                                   ),
                                 ),

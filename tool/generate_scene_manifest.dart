@@ -1,23 +1,9 @@
-// One-off generator: dumps the built-in `GameScenes.all`/`.skirmishes`
-// catalog to the server's `scene_manifest.json` (served verbatim by
-// `server/gemini_proxy.dart`'s `/scene-manifest` route - "the database"
-// for now, same as `content_manifest.json`).
+// Regenerates the scene manifest (bundled `assets/scenes/scenes.json` and
+// the server copy). It imports Flutter-backed code, so `dart run` can't load
+// it; regenerate via the test runner instead:
 //
-// Run with: dart run tool/generate_scene_manifest.dart
-// Re-run whenever a scene's hardcoded fields change, then bump the
-// affected scene's `version` by hand before committing.
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:boomspire/features/game_core/domain/models/game_scenes.dart';
-
-void main() {
-  final scenes = [...GameScenes.all, ...GameScenes.skirmishes];
-
-  final json = const JsonEncoder.withIndent('  ')
-      .convert(scenes.map((s) => s.toJson()).toList());
-
-  File('server/scene_manifest.json').writeAsStringSync('$json\n');
-
-  stdout.writeln('Wrote ${scenes.length} scenes.');
-}
+//   BOOMSPIRE_WRITE_SCENES=1 flutter test test/scene_manifest_test.dart
+//
+// The logic lives in lib/features/game_core/impl/scene_manifest_builder.dart.
+// Bump the affected scene's `version` by hand before committing so clients
+// with a cached copy pick the change up.

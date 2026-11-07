@@ -17,6 +17,7 @@ import '../domain/models/map_draft.dart';
 import '../domain/repos/map_draft_repository.dart';
 import 'state/map_editor_draft_state.dart';
 import 'state/map_editor_persistence_state.dart';
+import 'widgets/map_editor_ambience_panel_widget.dart';
 import 'widgets/map_editor_app_bar_button_widget.dart';
 import 'widgets/map_editor_brush_options_widget.dart';
 import 'widgets/map_editor_canvas_painter.dart';
@@ -559,6 +560,16 @@ class _MapEditorPageState extends State<MapEditorPage> {
                               ),
                             ],
                           ),
+                        MapEditorSidebarSectionWidget(
+                          icon: Icons.graphic_eq,
+                          title: S.current.ambienceLabelEditorPage,
+                          children: [
+                            MapEditorAmbiencePanelWidget(
+                              settings: currentDraft.environment.ambience,
+                              onChanged: _draftState.setAmbience,
+                            ),
+                          ],
+                        ),
                         MapEditorSidebarSectionWidget(
                           icon: Icons.wb_sunny,
                           title: S.current.environmentLabelEditorPage,

@@ -15,6 +15,7 @@ import '../../domain/enums/editor_tool.dart';
 import '../../domain/models/editor_point.dart';
 import '../../domain/models/editor_terrain_preview.dart';
 import '../../domain/models/environment_settings.dart';
+import '../../domain/models/ambience_settings.dart';
 import '../../domain/models/map_draft.dart';
 import '../../domain/models/painted_cell.dart';
 import '../../domain/models/tree_cell.dart';
@@ -309,6 +310,10 @@ class MapEditorDraftState {
   void setRiverWidth(double value) => _riverWidth.value = value;
 
   void setSelectedWaveNumber(int value) => _selectedWaveNumber.value = value;
+
+  /// Replaces the map's environment-sound mix.
+  void setAmbience(AmbienceSettings value) =>
+      _mutateEnvironment((env) => env.copyWith(ambience: value));
 
   void setSunAngle(double value) =>
       _mutateEnvironment((env) => env.copyWith(sunAngle: value));

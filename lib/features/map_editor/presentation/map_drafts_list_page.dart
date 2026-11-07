@@ -5,10 +5,10 @@ import '../../../core/di/service_locator.dart';
 import '../../../shared/app_theme/app_theme_borders.dart';
 import '../../../shared/app_theme/app_theme_colors.dart';
 import '../../../shared/app_theme/app_theme_paddings.dart';
-import '../../terrain/extensions/biome_extensions.dart';
 import '../domain/models/map_draft.dart';
 import '../domain/repos/map_draft_repository.dart';
 import 'map_editor_page.dart';
+import 'widgets/map_draft_card_widget.dart';
 import 'state/map_drafts_list_state.dart';
 
 /// Entry point for the map editor: browse, open, create, or delete
@@ -63,46 +63,33 @@ class _MapDraftsListPageState extends State<MapDraftsListPage> {
               ),
             );
           }
-          return ListView.builder(
+          return GridView.builder(
             padding: AppThemePaddings.ltrb16_16_16_96,
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 380,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              childAspectRatio: 1.4,
+            ),
             itemCount: drafts.length,
             itemBuilder: (context, index) {
               final draft = drafts[index];
-              return Padding(
-                padding: AppThemePaddings.bottom12,
-                child: OpenContainer<void>(
-                  transitionType: ContainerTransitionType.fade,
-                  closedElevation: 2,
-                  closedShape: RoundedRectangleBorder(
-                    borderRadius: AppThemeBorders.radius14,
-                  ),
-                  closedColor: AppThemeColors.surfaceCard,
-                  openColor: AppThemeColors.background,
-                  onClosed: (_) => _refresh(),
-                  closedBuilder: (context, openContainer) => ListTile(
-                    onTap: openContainer,
-                    title: Text(
-                      draft.name,
-                      style: const TextStyle(color: AppThemeColors.textPrimary),
-                    ),
-                    subtitle: Text(
-                      '${draft.biome.displayName} · ${draft.mode.name} · '
-                      '${draft.arenaWidth.toInt()}x${draft.arenaHeight.toInt()}',
-                      style: const TextStyle(
-                        color: AppThemeColors.textSecondary,
-                      ),
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(
-                        Icons.delete_outline,
-                        color: AppThemeColors.accentRed,
-                      ),
-                      onPressed: () => _deleteDraft(draft.id),
-                    ),
-                  ),
-                  openBuilder: (context, closeContainer) =>
-                      MapEditorPage(initialDraft: draft),
+              return OpenContainer<void>(
+                transitionType: ContainerTransitionType.fade,
+                closedElevation: 2,
+                closedShape: RoundedRectangleBorder(
+                  borderRadius: AppThemeBorders.radius14,
                 ),
+                closedColor: AppThemeColors.surfaceCard,
+                openColor: AppThemeColors.background,
+                onClosed: (_) => _refresh(),
+                closedBuilder: (context, openContainer) => MapDraftCardWidget(
+                  draft: draft,
+                  onTap: openContainer,
+                  onDelete: () => _deleteDraft(draft.id),
+                ),
+                openBuilder: (context, closeContainer) =>
+                    MapEditorPage(initialDraft: draft),
               );
             },
           );
