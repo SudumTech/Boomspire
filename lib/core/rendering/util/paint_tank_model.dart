@@ -174,6 +174,24 @@ void paintTankModel(Canvas canvas, VehiclePalette p) {
     _fill(const Color(0xFF14171A)),
   );
 
+  // Coaxial machine gun beside the main barrel (the tank's second weapon).
+  _rrect(
+    canvas,
+    const Offset(cx - 0.075 * s, cy - 0.2 * s),
+    0.028 * s,
+    0.3 * s,
+    1,
+    _fill(const Color(0xFF1C1F23)),
+  );
+  _rrect(
+    canvas,
+    const Offset(cx - 0.075 * s, cy - 0.36 * s),
+    0.04 * s,
+    0.03 * s,
+    0.8,
+    _fill(const Color(0xFF0E1012)),
+  );
+
   // Turret.
   _rrect(
     canvas,

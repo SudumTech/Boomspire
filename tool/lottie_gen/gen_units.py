@@ -325,6 +325,10 @@ def tank_model(light, hull, dark, track):
     ops.append(op(rrect(cx, cy - 0.27 * s, 0.1 * s, 0.05 * s, 1.5), fill(0xFF2A2E33)))
     ops.append(op(rrect(cx, cy - 0.49 * s, 0.11 * s, 0.05 * s, 1), fill(0xFF14171A)))
 
+    # Coaxial machine gun beside the main barrel (the tank's second weapon).
+    ops.append(op(rrect(cx - 0.075 * s, cy - 0.2 * s, 0.028 * s, 0.3 * s, 1), fill(0xFF1C1F23)))
+    ops.append(op(rrect(cx - 0.075 * s, cy - 0.36 * s, 0.04 * s, 0.03 * s, 0.8), fill(0xFF0E1012)))
+
     # Turret: bustle, rounded body, smoke dischargers, hatch.
     ops.append(op(rrect(cx, cy + 0.15 * s, 0.26 * s, 0.09 * s, 3), fill(dark)))
     turret = rrect(cx, cy - 0.01 * s, 0.38 * s, 0.34 * s, 0.13 * s)

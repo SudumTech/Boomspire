@@ -84,6 +84,16 @@ class MobileUnitRepositoryImpl implements MobileUnitRepository {
       attackInterval: 1.0,
       movementStyle: MovementStyle.roll,
       weaponType: WeaponType.cannon,
+      // Coaxial machine gun beside the main cannon: a short burst at
+      // anything on the ground, reloading independently.
+      secondary: SecondaryWeapon(
+        damage: 14,
+        range: 155,
+        interval: 1.6,
+        projectileCount: 5,
+        clipShotInterval: 0.08,
+        weaponType: WeaponType.bullet,
+      ),
     ),
     // Strafing-run attacker (see `MobileUnitComponent._updateStrafingRun`):
     // flies through its target firing a 4-round clip 0.5s apart, then
@@ -300,12 +310,22 @@ class MobileUnitRepositoryImpl implements MobileUnitRepository {
       speed: 34,
       bounty: 55,
       size: 50,
-      attackDamage: 18,
+      attackDamage: 16,
       attackRange: 170,
       attackInterval: 1.0,
       isVehicle: true,
       movementStyle: MovementStyle.roll,
       weaponType: WeaponType.cannon,
+      // Coaxial machine gun beside the main cannon: a short burst at
+      // anything on the ground, reloading independently.
+      secondary: SecondaryWeapon(
+        damage: 10,
+        range: 150,
+        interval: 1.6,
+        projectileCount: 5,
+        clipShotInterval: 0.08,
+        weaponType: WeaponType.bullet,
+      ),
     ),
     UnitKind.lightVehicle: MobileUnitBlueprint(
       kind: UnitKind.lightVehicle,

@@ -1,6 +1,7 @@
 import 'package:boomspire/core/combat/mobile_unit_repository_impl.dart';
 import 'package:boomspire/core/combat/team.dart';
 import 'package:boomspire/core/combat/unit_kind.dart';
+import 'package:boomspire/core/combat/weapon_type.dart';
 import 'package:boomspire/features/allies/presentation/components/ally_sprite_factory/ally_sprite_factory.dart';
 import 'package:boomspire/features/enemies/presentation/components/enemy_sprite_factory/enemy_sprite_factory.dart';
 import 'package:boomspire/features/towers/presentation/training_center_component.dart';
@@ -48,5 +49,17 @@ void main() {
       TrainingCenterComponent.producibleKinds,
       isNot(contains(UnitKind.artilleryBarrage)),
     );
+  });
+
+  test('both tanks carry a coaxial machine gun as a second weapon', () {
+    for (final team in [Team.invaders, Team.defaultPlayer]) {
+      final tank = repo.blueprintFor(team, UnitKind.tank);
+      expect(tank.secondary, isNotNull, reason: team.label);
+      expect(tank.secondary!.weaponType, WeaponType.bullet);
+      expect(
+        tank.totalDps,
+        greaterThan(tank.attackDamage / tank.attackInterval),
+      );
+    }
   });
 }

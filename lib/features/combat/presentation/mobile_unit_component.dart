@@ -945,7 +945,12 @@ class MobileUnitComponent extends PositionComponent
   ) {
     final dir = toTarget.normalized();
     final side = Vector2(-dir.y, dir.x);
-    final pylon = (clipIndex.isEven ? 1.0 : -1.0) * size.x * 0.28;
+    // Aircraft launch from wing pylons; a ground vehicle's second gun sits
+    // right beside its main barrel (a tank's coaxial machine gun).
+    final pylon =
+        (clipIndex.isEven ? 1.0 : -1.0) *
+        size.x *
+        (blueprint.domain == UnitDomain.air ? 0.28 : 0.07);
     final spawnPos = position + dir * (size.x * 0.35) + side * pylon;
     _spawnProjectile(
       spawnPos,

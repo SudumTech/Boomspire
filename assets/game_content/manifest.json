@@ -770,7 +770,17 @@
     "prefersStructures": false,
     "clipShotInterval": 0.12,
     "isStealth": false,
-    "secondary": null,
+    "secondary": {
+      "damage": 14.0,
+      "range": 155.0,
+      "interval": 1.6,
+      "weaponType": "bullet",
+      "projectileCount": 5,
+      "clipShotInterval": 0.08,
+      "attackDomains": [
+        "ground"
+      ]
+    },
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
@@ -1199,7 +1209,7 @@
     "id": "unit.buildable.tank",
     "version": 1,
     "category": "unit",
-    "damage": 18.0,
+    "damage": 16.0,
     "weaponType": "cannon",
     "fireRate": 1.0,
     "range": 170.0,
@@ -1220,7 +1230,17 @@
     "prefersStructures": false,
     "clipShotInterval": 0.12,
     "isStealth": false,
-    "secondary": null,
+    "secondary": {
+      "damage": 10.0,
+      "range": 150.0,
+      "interval": 1.6,
+      "weaponType": "bullet",
+      "projectileCount": 5,
+      "clipShotInterval": 0.08,
+      "attackDomains": [
+        "ground"
+      ]
+    },
     "producibleUnitIds": [],
     "requirements": [],
     "modelView": {
