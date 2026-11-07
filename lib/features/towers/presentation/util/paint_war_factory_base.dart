@@ -1,53 +1,71 @@
 import 'package:flutter/material.dart';
 
-/// A wide corrugated workshop with a roll-up bay door - reads as heavy
-/// industry rather than a gun emplacement.
+import 'tower_art.dart';
+
+const _accent = Color(0xFFB0BEC5);
+
+/// A vehicle hangar from above: sawtooth skylight roof, a smokestack and a
+/// big roll-up bay door under hazard stripes.
 void paintWarFactoryBase(Canvas canvas) {
-  const accent = Color(0xFFB0BEC5);
   final body = RRect.fromRectAndRadius(
-    const Rect.fromLTWH(6, 26, 52, 30),
+    const Rect.fromLTWH(4, 8, 56, 50),
     const Radius.circular(3),
   );
   canvas.drawShadow(Path()..addRRect(body), const Color(0xFF000000), 4, false);
   canvas.drawRRect(
     body,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF607d8b), Color(0xFF20242a)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ).createShader(body.outerRect),
+    metalPaint(
+      body.outerRect,
+      light: const Color(0xFF7C8A95),
+      dark: const Color(0xFF2B333A),
+    ),
   );
-  canvas.drawRRect(
-    body,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..color = accent.withValues(alpha: 0.85),
-  );
+  canvas.drawRRect(body, strokePaint(const Color(0xFF161B20), 2));
 
-  for (var x = 12.0; x <= 52; x += 8) {
-    canvas.drawLine(
-      Offset(x, 26),
-      Offset(x, 19),
-      Paint()
-        ..color = const Color(0xFF37474F)
-        ..strokeWidth = 2,
+  // Sawtooth roof ridges.
+  for (var i = 0; i < 4; i++) {
+    final y = 11.0 + i * 8;
+    canvas.drawRect(
+      Rect.fromLTWH(7, y, 50, 5),
+      fillPaint(const Color(0xFF9AA8B3)),
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(7, y + 5, 50, 2.6),
+      fillPaint(const Color(0xFF3A444D)),
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(7, y, 50, 1.2),
+      fillPaint(Colors.white, alpha: 0.4),
     );
   }
-
-  const door = Rect.fromLTWH(22, 40, 20, 16);
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(door, const Radius.circular(2)),
-    Paint()..color = const Color(0xFF11151a),
+  // Smokestack.
+  canvas.drawCircle(
+    const Offset(52, 16),
+    4.4,
+    fillPaint(const Color(0xFF1F2429)),
   );
-  for (var y = door.top + 3; y < door.bottom; y += 4) {
+  canvas.drawCircle(const Offset(52, 16), 4.4, strokePaint(_accent, 1.2));
+  canvas.drawCircle(
+    const Offset(52, 16),
+    2,
+    fillPaint(const Color(0xFF0C0F12)),
+  );
+
+  // Bay door with hazard header.
+  paintHazardStripes(canvas, const Rect.fromLTWH(16, 40, 32, 3.4));
+  const door = Rect.fromLTWH(16, 43.4, 32, 13);
+  canvas.drawRect(door, fillPaint(const Color(0xFF12171B)));
+  for (var y = 46.0; y < 56; y += 3) {
     canvas.drawLine(
-      Offset(door.left + 2, y),
-      Offset(door.right - 2, y),
-      Paint()
-        ..color = accent.withValues(alpha: 0.5)
-        ..strokeWidth = 1,
+      Offset(17, y),
+      Offset(47, y),
+      strokePaint(_accent, 0.9, alpha: 0.5),
     );
   }
+  paintBolts(canvas, const [
+    Offset(7, 11),
+    Offset(57, 11),
+    Offset(7, 55),
+    Offset(57, 55),
+  ], radius: 1.1);
 }

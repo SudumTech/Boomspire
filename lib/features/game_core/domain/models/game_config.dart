@@ -101,10 +101,4 @@ class GameConfig {
   /// How fast (per second) `BoomspireGame.combatIntensity` decays back
   /// toward 0 once shooting stops.
   static const combatIntensityDecayPerSecond = 0.4;
-
-  /// Ceiling ambient volume (0..1) for the wind/rain ambience loops at
-  /// full keyframe intensity (`windStrength`/`rainIntensity` == 1), before
-  /// combat ducking - kept below 1 so ambience always sits under SFX.
-  static const ambientWindMaxVolume = 0.45;
-  static const ambientRainMaxVolume = 0.55;
 }

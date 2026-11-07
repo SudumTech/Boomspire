@@ -1,47 +1,41 @@
 import 'package:flutter/material.dart';
 
-import 'paint_viewhole.dart';
+import 'tower_art.dart';
 
-/// A tilted dish on a mast - reads as a sensor/uplink structure rather
-/// than a weapon, since it never actually fires.
+const _accent = Color(0xFF1DE9B6);
+
+/// A satellite dish on a pedestal with a pulsing sensor core.
 void paintTechLabTurret(Canvas canvas, Offset center) {
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(0, -6), width: 4, height: 18),
-      const Radius.circular(2),
-    ),
-    Paint()..color = const Color(0xFF2b2f36),
+  final dish = Rect.fromCenter(
+    center: center.translate(-1, -2),
+    width: 22,
+    height: 15,
   );
   canvas.save();
-  canvas.translate(center.dx, center.dy - 16);
-  canvas.rotate(-0.4);
-  canvas.drawArc(
-    Rect.fromCenter(center: Offset.zero, width: 22, height: 16),
-    3.4,
-    3.0,
-    false,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..color = const Color(0xFF1DE9B6),
+  canvas.translate(center.dx, center.dy);
+  canvas.rotate(-0.5);
+  canvas.translate(-center.dx, -center.dy);
+  canvas.drawOval(
+    dish.shift(const Offset(0.8, 1.2)),
+    fillPaint(Colors.black, alpha: 0.3),
   );
-  canvas.drawCircle(Offset.zero, 2, Paint()..color = const Color(0xFFE0FFF6));
+  canvas.drawOval(
+    dish,
+    metalPaint(
+      dish,
+      light: const Color(0xFFE2EAEE),
+      dark: const Color(0xFF7F8E99),
+    ),
+  );
+  canvas.drawOval(dish.deflate(3), strokePaint(const Color(0xFF55646E), 1));
+  canvas.drawOval(dish, strokePaint(const Color(0xFF14181C), 1.2));
   canvas.restore();
-  canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF2e6b5f), Color(0xFF2b2f36)],
-      ).createShader(Rect.fromCircle(center: center, radius: 12)),
+  // Feed horn.
+  canvas.drawLine(
+    center.translate(-1, -2),
+    center.translate(7, -11),
+    strokePaint(const Color(0xFF3A444D), 1.6),
   );
-  canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFF1DE9B6),
-  );
-  paintViewhole(canvas, center.translate(0, 7));
+  canvas.drawCircle(center.translate(7, -11), 2, fillPaint(_accent));
+  paintDome(canvas, center.translate(-1, 7), 5, accent: _accent);
 }

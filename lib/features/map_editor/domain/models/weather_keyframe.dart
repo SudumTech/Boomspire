@@ -23,6 +23,13 @@ abstract class WeatherKeyframe with _$WeatherKeyframe {
     @Default(0.0) double fogDensity,
     @Default(0.0) double cloudCover,
 
+    /// Airborne dust/sand: drives the gritty dust-storm ambience.
+    @Default(0.0) double dustIntensity,
+
+    /// How lively the birdsong is, and how often flocks cross the sky -
+    /// birds fall quiet in rain, strong wind and combat.
+    @Default(0.0) double birdActivity,
+
     /// [WindType.automatic] (the default) inherits the map's own biome's
     /// natural wind look - see [resolvedWindType]. Any other value is an
     /// explicit author override, always editable per-keyframe regardless

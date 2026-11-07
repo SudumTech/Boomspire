@@ -7,6 +7,7 @@ import '../domain/models/tower_type.dart';
 import '../domain/models/unit_type.dart';
 import 'util/paint_anti_air_turret.dart';
 import 'util/paint_artillery_bunker_turret.dart';
+import 'util/paint_building_bases.dart';
 import 'util/paint_cannon_turret.dart';
 import 'util/paint_command_post_turret.dart';
 import 'util/paint_default_base.dart';
@@ -77,7 +78,18 @@ class TowerSpriteFactory {
       paintWarFactoryBase(canvas);
       return;
     }
-    paintDefaultBase(canvas, accentColor(type));
+    switch (type) {
+      case BuildingType.techLab:
+        paintTechLabBase(canvas);
+      case BuildingType.commandPost:
+        paintCommandPostBase(canvas);
+      case BuildingType.goldMine:
+        paintGoldMineBase(canvas);
+      case BuildingType.powerPlant:
+        paintPowerPlantBase(canvas);
+      default:
+        paintDefaultBase(canvas, accentColor(type));
+    }
   }
 
   static void _paintTurret(Canvas canvas, UnitType type) {

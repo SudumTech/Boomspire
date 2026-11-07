@@ -1,4 +1,4 @@
-import '../models/ambient_sound_type.dart';
+import '../models/ambient_environment.dart';
 import '../models/sfx_type.dart';
 
 /// Abstraction over sound effect playback so presentation code never talks
@@ -7,8 +7,9 @@ abstract class AudioRepository {
   void play(SfxType type, {double volume = 1});
   Future<void> preload();
 
-  /// Fades a continuous ambience [type] loop to [volume] (0..1, 0 stops
-  /// it) - unlike [play], this is meant to be called every frame with a
-  /// smoothly-changing value rather than once per event.
-  void setAmbientVolume(AmbientSoundType type, double volume);
+  /// Feeds the environmental sound engine the current state of the world
+  /// (weather, terrain in view, combat). Call it every frame: the engine
+  /// decides which parts of which recordings to play, how loud, and how
+  /// often, fading them in and out as the environment changes.
+  void updateAmbience(AmbientEnvironment environment, double dt);
 }

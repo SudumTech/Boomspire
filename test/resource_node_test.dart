@@ -10,7 +10,7 @@ import 'package:boomspire/core/combat/unit_kind.dart';
 import 'package:boomspire/core/combat/unit_objective.dart';
 import 'package:boomspire/core/rendering/impl/procedural_unit_render_repository_impl.dart';
 import 'package:boomspire/features/ai_director/impl/ai_director_repository_impl.dart';
-import 'package:boomspire/features/audio/domain/models/ambient_sound_type.dart';
+import 'package:boomspire/features/audio/domain/models/ambient_environment.dart';
 import 'package:boomspire/features/audio/domain/models/sfx_type.dart';
 import 'package:boomspire/features/audio/domain/repos/audio_repository.dart';
 import 'package:boomspire/features/combat/presentation/mobile_unit_component.dart';
@@ -65,7 +65,9 @@ void main() {
     await game.world.add(node);
     _spawnInfantry(game, Team.defaultPlayer, node.position);
 
-    for (var i = 0; i < 100; i++) {
+    // (A decision round can be skipped as a deliberate "mistake" or spent
+    // building a production building, so allow a few rounds.)
+    for (var i = 0; i < 135; i++) {
       game.update(0.1);
     }
 
@@ -208,5 +210,5 @@ class _FakeAudioRepository implements AudioRepository {
   Future<void> preload() async {}
 
   @override
-  void setAmbientVolume(AmbientSoundType type, double volume) {}
+  void updateAmbience(AmbientEnvironment environment, double dt) {}
 }

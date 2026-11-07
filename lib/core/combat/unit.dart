@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'team.dart';
 import 'unit_domain.dart';
 
 export 'unit_domain.dart';
@@ -14,6 +17,16 @@ export 'unit_domain.dart';
 /// air-domain plane - whether that plane is a friendly ally aircraft or an
 /// enemy attack plane, since [canAttack] is checked the same way on both
 /// sides of a fight.
+/// Anything on the map that belongs to a side - every mobile unit and every
+/// tower/building. It must always show its owner's colour, so the colour is
+/// derived here, in one place, from the owning [Team]; renderers read
+/// [teamColor] instead of picking colours themselves.
+abstract mixin class TeamOwned {
+  Team get ownerTeam;
+
+  Color get teamColor => ownerTeam.color;
+}
+
 abstract mixin class Unit {
   Set<UnitDomain> get attackDomains;
 

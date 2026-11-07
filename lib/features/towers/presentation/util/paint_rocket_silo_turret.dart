@@ -1,51 +1,63 @@
 import 'package:flutter/material.dart';
 
-import 'paint_viewhole.dart';
+import 'tower_art.dart';
 
-/// A boxy multi-tube launcher angled skyward - reads as long-range
-/// artillery built to reach big/armored targets rather than a nimble gun.
+const _accent = Color(0xFFFF8A00);
+
+/// Open silo hatches with a missile nose rising out of the middle.
 void paintRocketSiloTurret(Canvas canvas, Offset center) {
-  canvas.save();
-  canvas.translate(center.dx, center.dy);
-  canvas.rotate(-0.15);
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(
-      Rect.fromCenter(center: const Offset(0, -10), width: 22, height: 26),
-      const Radius.circular(3),
-    ),
-    Paint()..color = const Color(0xFF4a3a28),
-  );
-  for (final dx in [-6.0, 0.0, 6.0]) {
-    canvas.drawCircle(
-      Offset(dx, -18),
-      3.2,
-      Paint()..color = const Color(0xFF1c1712),
-    );
-    canvas.drawCircle(
-      Offset(dx, -18),
-      3.2,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1
-        ..color = const Color(0xFFFF8A00),
+  // Hatch doors folded back.
+  for (final side in [-1.0, 1.0]) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(center.dx + side * 3, center.dy - 3)
+        ..lineTo(center.dx + side * 12, center.dy - 10)
+        ..lineTo(center.dx + side * 12, center.dy + 6)
+        ..lineTo(center.dx + side * 3, center.dy + 8)
+        ..close(),
+      metalPaint(
+        Rect.fromCenter(center: center, width: 24, height: 20),
+        light: const Color(0xFF7B8794),
+        dark: const Color(0xFF2D343C),
+      ),
     );
   }
-  canvas.restore();
-  canvas.drawCircle(
-    center,
-    13,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF8a5a2a), Color(0xFF2b2f36)],
-      ).createShader(Rect.fromCircle(center: center, radius: 13)),
+  canvas.drawCircle(center, 9, fillPaint(const Color(0xFF0F1318)));
+  canvas.drawCircle(center, 9, strokePaint(_accent, 1.4));
+  // Missile.
+  final body = Rect.fromCenter(
+    center: center.translate(0, -2),
+    width: 8,
+    height: 20,
   );
-  canvas.drawCircle(
-    center,
-    13,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFFFF8A00),
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(body, const Radius.circular(3)),
+    metalPaint(
+      body,
+      light: const Color(0xFFE6EAEE),
+      dark: const Color(0xFF8C97A3),
+    ),
   );
-  paintViewhole(canvas, center.translate(0, 8));
+  canvas.drawPath(
+    Path()
+      ..moveTo(center.dx, center.dy - 18)
+      ..lineTo(center.dx + 4, center.dy - 10)
+      ..lineTo(center.dx - 4, center.dy - 10)
+      ..close(),
+    fillPaint(_accent),
+  );
+  canvas.drawRect(
+    Rect.fromCenter(center: center.translate(0, 1), width: 8, height: 2.4),
+    fillPaint(_accent, alpha: 0.9),
+  );
+  for (final side in [-1.0, 1.0]) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(center.dx + side * 4, center.dy + 3)
+        ..lineTo(center.dx + side * 8, center.dy + 8)
+        ..lineTo(center.dx + side * 4, center.dy + 7)
+        ..close(),
+      fillPaint(const Color(0xFF3B424C)),
+    );
+  }
 }

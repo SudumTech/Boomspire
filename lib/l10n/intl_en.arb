@@ -130,6 +130,15 @@
       "weakness": {"type": "String"}
     }
   },
+  "unitCardAttacksLabel": "Attacks",
+  "unitCardTargetGround": "Ground",
+  "unitCardTargetAir": "Air",
+  "unitCardTargetSea": "Sea",
+  "unitCardUnarmed": "Unarmed",
+  "unitCardPower": "Power",
+  "unitCardHealth": "Health",
+  "unitCardSpeed": "Speed",
+  "unitCardRange": "Range",
   "hudWaveLabel": "WAVE {current} / {total}",
   "@hudWaveLabel": {
     "placeholders": {
@@ -434,6 +443,10 @@
   "@fogLabelEditorPage": {},
   "cloudLabelEditorPage": "Cloud",
   "@cloudLabelEditorPage": {},
+  "dustLabelEditorPage": "Dust",
+  "@dustLabelEditorPage": {},
+  "birdsLabelEditorPage": "Birds",
+  "@birdsLabelEditorPage": {},
   "onlyHomeSitesSupportedEditorPage": "Only {max} home sites supported",
   "@onlyHomeSitesSupportedEditorPage": {
     "placeholders": {

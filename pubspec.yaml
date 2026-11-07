@@ -85,6 +85,7 @@ flutter:
 
   assets:
     - assets/audio/
+    - assets/audio/effects/
     - assets/models/
     - assets/game_content/
 

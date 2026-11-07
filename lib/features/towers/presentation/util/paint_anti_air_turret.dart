@@ -1,52 +1,42 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
-import 'paint_viewhole.dart';
+import 'tower_art.dart';
 
-/// Twin angled flak barrels pointed skyward, each with a muzzle collar.
+const _accent = Color(0xFF7C4DFF);
+
+/// Twin flak barrels splayed in a V on an elevated mount with a radar bar.
 void paintAntiAirTurret(Canvas canvas, Offset center) {
   for (final side in [-1.0, 1.0]) {
-    canvas.save();
-    canvas.translate(center.dx, center.dy);
-    canvas.rotate(side * -0.5);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: const Offset(0, -14), width: 5, height: 24),
-        const Radius.circular(2),
-      ),
-      Paint()..color = const Color(0xFF35284f),
+    paintBarrel(
+      canvas,
+      from: center.translate(side * 3.5, -1),
+      to: center.translate(side * 11, -21),
+      width: 3.4,
+      muzzleWidth: 5.2,
     );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: const Offset(0, -25), width: 6.5, height: 5),
-        const Radius.circular(1.5),
-      ),
-      Paint()..color = const Color(0xFF1a1420),
+    canvas.drawCircle(
+      center.translate(side * 11, -21),
+      1.4,
+      fillPaint(_accent),
     );
-    canvas.restore();
   }
-  // Ammo feed box at the base - reads closer to a real flak/AA mount.
+  // Radar bar behind the mount.
+  canvas.save();
+  canvas.translate(center.dx, center.dy + 9);
+  canvas.rotate(-pi / 14);
   canvas.drawRRect(
     RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(0, 9), width: 12, height: 8),
-      const Radius.circular(2),
+      Rect.fromCenter(center: Offset.zero, width: 17, height: 3.4),
+      const Radius.circular(1.5),
     ),
-    Paint()..color = const Color(0xFF2b2436),
+    fillPaint(const Color(0xFF3A424C)),
   );
-  canvas.drawCircle(
-    center,
-    11,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF9575CD), Color(0xFF2b2f36)],
-      ).createShader(Rect.fromCircle(center: center, radius: 11)),
+  canvas.drawRect(
+    Rect.fromCenter(center: Offset.zero, width: 15, height: 0.9),
+    fillPaint(_accent, alpha: 0.9),
   );
-  canvas.drawCircle(
-    center,
-    11,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFF7C4DFF),
-  );
-  paintViewhole(canvas, center.translate(-6, -1));
+  canvas.restore();
+  paintDome(canvas, center, 8.8, accent: _accent);
 }

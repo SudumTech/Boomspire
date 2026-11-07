@@ -10,6 +10,8 @@ import '../../../core/combat/team.dart';
 import '../../combat/presentation/mobile_unit_component.dart';
 import '../../terrain/presentation/components/cloud_layer_component/cloud_layer_component.dart';
 import '../../terrain/presentation/components/terrain_component/terrain_component.dart';
+import '../../terrain/presentation/components/ambient_weather_audio_component/ambient_weather_audio_component.dart';
+import '../../terrain/presentation/components/bird_flock_component/bird_flock_component.dart';
 import '../../terrain/presentation/components/wind_effect_component/wind_effect_component.dart';
 import '../../towers/domain/models/building_type.dart';
 import '../../towers/domain/targeting/target_assignment_computer.dart';
@@ -121,8 +123,15 @@ class GameWorld extends World
         biome: game.scene.biome,
       ),
     );
-    // Disabled for now - the procedural ambient loops need rework before
-    // this is worth turning back on (see AmbientWeatherAudioComponent).
+    await add(
+      BirdFlockComponent(
+        arenaSize: Vector2(
+          game.terrainMap.arenaWidth,
+          game.terrainMap.arenaHeight,
+        ),
+      ),
+    );
+    await add(AmbientWeatherAudioComponent());
     playerHomeBase = HomeBaseComponent(
       position: Vector2(
         game.terrainMap.basePoint.x,

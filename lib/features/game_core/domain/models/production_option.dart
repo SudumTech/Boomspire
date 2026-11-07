@@ -1,4 +1,5 @@
 import '../../../../core/combat/unit_kind.dart';
+import 'unit_card_info.dart';
 
 /// One buildable-unit row for a Training Center/War Factory's produce menu,
 /// as computed by `GameCoreProductionState` - a read-only UI projection,
@@ -15,12 +16,16 @@ class ProductionOption {
   /// blocking it. See `BoomspireGame.unitBlockReason`.
   final String? lockReason;
 
+  /// Name/targets/power/health/speed shown on the hover card.
+  final UnitCardInfo card;
+
   const ProductionOption({
     required this.kind,
     required this.ready,
     required this.cooldownRemaining,
     required this.cost,
     required this.affordable,
+    required this.card,
     this.lockReason,
   });
 }

@@ -187,45 +187,6 @@ class $AssetsModelsGen {
   /// File path: assets/models/enemy_tank.json
   String get enemyTank => 'assets/models/enemy_tank.json';
 
-  /// File path: assets/models/tower_antiAir.json
-  String get towerAntiAir => 'assets/models/tower_antiAir.json';
-
-  /// File path: assets/models/tower_artilleryBunker.json
-  String get towerArtilleryBunker => 'assets/models/tower_artilleryBunker.json';
-
-  /// File path: assets/models/tower_cannon.json
-  String get towerCannon => 'assets/models/tower_cannon.json';
-
-  /// File path: assets/models/tower_commandPost.json
-  String get towerCommandPost => 'assets/models/tower_commandPost.json';
-
-  /// File path: assets/models/tower_goldMine.json
-  String get towerGoldMine => 'assets/models/tower_goldMine.json';
-
-  /// File path: assets/models/tower_laser.json
-  String get towerLaser => 'assets/models/tower_laser.json';
-
-  /// File path: assets/models/tower_machineGun.json
-  String get towerMachineGun => 'assets/models/tower_machineGun.json';
-
-  /// File path: assets/models/tower_rocket.json
-  String get towerRocket => 'assets/models/tower_rocket.json';
-
-  /// File path: assets/models/tower_rocketSilo.json
-  String get towerRocketSilo => 'assets/models/tower_rocketSilo.json';
-
-  /// File path: assets/models/tower_sam.json
-  String get towerSam => 'assets/models/tower_sam.json';
-
-  /// File path: assets/models/tower_techLab.json
-  String get towerTechLab => 'assets/models/tower_techLab.json';
-
-  /// File path: assets/models/tower_trainingCenter.json
-  String get towerTrainingCenter => 'assets/models/tower_trainingCenter.json';
-
-  /// File path: assets/models/tower_warFactory.json
-  String get towerWarFactory => 'assets/models/tower_warFactory.json';
-
   /// List of all assets
   List<String> get values => [
     readme,
@@ -248,19 +209,6 @@ class $AssetsModelsGen {
     enemySoldier,
     enemyStealthBomber,
     enemyTank,
-    towerAntiAir,
-    towerArtilleryBunker,
-    towerCannon,
-    towerCommandPost,
-    towerGoldMine,
-    towerLaser,
-    towerMachineGun,
-    towerRocket,
-    towerRocketSilo,
-    towerSam,
-    towerTechLab,
-    towerTrainingCenter,
-    towerWarFactory,
   ];
 }
 

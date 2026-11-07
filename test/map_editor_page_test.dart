@@ -127,14 +127,16 @@ void main() {
       expect(find.text(S.current.addKeyframeLabelEditorPage), findsOneWidget);
 
       // Sun angle + preview-progress sliders, plus one Wind/Rain/Snow/Fog/
-      // Cloud slider each for the single default keyframe.
-      expect(find.byType(Slider), findsNWidgets(7));
+      // Cloud/Dust/Birds slider each for the single default keyframe.
+      expect(find.byType(Slider), findsNWidgets(9));
 
       expect(find.text(S.current.windLabelEditorPage), findsOneWidget);
       expect(find.text(S.current.rainLabelEditorPage), findsOneWidget);
       expect(find.text(S.current.snowLabelEditorPage), findsOneWidget);
       expect(find.text(S.current.fogLabelEditorPage), findsOneWidget);
       expect(find.text(S.current.cloudLabelEditorPage), findsOneWidget);
+      expect(find.text(S.current.dustLabelEditorPage), findsOneWidget);
+      expect(find.text(S.current.birdsLabelEditorPage), findsOneWidget);
     },
   );
 }

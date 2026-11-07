@@ -1,47 +1,52 @@
 import 'package:flutter/material.dart';
 
-import 'paint_viewhole.dart';
+import 'tower_art.dart';
 
-/// A stubby smokestack with a crane arm - reads as heavy industry rather
-/// than a weapon, since it never actually fires; it just rolls out
-/// vehicles and aircraft.
+const _accent = Color(0xFFB0BEC5);
+
+/// A gantry crane arm with a hanging hook over the assembly bay.
 void paintWarFactoryTurret(Canvas canvas, Offset center) {
   canvas.drawRRect(
     RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(-5, -8), width: 7, height: 22),
+      Rect.fromCenter(center: center.translate(0, 4), width: 9, height: 9),
       const Radius.circular(2),
     ),
-    Paint()..color = const Color(0xFF78909C),
+    fillPaint(const Color(0xFF3A444D)),
   );
   canvas.drawRRect(
     RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(-5, -20), width: 9, height: 5),
-      const Radius.circular(1.5),
+      Rect.fromCenter(center: center.translate(0, 4), width: 9, height: 9),
+      const Radius.circular(2),
     ),
-    Paint()..color = const Color(0xFF37474F),
+    strokePaint(_accent, 1),
+  );
+  paintBarrel(
+    canvas,
+    from: center.translate(0, 4),
+    to: center.translate(0, -17),
+    width: 3.2,
+    body: const Color(0xFF59646E),
+    highlight: const Color(0xFFB9C4CD),
+  );
+  paintBarrel(
+    canvas,
+    from: center.translate(-9, -16),
+    to: center.translate(11, -16),
+    width: 3,
+    body: const Color(0xFF59646E),
+    highlight: const Color(0xFFB9C4CD),
   );
   canvas.drawLine(
-    center.translate(2, -14),
-    center.translate(12, -18),
-    Paint()
-      ..color = const Color(0xFFB0BEC5)
-      ..strokeWidth = 2,
+    center.translate(8, -16),
+    center.translate(8, -7),
+    strokePaint(const Color(0xFF1F2429), 1),
   );
-  canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF607d8b), Color(0xFF2b2f36)],
-      ).createShader(Rect.fromCircle(center: center, radius: 12)),
+  canvas.drawPath(
+    Path()..addArc(
+      Rect.fromCenter(center: center.translate(8, -5.5), width: 5, height: 5),
+      0,
+      4.2,
+    ),
+    strokePaint(const Color(0xFFF2B705), 1.4),
   );
-  canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFFB0BEC5),
-  );
-  paintViewhole(canvas, center.translate(0, 7));
 }

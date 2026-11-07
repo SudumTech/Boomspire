@@ -1,46 +1,42 @@
 import 'package:flutter/material.dart';
 
-import 'paint_viewhole.dart';
+import 'tower_art.dart';
 
-/// A rotating comms antenna array with a beacon light - reads as a
-/// command/support structure that coordinates rather than fires.
+const _accent = Color(0xFFFFD54A);
+
+/// A comms mast with crossbars, a radar dome and a blinking beacon.
 void paintCommandPostTurret(Canvas canvas, Offset center) {
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(0, -8), width: 4, height: 20),
-      const Radius.circular(2),
-    ),
-    Paint()..color = const Color(0xFF3a3220),
+  canvas.drawLine(
+    center.translate(0, 4),
+    center.translate(0, -20),
+    strokePaint(const Color(0xFF3A3D2C), 2.2),
   );
-  for (final side in [-1.0, 1.0]) {
+  for (final dy in [-8.0, -14.0]) {
+    final half = dy == -8.0 ? 8.0 : 5.0;
     canvas.drawLine(
-      center.translate(0, -18),
-      center.translate(side * 8, -12),
-      Paint()
-        ..color = const Color(0xFFFFD54A)
-        ..strokeWidth = 1.5,
+      center.translate(-half, dy),
+      center.translate(half, dy),
+      strokePaint(const Color(0xFF3A3D2C), 1.6),
     );
+    canvas.drawCircle(center.translate(-half, dy), 1.3, fillPaint(_accent));
+    canvas.drawCircle(center.translate(half, dy), 1.3, fillPaint(_accent));
   }
   canvas.drawCircle(
-    center.translate(0, -19),
-    2.4,
-    Paint()..color = const Color(0xFFFFF176),
+    center.translate(0, -21),
+    3,
+    fillPaint(const Color(0xFFE53935)),
   );
   canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFFb89a4a), Color(0xFF2b2f36)],
-      ).createShader(Rect.fromCircle(center: center, radius: 12)),
+    center.translate(0, -21),
+    5,
+    fillPaint(const Color(0xFFE53935), alpha: 0.25),
   );
-  canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFFFFD54A),
+  paintDome(
+    canvas,
+    center.translate(0, 6),
+    8,
+    accent: _accent,
+    light: const Color(0xFFB9B58C),
+    dark: const Color(0xFF4A482B),
   );
-  paintViewhole(canvas, center.translate(0, 7));
 }

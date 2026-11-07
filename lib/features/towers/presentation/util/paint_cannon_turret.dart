@@ -1,47 +1,37 @@
 import 'package:flutter/material.dart';
 
 import 'paint_viewhole.dart';
+import 'tower_art.dart';
 
-/// A single thick barrel with a muzzle brake - reads as "heavy artillery".
+const _accent = Color(0xFFFFC107);
+
+/// A heavy cannon: thick barrel with a muzzle brake and recoil sleeve on a
+/// squat armoured turret.
 void paintCannonTurret(Canvas canvas, Offset center) {
+  paintBarrel(
+    canvas,
+    from: center.translate(0, -2),
+    to: center.translate(0, -23),
+    width: 6,
+    muzzleWidth: 9,
+  );
   canvas.drawRRect(
     RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(0, -9), width: 16, height: 34),
-      const Radius.circular(5),
+      Rect.fromCenter(center: center.translate(0, -8), width: 9, height: 7),
+      const Radius.circular(2),
     ),
-    Paint()..color = const Color(0xFF454b52),
+    fillPaint(const Color(0xFF454E58)),
   );
-  for (final dy in [-24.0, -20.0]) {
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: center.translate(0, dy), width: 21, height: 3),
-        const Radius.circular(1.5),
-      ),
-      Paint()..color = const Color(0xFF23262b),
-    );
-  }
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(0, -24), width: 19, height: 8),
-      const Radius.circular(3),
-    ),
-    Paint()..color = const Color(0xFF23262b),
+  paintDome(canvas, center, 11, accent: _accent);
+  canvas.drawCircle(
+    center.translate(4, 3),
+    2.6,
+    fillPaint(const Color(0xFF14181C)),
   );
   canvas.drawCircle(
-    center,
-    14,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF8d8060), Color(0xFF2b2f36)],
-      ).createShader(Rect.fromCircle(center: center, radius: 14)),
+    center.translate(4, 3),
+    2.6,
+    strokePaint(_accent, 0.8, alpha: 0.8),
   );
-  canvas.drawCircle(
-    center,
-    14,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFFFFC107),
-  );
-  paintViewhole(canvas, center.translate(8, 6));
+  paintViewhole(canvas, center.translate(-3, 4));
 }

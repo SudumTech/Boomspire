@@ -3,6 +3,7 @@ import '../../../towers/presentation/tower_component.dart';
 import '../../../towers/presentation/training_center_component.dart';
 import '../../../towers/presentation/war_factory_component.dart';
 import '../../domain/models/production_option.dart';
+import '../../domain/models/unit_card_info.dart';
 import '../boomspire_game.dart';
 
 /// Computes what a selected Training Center/War Factory's produce-unit row
@@ -28,6 +29,9 @@ class GameCoreProductionState {
               gold >= costFor(kind) &&
               game.canProduceUnit(kind, owner: tower.owner),
           lockReason: game.unitBlockReason(kind, owner: tower.owner),
+          card: UnitCardInfo.fromBlueprint(
+            game.unitRepository.blueprintFor(tower.owner, kind),
+          ),
         ),
     ];
   }

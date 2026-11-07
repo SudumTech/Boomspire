@@ -584,6 +584,61 @@ class S {
     );
   }
 
+  /// `Attacks`
+  String get unitCardAttacksLabel {
+    return Intl.message(
+      'Attacks',
+      name: 'unitCardAttacksLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ground`
+  String get unitCardTargetGround {
+    return Intl.message(
+      'Ground',
+      name: 'unitCardTargetGround',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Air`
+  String get unitCardTargetAir {
+    return Intl.message('Air', name: 'unitCardTargetAir', desc: '', args: []);
+  }
+
+  /// `Sea`
+  String get unitCardTargetSea {
+    return Intl.message('Sea', name: 'unitCardTargetSea', desc: '', args: []);
+  }
+
+  /// `Unarmed`
+  String get unitCardUnarmed {
+    return Intl.message('Unarmed', name: 'unitCardUnarmed', desc: '', args: []);
+  }
+
+  /// `Power`
+  String get unitCardPower {
+    return Intl.message('Power', name: 'unitCardPower', desc: '', args: []);
+  }
+
+  /// `Health`
+  String get unitCardHealth {
+    return Intl.message('Health', name: 'unitCardHealth', desc: '', args: []);
+  }
+
+  /// `Speed`
+  String get unitCardSpeed {
+    return Intl.message('Speed', name: 'unitCardSpeed', desc: '', args: []);
+  }
+
+  /// `Range`
+  String get unitCardRange {
+    return Intl.message('Range', name: 'unitCardRange', desc: '', args: []);
+  }
+
   /// `WAVE {current} / {total}`
   String hudWaveLabel(int current, int total) {
     return Intl.message(
@@ -1609,6 +1664,26 @@ class S {
     return Intl.message(
       'Cloud',
       name: 'cloudLabelEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dust`
+  String get dustLabelEditorPage {
+    return Intl.message(
+      'Dust',
+      name: 'dustLabelEditorPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Birds`
+  String get birdsLabelEditorPage {
+    return Intl.message(
+      'Birds',
+      name: 'birdsLabelEditorPage',
       desc: '',
       args: [],
     );

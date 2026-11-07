@@ -26,6 +26,8 @@ import '../../terrain/domain/models/weather_focus_state.dart';
 import '../../terrain/domain/repos/terrain_repository.dart';
 import '../../terrain/presentation/components/cloud_layer_component/cloud_layer_component.dart';
 import '../../terrain/presentation/components/terrain_component/terrain_component.dart';
+import '../../terrain/presentation/components/ambient_weather_audio_component/ambient_weather_audio_component.dart';
+import '../../terrain/presentation/components/bird_flock_component/bird_flock_component.dart';
 import '../../terrain/presentation/components/wind_effect_component/wind_effect_component.dart';
 import '../../towers/domain/models/building_type.dart';
 import '../../towers/domain/models/tower_type.dart';
@@ -649,8 +651,12 @@ class BoomspireGame extends FlameGame<GameWorld>
         biome: scene.biome,
       ),
     );
-    // Disabled for now - the procedural ambient loops need rework before
-    // this is worth turning back on (see AmbientWeatherAudioComponent).
+    world.add(
+      BirdFlockComponent(
+        arenaSize: Vector2(terrainMap.arenaWidth, terrainMap.arenaHeight),
+      ),
+    );
+    world.add(AmbientWeatherAudioComponent());
     world.playerHomeBase = HomeBaseComponent(
       position: Vector2(terrainMap.basePoint.x, terrainMap.basePoint.y),
       owner: playerTeam,
@@ -915,6 +921,16 @@ class BoomspireGame extends FlameGame<GameWorld>
   /// (flat per-type caps, via any [MaxCountRequirement] in the list) read
   /// from, so every build condition for towers/buildings genuinely comes
   /// from data rather than a hardcoded per-type `if`.
+  /// The prerequisite/limit rules for [type] - read by the skirmish AI to
+  /// work out which buildings it must construct before it can build [type].
+  List<BuildRequirement> requirementsOf(UnitType type) =>
+      _requirementsFor(type);
+
+  /// Whether [team] has ever built the building with id [buildingId] (e.g.
+  /// `'building.techLab'`) - the same check [buildBlockReason] uses.
+  bool hasBuilt(String buildingId, Team team) =>
+      _everBuiltByTeam[buildingId]?.contains(team.id) ?? false;
+
   List<BuildRequirement> _requirementsFor(UnitType type) => type is BuildingType
       ? buildingRepository.requirementsFor(type)
       : towerRepository.requirementsFor(type as TowerType);

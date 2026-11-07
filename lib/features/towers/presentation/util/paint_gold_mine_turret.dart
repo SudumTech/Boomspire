@@ -1,51 +1,62 @@
 import 'package:flutter/material.dart';
 
-/// A small ore headframe (A-frame + pulley wheel) over a pile of gold
-/// nuggets - reads as an economy structure, not a weapon.
+import 'tower_art.dart';
+
+const _accent = Color(0xFFFFB300);
+
+/// A heap of gold nuggets on an ore cart.
 void paintGoldMineTurret(Canvas canvas, Offset center) {
-  for (final side in [-1.0, 1.0]) {
-    canvas.drawLine(
-      center.translate(side * 8, 10),
-      center.translate(0, -16),
-      Paint()
-        ..color = const Color(0xFF6d4c1f)
-        ..strokeWidth = 2.5,
+  final cart = Rect.fromCenter(
+    center: center.translate(0, 5),
+    width: 21,
+    height: 11,
+  );
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(
+      cart.shift(const Offset(0.8, 1.2)),
+      const Radius.circular(2),
+    ),
+    fillPaint(Colors.black, alpha: 0.3),
+  );
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(cart, const Radius.circular(2)),
+    metalPaint(
+      cart,
+      light: const Color(0xFF7A5B3A),
+      dark: const Color(0xFF3A2917),
+    ),
+  );
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(cart, const Radius.circular(2)),
+    strokePaint(const Color(0xFF1E140B), 1.2),
+  );
+  for (final dx in [-6.0, 6.0]) {
+    canvas.drawCircle(
+      center.translate(dx, 11),
+      2.4,
+      fillPaint(const Color(0xFF1C1C20)),
+    );
+    canvas.drawCircle(
+      center.translate(dx, 11),
+      1,
+      fillPaint(const Color(0xFF8A8A92)),
     );
   }
-  canvas.drawCircle(
-    center.translate(0, -16),
-    3,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFFFFD54A),
-  );
-  canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFFFFD54A), Color(0xFF7a5a1a)],
-      ).createShader(Rect.fromCircle(center: center, radius: 12)),
-  );
-  canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFFFFB300),
-  );
-  // Gold nuggets scattered at the base.
-  for (final offset in [
-    const Offset(-6, 8),
-    const Offset(5, 9),
-    const Offset(0, 11),
-  ]) {
-    canvas.drawCircle(
-      center.translate(offset.dx, offset.dy),
-      2.2,
-      Paint()..color = const Color(0xFFFFE082),
-    );
+  // Nugget heap.
+  const nuggets = [
+    Offset(-6, -1),
+    Offset(0, -4),
+    Offset(6, -1),
+    Offset(-3, 0),
+    Offset(3, 0),
+    Offset(0, -9),
+    Offset(-4, -5),
+    Offset(4, -5),
+  ];
+  for (final n in nuggets) {
+    final c = center + n;
+    canvas.drawCircle(c, 3.4, fillPaint(const Color(0xFFC98600)));
+    canvas.drawCircle(c, 3.1, fillPaint(_accent));
+    paintGlint(canvas, c.translate(-1, -1.1), 0.9);
   }
 }

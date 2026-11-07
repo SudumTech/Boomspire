@@ -14,6 +14,8 @@ _WeatherKeyframe _$WeatherKeyframeFromJson(Map<String, dynamic> json) =>
       snowIntensity: (json['snowIntensity'] as num?)?.toDouble() ?? 0.0,
       fogDensity: (json['fogDensity'] as num?)?.toDouble() ?? 0.0,
       cloudCover: (json['cloudCover'] as num?)?.toDouble() ?? 0.0,
+      dustIntensity: (json['dustIntensity'] as num?)?.toDouble() ?? 0.0,
+      birdActivity: (json['birdActivity'] as num?)?.toDouble() ?? 0.0,
       windType:
           $enumDecodeNullable(_$WindTypeEnumMap, json['windType']) ??
           WindType.automatic,
@@ -27,6 +29,8 @@ Map<String, dynamic> _$WeatherKeyframeToJson(_WeatherKeyframe instance) =>
       'snowIntensity': instance.snowIntensity,
       'fogDensity': instance.fogDensity,
       'cloudCover': instance.cloudCover,
+      'dustIntensity': instance.dustIntensity,
+      'birdActivity': instance.birdActivity,
       'windType': _$WindTypeEnumMap[instance.windType]!,
     };
 

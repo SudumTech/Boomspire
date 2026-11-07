@@ -1,29 +1,73 @@
+import 'dart:ui';
+
 import 'package:flame/components.dart';
 
-import '../../../../audio/domain/models/ambient_sound_type.dart';
+import '../../../../audio/domain/models/ambient_environment.dart';
 import '../../../../game_core/presentation/boomspire_game.dart';
-import 'util/ambient_weather_volumes.dart';
+import '../../../domain/models/terrain_ambience.dart';
+import '../../../impl/terrain_ambience_sampler.dart';
 
-/// Keeps the wind/rain ambience loops tracking the live weather blend from
-/// `BoomspireGame.weatherFocus` every frame - the aural counterpart to
-/// `WindEffectComponent`/`CloudLayerComponent`'s always-on visual layers.
-/// Volume also ducks under heavy weapon fire
-/// (`BoomspireGame.combatIntensity`) so ambience never fights combat SFX
-/// for attention, see `GameConfig.combatAmbientDuckStrength`.
+/// Reads the live state of the world every frame and hands it to the
+/// environmental sound engine (see `AudioRepository.updateAmbience`):
+///
+/// - the weather blend (`BoomspireGame.weatherFocus`) - wind, rain, snow,
+///   dust, bird activity;
+/// - the terrain the camera currently sees - water, sea, lava, trees;
+/// - how intense the fighting is (`BoomspireGame.combatIntensity`), which
+///   turns the whole soundscape down.
+///
+/// The terrain is re-measured a couple of times a second rather than every
+/// frame; scrolling the camera is slow compared to that.
 class AmbientWeatherAudioComponent extends Component
     with HasGameReference<BoomspireGame> {
+  static const _terrainSampleInterval = 0.5;
+
+  final TerrainAmbienceSampler _sampler;
+  TerrainAmbience _terrain = TerrainAmbience.none;
+  double _untilTerrainSample = 0;
+
+  AmbientWeatherAudioComponent({
+    TerrainAmbienceSampler sampler = const TerrainAmbienceSampler(),
+  }) : _sampler = sampler;
+
   @override
   void update(double dt) {
     super.update(dt);
+    _refreshTerrain(dt);
     final weather = game.scene.environment.sampleBlend(
       game.weatherFocus.weights,
     );
-    final volumes = ambientWeatherVolumes(
-      windStrength: weather.windStrength,
-      rainIntensity: weather.rainIntensity,
-      combatIntensity: game.combatIntensity,
+    game.audioRepository.updateAmbience(
+      AmbientEnvironment(
+        windStrength: weather.windStrength,
+        rainIntensity: weather.rainIntensity,
+        snowIntensity: weather.snowIntensity,
+        dustIntensity: weather.dustIntensity,
+        birdActivity: weather.birdActivity,
+        treeDensity: _terrain.treeDensity,
+        waterShare: _terrain.waterShare,
+        seaShare: _terrain.seaShare,
+        lavaShare: _terrain.lavaShare,
+        combatIntensity: game.combatIntensity,
+      ),
+      dt,
     );
-    game.audioRepository.setAmbientVolume(AmbientSoundType.wind, volumes.wind);
-    game.audioRepository.setAmbientVolume(AmbientSoundType.rain, volumes.rain);
+  }
+
+  void _refreshTerrain(double dt) {
+    _untilTerrainSample -= dt;
+    if (_untilTerrainSample > 0) return;
+    _untilTerrainSample = _terrainSampleInterval;
+    _terrain = _sampler.sample(game.terrainMap, _visibleArea());
+  }
+
+  Rect _visibleArea() {
+    final map = game.terrainMap;
+    final everything = Rect.fromLTWH(0, 0, map.arenaWidth, map.arenaHeight);
+    try {
+      return game.camera.visibleWorldRect.intersect(everything);
+    } on Object {
+      return everything; // camera not laid out yet
+    }
   }
 }

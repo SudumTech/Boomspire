@@ -7,7 +7,6 @@ import '../../../core/combat/unit_kind.dart';
 import '../../game_core/presentation/boomspire_game.dart';
 import '../../towers/presentation/training_center_component.dart';
 import '../../towers/presentation/war_factory_component.dart';
-import '../domain/models/skirmish_ai_profile.dart';
 import 'ai_base_queries.dart';
 import 'player_weakness_analyzer.dart';
 import 'strength_assessor.dart';
@@ -23,36 +22,42 @@ class SkirmishProductionPlanner {
   /// Score bonus for armed aircraft while the opponent cannot shoot them.
   static const _airWeaknessBonus = 3.0;
 
+  /// Score bonus for units that can shoot aircraft while the AI fields fewer
+  /// of them than the air power it has seen calls for.
+  static const _antiAirNeedBonus = 3.0;
+
   /// Below this many own combat units the AI never saves gold for
   /// buildings - a minimum defense comes first.
   static const _minArmyBeforeSaving = 3;
 
+  /// Most anti-air units the AI ever wants at once.
+  static const _maxAntiAirUnits = 8;
+
   final BoomspireGame _game;
-  final SkirmishAiProfile _profile;
   final AiBaseQueries _queries;
   final StrengthAssessor _assessor;
-  final Random _random;
   final PlayerWeaknessAnalyzer _weakness;
 
   SkirmishProductionPlanner(
-    this._game,
-    this._profile, {
+    this._game, {
     this._assessor = const StrengthAssessor(),
-    Random? random,
   }) : _queries = AiBaseQueries(_game),
-       _random = random ?? Random(),
        _weakness = PlayerWeaknessAnalyzer(_game);
 
   /// Mans every idle production building. [savingsTarget] gold is held back
   /// for the AI's next building, once it fields a minimal army.
   void produce(Team aiTeam, {int savingsTarget = 0}) {
     final enemy = _queries.enemyComposition(aiTeam);
-    final exploitAir =
-        _profile.exploitsWeaknesses && _weakness.analyze(aiTeam).lacksAntiAir;
+    final exploitAir = _weakness.analyze(aiTeam).lacksAntiAir;
     final keepGold = _ownUnitCount(aiTeam) >= _minArmyBeforeSaving
         ? savingsTarget
         : 0;
-    final context = (enemy: enemy, exploitAir: exploitAir, keepGold: keepGold);
+    final context = (
+      enemy: enemy,
+      exploitAir: exploitAir,
+      keepGold: keepGold,
+      antiAirDeficit: _antiAirUnitDeficit(aiTeam),
+    );
     for (final tower in _queries.ownedStructures(aiTeam)) {
       if (tower is TrainingCenterComponent && tower.canProduce) {
         _produceFrom(
@@ -96,9 +101,6 @@ class SkirmishProductionPlanner {
       .length;
 
   UnitKind _pickKind(Team aiTeam, List<UnitKind> kinds, _Context context) {
-    if (!_profile.countersPlayerArmy) {
-      return kinds[_random.nextInt(kinds.length)];
-    }
     final blueprints = {
       for (final kind in kinds)
         kind: _game.unitRepository.blueprintFor(aiTeam, kind),
@@ -114,7 +116,8 @@ class SkirmishProductionPlanner {
       final score =
           _valueForCost(blueprint) / bestValue +
           _counterScore(blueprint, context.enemy) +
-          _weaknessScore(blueprint, context) -
+          _weaknessScore(blueprint, context) +
+          _antiAirNeedScore(blueprint, context) -
           _varietyPenalty * (ownCounts[kind] ?? 0) / ownTotal;
       if (score > bestScore) {
         bestScore = score;
@@ -151,6 +154,27 @@ class SkirmishProductionPlanner {
     return context.exploitAir && armedAircraft ? _airWeaknessBonus : 0;
   }
 
+  /// How many more units that can shoot aircraft the AI wants right now:
+  /// one per enemy aircraft seen (more once the opponent can build planes at
+  /// all), minus the ones it already has.
+  int _antiAirUnitDeficit(Team aiTeam) {
+    final enemy = _queries.enemyComposition(aiTeam);
+    final potential = _queries.enemyCanBuildAircraft(aiTeam) ? 2 : 0;
+    final wanted = (enemy.air > potential ? enemy.air : potential).clamp(
+      0,
+      _maxAntiAirUnits,
+    );
+    final owned = _queries.ownedAntiAirUnits(aiTeam).length;
+    return wanted > owned ? wanted - owned : 0;
+  }
+
+  double _antiAirNeedScore(MobileUnitBlueprint blueprint, _Context context) {
+    final shootsAir =
+        blueprint.attackDamage > 0 &&
+        blueprint.attackDomains.contains(UnitDomain.air);
+    return context.antiAirDeficit > 0 && shootsAir ? _antiAirNeedBonus : 0;
+  }
+
   Map<UnitKind, int> _ownKindCounts(Team aiTeam) {
     final counts = <UnitKind, int>{};
     for (final unit in _game.world.activeUnits) {
@@ -165,4 +189,9 @@ typedef _Enemy = ({int air, int vehicle, int total});
 
 /// What one production round knows: the opponent's army makeup, whether to
 /// exploit missing anti-air, and how much gold to hold back.
-typedef _Context = ({_Enemy enemy, bool exploitAir, int keepGold});
+typedef _Context = ({
+  _Enemy enemy,
+  bool exploitAir,
+  int keepGold,
+  int antiAirDeficit,
+});

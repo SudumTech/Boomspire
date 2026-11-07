@@ -11,6 +11,7 @@ import '../../towers/domain/models/tower_type.dart';
 import '../../towers/domain/models/unit_type.dart';
 import '../domain/models/skirmish_ai_profile.dart';
 import 'ai_base_queries.dart';
+import 'build_prerequisite_resolver.dart';
 import 'build_site_finder.dart';
 import 'player_weakness_analyzer.dart';
 
@@ -43,9 +44,22 @@ class SkirmishBuildPlanner {
     BuildingType.trainingCenter,
   ];
   static const _techBuildOrder = [
+    BuildingType.powerPlant,
     BuildingType.techLab,
     BuildingType.commandPost,
   ];
+
+  /// Big late-game towers the AI works toward, most useful first, once it
+  /// is rich enough (see [_richGold]).
+  static const _lateGameTowers = [
+    TowerType.laser,
+    TowerType.rocketSilo,
+    TowerType.artilleryBunker,
+  ];
+
+  /// Gold above which the AI starts investing in big towers beyond the
+  /// basic garrison.
+  static const _richGold = 1800;
   static const _expandable = [
     BuildingType.goldMine,
     BuildingType.trainingCenter,
@@ -76,8 +90,9 @@ class SkirmishBuildPlanner {
   final AiBaseQueries _queries;
   final BuildSiteFinder _siteFinder;
   final PlayerWeaknessAnalyzer _weakness;
+  final BuildPrerequisiteResolver _prerequisites;
 
-  BuildingType? _savingFor;
+  UnitType? _savingFor;
   bool _saving = true;
   double _phaseStart = 0;
 
@@ -86,7 +101,8 @@ class SkirmishBuildPlanner {
     this._profile, {
     this._siteFinder = const BuildSiteFinder(),
   }) : _queries = AiBaseQueries(_game),
-       _weakness = PlayerWeaknessAnalyzer(_game);
+       _weakness = PlayerWeaknessAnalyzer(_game),
+       _prerequisites = BuildPrerequisiteResolver(_game);
 
   /// Attempts one build; returns the type placed, or null if none.
   UnitType? tryBuild(Team aiTeam, SkirmishDirective directive) {
@@ -122,7 +138,11 @@ class SkirmishBuildPlanner {
     final threatDomain = _expectedThreatDomain(aiTeam);
 
     final underAttack = threats.isNotEmpty;
-    if (underAttack && garrison < _profile.baseDefenseTowers + 2) {
+    final antiAirShort = _antiAirShort(aiTeam);
+    final airRaid = threats.any((u) => u.blueprint.domain == UnitDomain.air);
+    final needsUrgentDefense =
+        garrison < _profile.baseDefenseTowers + 2 || (airRaid && antiAirShort);
+    if (underAttack && needsUrgentDefense) {
       return context.order(
         _pickCombatTower(aiTeam, 0, _queries.counterDomainFor(threats)),
         _SiteSide.front,
@@ -144,6 +164,21 @@ class SkirmishBuildPlanner {
         _pickCombatTower(aiTeam, reserve, threatDomain),
         _SiteSide.front,
       );
+    }
+
+    // Anti-air is its own need: air units (or the ability to build them)
+    // call for dedicated defenses long before the first raid arrives.
+    if (antiAirShort) {
+      final tower = _pickCombatTower(aiTeam, reserve, UnitDomain.air);
+      if (tower != null) return context.order(tower, _SiteSide.front);
+    }
+
+    // Big towers (SAM, Laser...) need a whole chain of buildings first and a
+    // lot of gold: build the missing prerequisite, then the tower itself.
+    final goal = _strategicGoal(aiTeam);
+    if (goal != null && _canAfford(aiTeam, goal, spareReserve)) {
+      final isTower = AiBaseQueries.combatTowerTypes.contains(goal);
+      return context.order(goal, isTower ? _SiteSide.front : _SiteSide.back);
     }
 
     final fortify = _nodeNeedingGuard(aiTeam);
@@ -175,9 +210,55 @@ class SkirmishBuildPlanner {
     return null;
   }
 
+  /// The next structure to build toward a big tower the AI wants: the
+  /// missing prerequisite building if there is one, otherwise the tower
+  /// itself - or null when it wants no big tower (or cannot get one).
+  UnitType? _strategicGoal(Team aiTeam) {
+    final tower = _wantedBigTower(aiTeam);
+    if (tower == null) return null;
+    final missing = _prerequisites.nextMissing(aiTeam, tower);
+    if (missing != null) {
+      return _game.canBuildTower(missing, owner: aiTeam) ? missing : null;
+    }
+    return _game.canBuildTower(tower, owner: aiTeam) ? tower : null;
+  }
+
+  /// The big tower worth working toward right now: a SAM Site when it needs
+  /// more anti-air and can afford to think long-term, otherwise one of the
+  /// [_lateGameTowers] once it is rich.
+  TowerType? _wantedBigTower(Team aiTeam) {
+    if (!_queries.hasProduction(aiTeam)) return null;
+    final hasEconomy = _queries.ownedCountOf(aiTeam, BuildingType.goldMine) > 0;
+    if (!hasEconomy) return null;
+    if (_wantsSam(aiTeam)) return TowerType.sam;
+    if (_game.goldFor(aiTeam) < _richGold) return null;
+    for (final tower in _lateGameTowers) {
+      if (_queries.ownedCountOf(aiTeam, tower) == 0) return tower;
+    }
+    return null;
+  }
+
+  /// A SAM Site's long range is the answer to a real air threat: two or
+  /// more enemy aircraft seen, or an opponent able to build them.
+  bool _wantsSam(Team aiTeam) {
+    final airThreat =
+        _queries.enemyComposition(aiTeam).air >= 2 ||
+        _queries.enemyCanBuildAircraft(aiTeam);
+    return airThreat && _samStillAllowed(aiTeam);
+  }
+
+  bool _samStillAllowed(Team aiTeam) {
+    final limit = _game.buildLimitFor(TowerType.sam, owner: aiTeam);
+    return limit == null ||
+        _queries.ownedCountOf(aiTeam, TowerType.sam) < limit;
+  }
+
+  bool _antiAirShort(Team aiTeam) =>
+      _queries.ownedAntiAirTowerCount(aiTeam) <
+      _queries.desiredAntiAirTowers(aiTeam);
+
   /// An owned resource node with no friendly combat tower close by.
   ResourceNodeComponent? _nodeNeedingGuard(Team aiTeam) {
-    if (!_profile.fortifiesNodes) return null;
     final towers = _queries
         .ownedStructures(aiTeam)
         .where((t) => AiBaseQueries.combatTowerTypes.contains(t.blueprint.type))
@@ -251,12 +332,21 @@ class SkirmishBuildPlanner {
     _phaseStart = now;
   }
 
-  BuildingType? _nextWantedBuilding(Team aiTeam) {
-    final candidates = [
-      ..._coreOrder(aiTeam),
+  /// What the AI is next saving up for: missing core buildings, then the
+  /// big tower it is working toward (or its missing prerequisite), then
+  /// tech and expansion buildings.
+  UnitType? _nextWantedBuilding(Team aiTeam) {
+    final core = _firstWanted(aiTeam, _coreOrder(aiTeam));
+    if (core != null) return core;
+    final goal = _strategicGoal(aiTeam);
+    if (goal != null) return goal;
+    return _firstWanted(aiTeam, [
       if (_exploitsAirWeakness(aiTeam)) ..._techBuildOrder,
       ..._expandableOrder(aiTeam),
-    ];
+    ]);
+  }
+
+  BuildingType? _firstWanted(Team aiTeam, List<BuildingType> candidates) {
     for (final candidate in candidates) {
       final owned = _queries.ownedCountOf(aiTeam, candidate);
       if (owned >= _capFor(candidate)) continue;
@@ -266,7 +356,7 @@ class SkirmishBuildPlanner {
   }
 
   bool _exploitsAirWeakness(Team aiTeam) =>
-      _profile.exploitsWeaknesses && _weakness.analyze(aiTeam).lacksAntiAir;
+      _weakness.analyze(aiTeam).lacksAntiAir;
 
   List<BuildingType> _coreOrder(Team aiTeam) =>
       _exploitsAirWeakness(aiTeam) ? _airFirstCoreOrder : _coreBuildOrder;

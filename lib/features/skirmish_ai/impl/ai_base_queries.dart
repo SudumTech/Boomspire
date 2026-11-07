@@ -30,6 +30,9 @@ class AiBaseQueries {
   /// Hostile units this close to the AI base count as an assault on it.
   static const threatRadius = 420.0;
 
+  /// Most anti-air towers the AI ever wants (a cap, not a knowledge limit).
+  static const maxAntiAirTowers = 4;
+
   final BoomspireGame _game;
 
   const AiBaseQueries(this._game);
@@ -67,6 +70,46 @@ class AiBaseQueries {
       threats.any((u) => u.blueprint.domain == UnitDomain.air)
       ? UnitDomain.air
       : UnitDomain.ground;
+
+  /// Own armed towers that can shoot aircraft.
+  int ownedAntiAirTowerCount(Team team) => ownedStructures(team)
+      .where(
+        (t) =>
+            t.blueprint.damage > 0 &&
+            t.blueprint.attackDomains.contains(UnitDomain.air),
+      )
+      .length;
+
+  /// Own mobile units that can shoot aircraft (ground defenders and fighters
+  /// alike).
+  List<MobileUnitComponent> ownedAntiAirUnits(Team team) => _game
+      .world
+      .activeUnits
+      .where(
+        (u) =>
+            !u.destroyed &&
+            u.team.id == team.id &&
+            u.blueprint.attackDamage > 0 &&
+            u.blueprint.attackDomains.contains(UnitDomain.air),
+      )
+      .toList();
+
+  /// Whether the opponent has built a Command Post - the building that
+  /// unlocks aircraft - so an air force may be coming even if none has
+  /// shown up yet.
+  bool enemyCanBuildAircraft(Team team) => _game.world
+      .towersHostileTo(team)
+      .any((t) => t.blueprint.type == BuildingType.commandPost);
+
+  /// How many anti-air defenders (towers + units) the AI wants given the
+  /// air power it has seen: one per two enemy aircraft, and at least one as
+  /// soon as the opponent is able to build aircraft at all.
+  int desiredAntiAirTowers(Team team) {
+    final aircraft = enemyComposition(team).air;
+    final seen = (aircraft / 2).ceil();
+    final potential = enemyCanBuildAircraft(team) ? 1 : 0;
+    return (seen > potential ? seen : potential).clamp(0, maxAntiAirTowers);
+  }
 
   /// How many hostile units of each broad class [team] currently faces.
   ({int air, int vehicle, int total}) enemyComposition(Team team) {

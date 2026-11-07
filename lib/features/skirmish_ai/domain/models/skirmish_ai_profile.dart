@@ -1,6 +1,12 @@
 /// Every knob that makes the skirmish AI easier or harder - one immutable
 /// bundle per `GameDifficulty` (see `GameDifficultyAiExtensions`), so no
 /// planner ever branches on the difficulty enum itself.
+///
+/// Difficulty only changes *how well* the AI executes (reaction speed,
+/// mistakes, attack thresholds, income, how large it grows). What it
+/// *knows* - counter-picking units, defending against air, claiming and
+/// fortifying nodes, spotting weaknesses, deciding when to build what - is
+/// the same on every difficulty.
 class SkirmishAiProfile {
   /// Seconds between two AI decision rounds (build/produce/command) - a
   /// slower brain reacts later to everything.
@@ -34,28 +40,12 @@ class SkirmishAiProfile {
   /// Combat towers kept around its own base even in peacetime.
   final int baseDefenseTowers;
 
-  /// Whether it recalls the army to repel units attacking its base.
-  final bool defendsWithArmy;
-
-  /// Whether it picks units that counter the player's current army.
-  final bool countersPlayerArmy;
-
   /// Whether it spends spare gold upgrading its structures.
   final bool upgradesStructures;
-
-  /// Whether it sends vehicles to claim resource nodes.
-  final bool capturesNodes;
-
-  /// Whether it fortifies its resource nodes with defense towers.
-  final bool fortifiesNodes;
 
   /// Whether a big army splits off a fast squad to raid weakly guarded
   /// economy/production targets while the main force pushes.
   final bool raidsEconomy;
-
-  /// Whether it spots gaps in the opponent's defenses (e.g. no anti-air)
-  /// and builds/strikes to exploit them.
-  final bool exploitsWeaknesses;
 
   /// How many Gold Mines it will build.
   final int maxGoldMines;
@@ -70,13 +60,8 @@ class SkirmishAiProfile {
     required this.incomeMultiplier,
     required this.maxProductionBuildings,
     required this.baseDefenseTowers,
-    required this.defendsWithArmy,
-    required this.countersPlayerArmy,
     required this.upgradesStructures,
-    required this.capturesNodes,
-    required this.fortifiesNodes,
     required this.raidsEconomy,
     required this.maxGoldMines,
-    required this.exploitsWeaknesses,
   });
 }

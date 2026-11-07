@@ -150,6 +150,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "biomeNameSnowyGrassland": MessageLookupByLibrary.simpleMessage(
       "Snowy Grassland",
     ),
+    "birdsLabelEditorPage": MessageLookupByLibrary.simpleMessage("Birds"),
     "brushLabelEditorPage": MessageLookupByLibrary.simpleMessage("Brush"),
     "brushTypeLabelEditorPage": MessageLookupByLibrary.simpleMessage("Type"),
     "brushTypeMatchBiomeEditorPage": MessageLookupByLibrary.simpleMessage(
@@ -184,6 +185,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "downloadLabelEditorPage": MessageLookupByLibrary.simpleMessage("Download"),
     "downloadedMapEditorPage": m3,
     "duneLabelEditorPage": MessageLookupByLibrary.simpleMessage("Dune"),
+    "dustLabelEditorPage": MessageLookupByLibrary.simpleMessage("Dust"),
     "dynamicWeatherLabelEditorPage": MessageLookupByLibrary.simpleMessage(
       "Dynamic weather over match",
     ),
@@ -361,6 +363,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "unclaimedLabelEntityPanel": MessageLookupByLibrary.simpleMessage(
       "Unclaimed",
     ),
+    "unitCardAttacksLabel": MessageLookupByLibrary.simpleMessage("Attacks"),
+    "unitCardHealth": MessageLookupByLibrary.simpleMessage("Health"),
+    "unitCardPower": MessageLookupByLibrary.simpleMessage("Power"),
+    "unitCardRange": MessageLookupByLibrary.simpleMessage("Range"),
+    "unitCardSpeed": MessageLookupByLibrary.simpleMessage("Speed"),
+    "unitCardTargetAir": MessageLookupByLibrary.simpleMessage("Air"),
+    "unitCardTargetGround": MessageLookupByLibrary.simpleMessage("Ground"),
+    "unitCardTargetSea": MessageLookupByLibrary.simpleMessage("Sea"),
+    "unitCardUnarmed": MessageLookupByLibrary.simpleMessage("Unarmed"),
     "untitledMapEditorPage": MessageLookupByLibrary.simpleMessage(
       "Untitled Map",
     ),

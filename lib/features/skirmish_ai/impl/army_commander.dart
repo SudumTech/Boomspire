@@ -13,6 +13,7 @@ import '../domain/models/army_strength.dart';
 import '../domain/models/skirmish_ai_profile.dart';
 import '../domain/models/strike_plan.dart';
 import '../domain/models/strike_target.dart';
+import 'ai_base_queries.dart';
 import 'open_ground_finder.dart';
 import 'player_weakness_analyzer.dart';
 import 'rally_point_finder.dart';
@@ -51,6 +52,9 @@ class ArmyCommander {
   /// Fewest armed aircraft that count as an air wing worth sending alone.
   static const _minAirWing = 2;
 
+  /// How far in front of the base home guards stand.
+  static const _guardDistance = 110.0;
+
   /// Re-point a striking group only when its target moved this far.
   static const _approachTolerance = 60.0;
 
@@ -64,6 +68,7 @@ class ArmyCommander {
   final OpenGroundFinder _groundFinder;
   final StrikePlanner _strikePlanner;
   final PlayerWeaknessAnalyzer _weakness;
+  final AiBaseQueries _queries;
 
   ArmyStance _stance = ArmyStance.muster;
   StrikePlan? _plan;
@@ -78,7 +83,8 @@ class ArmyCommander {
     this._rallyFinder = const RallyPointFinder(),
     this._groundFinder = const OpenGroundFinder(),
   }) : _strikePlanner = StrikePlanner(_game),
-       _weakness = PlayerWeaknessAnalyzer(_game);
+       _weakness = PlayerWeaknessAnalyzer(_game),
+       _queries = AiBaseQueries(_game);
 
   ArmyStance get stance => _stance;
 
@@ -105,9 +111,10 @@ class ArmyCommander {
 
     final everyone = _combatArmy(aiTeam);
     final airWing = _airWing(aiTeam, everyone);
-    final army = airWing.isEmpty
-        ? everyone
-        : everyone.where((u) => !airWing.contains(u)).toList();
+    final guards = _homeGuard(aiTeam, everyone, airWing);
+    final army = everyone
+        .where((u) => !airWing.contains(u) && !guards.contains(u))
+        .toList();
     final threats = _threatsNear(aiTeam, ownBase.position);
     final armyPower = _assessor.ofUnits(everyone).power;
     final threatPower = _assessor.ofUnits(threats).power;
@@ -137,10 +144,48 @@ class ArmyCommander {
       armyPower: armyPower,
       rally: rally,
     );
+    if (!defending && guards.isNotEmpty) {
+      _sendAllTo(
+        guards,
+        _guardPoint(ownBase.position, enemyBase),
+        tolerance: _approachTolerance,
+      );
+    }
     _airTarget = null;
     if (!defending && airWing.isNotEmpty) {
       _airTarget = _strikeFromAir(aiTeam, airWing, rally);
     }
+  }
+
+  /// Ground units that can shoot aircraft and are kept home to protect the
+  /// base while the opponent has aircraft in the field - one guard per enemy
+  /// aircraft (at least one). They never march off with the assault.
+  List<MobileUnitComponent> _homeGuard(
+    Team aiTeam,
+    List<MobileUnitComponent> everyone,
+    List<MobileUnitComponent> airWing,
+  ) {
+    final enemyAircraft = _queries.enemyComposition(aiTeam).air;
+    if (enemyAircraft == 0) return const [];
+    final candidates = everyone
+        .where(
+          (u) =>
+              u.blueprint.domain == UnitDomain.ground &&
+              u.blueprint.attackDamage > 0 &&
+              u.blueprint.attackDomains.contains(UnitDomain.air) &&
+              !airWing.contains(u),
+        )
+        .toList();
+    return candidates.take(max(1, enemyAircraft)).toList();
+  }
+
+  /// Where home guards stand: a little in front of the base, enemy-side.
+  Vector2 _guardPoint(Vector2 ownBase, Vector2 enemyBase) {
+    final toward = enemyBase - ownBase;
+    final ideal = toward.length2 == 0
+        ? ownBase.clone()
+        : ownBase + toward.normalized() * _guardDistance;
+    return _groundFinder.nearestOpen(_game.terrainMap.grid, ideal) ?? ideal;
   }
 
   /// The armed aircraft to send out on their own because the opponent has
@@ -149,7 +194,6 @@ class ArmyCommander {
     Team aiTeam,
     List<MobileUnitComponent> everyone,
   ) {
-    if (!_profile.exploitsWeaknesses) return const [];
     if (!_weakness.analyze(aiTeam).lacksAntiAir) return const [];
     final aircraft = everyone
         .where(
@@ -220,8 +264,7 @@ class ArmyCommander {
     final seriousEnough =
         _stance != ArmyStance.attack ||
         threatPower >= armyPower * _significantThreatShare;
-    final baseUnderAttack =
-        _profile.defendsWithArmy && threatPower > 0 && seriousEnough;
+    final baseUnderAttack = threatPower > 0 && seriousEnough;
     if (baseUnderAttack) return ArmyStance.defend;
 
     if (_stance == ArmyStance.attack) {

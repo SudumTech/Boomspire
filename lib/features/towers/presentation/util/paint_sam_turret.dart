@@ -1,50 +1,76 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
-import 'paint_viewhole.dart';
+import 'tower_art.dart';
 
-/// A single missile tube tilted skyward on a launcher box - reads as a
-/// dedicated long-range AA site rather than a rapid-fire flak mount.
+const _accent = Color(0xFF00E5FF);
+
+/// A tilted twin-missile launcher rail with a rotating search radar - a
+/// dedicated long-range AA site.
 void paintSamTurret(Canvas canvas, Offset center) {
+  // Launcher box.
+  final box = Rect.fromCenter(
+    center: center.translate(0, 5),
+    width: 15,
+    height: 12,
+  );
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(box, const Radius.circular(2.5)),
+    metalPaint(
+      box,
+      light: const Color(0xFF4E7077),
+      dark: const Color(0xFF1B2C30),
+    ),
+  );
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(box, const Radius.circular(2.5)),
+    strokePaint(const Color(0xFF0F181B), 1.1),
+  );
+  // Two missiles on rails, tilted skyward.
   canvas.save();
   canvas.translate(center.dx, center.dy);
-  canvas.rotate(-0.35);
+  canvas.rotate(-0.3);
+  for (final dx in [-3.6, 3.6]) {
+    final m = Rect.fromCenter(center: Offset(dx, -13), width: 4.6, height: 24);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(m, const Radius.circular(2.3)),
+      metalPaint(
+        m,
+        light: const Color(0xFFEEF2F5),
+        dark: const Color(0xFF99A5B1),
+      ),
+    );
+    canvas.drawPath(
+      Path()
+        ..moveTo(dx, -27)
+        ..lineTo(dx + 2.3, -23)
+        ..lineTo(dx - 2.3, -23)
+        ..close(),
+      fillPaint(const Color(0xFFFF6B35)),
+    );
+    canvas.drawRect(
+      Rect.fromCenter(center: Offset(dx, -8), width: 4.6, height: 1.6),
+      fillPaint(_accent),
+    );
+  }
+  canvas.restore();
+  // Search radar.
+  canvas.save();
+  canvas.translate(center.dx - 8, center.dy + 9);
+  canvas.rotate(-pi / 6);
   canvas.drawRRect(
     RRect.fromRectAndRadius(
-      Rect.fromCenter(center: const Offset(0, -15), width: 6, height: 26),
-      const Radius.circular(3),
+      Rect.fromCenter(center: Offset.zero, width: 9, height: 2.4),
+      const Radius.circular(1),
     ),
-    Paint()..color = const Color(0xFF1c3d42),
-  );
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(
-      Rect.fromCenter(center: const Offset(0, -27), width: 4, height: 8),
-      const Radius.circular(2),
-    ),
-    Paint()..color = const Color(0xFFFF6B35),
+    fillPaint(const Color(0xFF3A424C)),
   );
   canvas.restore();
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(0, 8), width: 16, height: 9),
-      const Radius.circular(2),
-    ),
-    Paint()..color = const Color(0xFF16282b),
-  );
   canvas.drawCircle(
-    center,
-    11,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF2b6e78), Color(0xFF2b2f36)],
-      ).createShader(Rect.fromCircle(center: center, radius: 11)),
+    center.translate(0, 3),
+    4,
+    fillPaint(const Color(0xFF16282B)),
   );
-  canvas.drawCircle(
-    center,
-    11,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFF00E5FF),
-  );
-  paintViewhole(canvas, center.translate(-6, 6));
+  canvas.drawCircle(center.translate(0, 3), 4, strokePaint(_accent, 1.2));
 }

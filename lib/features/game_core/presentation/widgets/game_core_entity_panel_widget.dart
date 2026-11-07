@@ -19,7 +19,9 @@ import '../../domain/models/production_option.dart';
 import '../boomspire_game.dart';
 import '../state/game_core_production_state.dart';
 import 'game_core_entity_panel_shell_widget.dart';
+import 'game_core_hover_card_anchor_widget.dart';
 import 'game_core_tower_action_button_widget.dart';
+import 'game_core_unit_hover_card_widget.dart';
 import 'game_core_tower_action_stat_chip_widget.dart';
 import 'game_core_unit_fire_stats_widget.dart';
 
@@ -286,9 +288,14 @@ class _GameCoreEntityPanelWidgetState extends State<GameCoreEntityPanelWidget> {
       enabled: option.affordable,
       onTap: () => _productionState.produce(tower, option.kind),
     );
-    return option.lockReason == null
-        ? button
-        : Tooltip(message: option.lockReason!, child: button);
+    return GameCoreHoverCardAnchorWidget(
+      cardBuilder: (_) => GameCoreUnitHoverCardWidget(
+        info: option.card,
+        cost: option.cost,
+        lockReason: option.lockReason,
+      ),
+      child: button,
+    );
   }
 
   List<Widget> _produceButtons(BoomspireGame game, TowerComponent tower) {

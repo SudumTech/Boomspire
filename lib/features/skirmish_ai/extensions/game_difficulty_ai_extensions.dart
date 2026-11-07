@@ -4,13 +4,14 @@ import '../domain/models/skirmish_ai_profile.dart';
 extension GameDifficultyAiExtensions on GameDifficulty {
   /// How the skirmish AI plays at this difficulty.
   ///
-  /// - **Easy**: slow, distracted, builds little, attacks only with a big
-  ///   edge, never counters or upgrades, earns less.
-  /// - **Normal**: a competent opponent that musters an army, defends its
-  ///   base and counters what it sees.
+  /// All difficulties know the same things (see [SkirmishAiProfile]); they
+  /// differ in execution:
+  /// - **Easy**: slow, distracted, grows a smaller base, attacks only with a
+  ///   big edge, earns less.
+  /// - **Normal**: a competent opponent.
   /// - **Hard**: fast, never distracted, attacks as soon as it is merely
-  ///   stronger, retreats from lost fights, upgrades relentlessly and earns
-  ///   a bonus on top of what the player does.
+  ///   stronger, retreats from lost fights, upgrades and raids, grows the
+  ///   largest base and earns a bonus on top of what the player does.
   SkirmishAiProfile get skirmishAiProfile => switch (this) {
     GameDifficulty.easy => const SkirmishAiProfile(
       decisionInterval: 5.0,
@@ -20,16 +21,11 @@ extension GameDifficultyAiExtensions on GameDifficulty {
       minAttackers: 5,
       forceAttackArmySize: 16,
       incomeMultiplier: 0.8,
-      maxProductionBuildings: 1,
+      maxProductionBuildings: 2,
       baseDefenseTowers: 2,
-      defendsWithArmy: false,
-      countersPlayerArmy: false,
       upgradesStructures: false,
-      capturesNodes: false,
-      fortifiesNodes: false,
       raidsEconomy: false,
-      maxGoldMines: 1,
-      exploitsWeaknesses: false,
+      maxGoldMines: 2,
     ),
     GameDifficulty.normal => const SkirmishAiProfile(
       decisionInterval: 3.0,
@@ -39,16 +35,11 @@ extension GameDifficultyAiExtensions on GameDifficulty {
       minAttackers: 4,
       forceAttackArmySize: 14,
       incomeMultiplier: 1.0,
-      maxProductionBuildings: 2,
+      maxProductionBuildings: 3,
       baseDefenseTowers: 3,
-      defendsWithArmy: true,
-      countersPlayerArmy: true,
       upgradesStructures: false,
-      capturesNodes: true,
-      fortifiesNodes: true,
       raidsEconomy: false,
-      maxGoldMines: 2,
-      exploitsWeaknesses: true,
+      maxGoldMines: 3,
     ),
     GameDifficulty.hard => const SkirmishAiProfile(
       decisionInterval: 1.5,
@@ -58,16 +49,11 @@ extension GameDifficultyAiExtensions on GameDifficulty {
       minAttackers: 3,
       forceAttackArmySize: 12,
       incomeMultiplier: 1.25,
-      maxProductionBuildings: 3,
+      maxProductionBuildings: 4,
       baseDefenseTowers: 4,
-      defendsWithArmy: true,
-      countersPlayerArmy: true,
       upgradesStructures: true,
-      capturesNodes: true,
-      fortifiesNodes: true,
       raidsEconomy: true,
-      maxGoldMines: 3,
-      exploitsWeaknesses: true,
+      maxGoldMines: 4,
     ),
   };
 }

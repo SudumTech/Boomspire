@@ -1,46 +1,57 @@
 import 'package:flutter/material.dart';
 
-import 'paint_viewhole.dart';
+import 'tower_art.dart';
 
-/// A short, wide reinforced barrel on a squat mount - heavier and more
-/// armored-looking than the Siege Cannon, built to endure return fire.
+const _accent = Color(0xFF8D6E63);
+
+/// A long-barrelled howitzer behind an armoured gun shield.
 void paintArtilleryBunkerTurret(Canvas canvas, Offset center) {
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(0, -6), width: 20, height: 20),
-      const Radius.circular(3),
+  paintBarrel(
+    canvas,
+    from: center.translate(0, 0),
+    to: center.translate(0, -25),
+    width: 5,
+    body: const Color(0xFF3A3530),
+    highlight: const Color(0xFF8A7F77),
+    muzzleWidth: 7.4,
+  );
+  // Recoil cylinders.
+  for (final dx in [-3.8, 3.8]) {
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(
+          center: center.translate(dx, -7),
+          width: 2.6,
+          height: 11,
+        ),
+        const Radius.circular(1.3),
+      ),
+      fillPaint(const Color(0xFF59514A)),
+    );
+  }
+  // Gun shield.
+  final shield = Path()
+    ..moveTo(center.dx - 12, center.dy - 4)
+    ..lineTo(center.dx + 12, center.dy - 4)
+    ..lineTo(center.dx + 10, center.dy + 9)
+    ..lineTo(center.dx - 10, center.dy + 9)
+    ..close();
+  canvas.drawPath(
+    shield,
+    metalPaint(
+      Rect.fromCenter(center: center, width: 24, height: 14),
+      light: const Color(0xFF8C8178),
+      dark: const Color(0xFF3B3631),
     ),
-    Paint()..color = const Color(0xFF4e4038),
   );
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(0, -18), width: 12, height: 20),
-      const Radius.circular(4),
-    ),
-    Paint()..color = const Color(0xFF6d5a4e),
+  canvas.drawPath(shield, strokePaint(const Color(0xFF14181C), 1.2));
+  canvas.drawLine(
+    center.translate(-9, 5),
+    center.translate(9, 5),
+    strokePaint(_accent, 1.2),
   );
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(0, -28), width: 14, height: 6),
-      const Radius.circular(2),
-    ),
-    Paint()..color = const Color(0xFF2b2318),
-  );
-  canvas.drawCircle(
-    center,
-    13,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF8D6E63), Color(0xFF2b2f36)],
-      ).createShader(Rect.fromCircle(center: center, radius: 13)),
-  );
-  canvas.drawCircle(
-    center,
-    13,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFF8D6E63),
-  );
-  paintViewhole(canvas, center.translate(-7, 6));
+  paintBolts(canvas, [
+    center.translate(-8, -1),
+    center.translate(8, -1),
+  ], radius: 1.1);
 }

@@ -1,42 +1,33 @@
 import 'package:flutter/material.dart';
 
 import 'paint_viewhole.dart';
+import 'tower_art.dart';
 
-/// Three-barrel rotary cluster - reads closer to a real minigun/gatling.
+const _accent = Color(0xFF4FC3F7);
+
+/// Twin-barrel machine gun on a domed mount with an ammo box.
 void paintMachineGunTurret(Canvas canvas, Offset center) {
-  for (final dx in [-6.0, 0.0, 6.0]) {
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(
-          center: center.translate(dx, -9),
-          width: 4.5,
-          height: 25,
-        ),
-        const Radius.circular(2),
-      ),
-      Paint()..color = const Color(0xFF2b2f36),
+  // Ammo box on the left flank.
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(
+      Rect.fromCenter(center: center.translate(-10, 3), width: 7, height: 11),
+      const Radius.circular(1.5),
+    ),
+    fillPaint(const Color(0xFF4B5A3A)),
+  );
+  canvas.drawRect(
+    Rect.fromCenter(center: center.translate(-10, 3), width: 7, height: 1.4),
+    fillPaint(const Color(0xFF2E3924)),
+  );
+  for (final dx in [-2.6, 2.6]) {
+    paintBarrel(
+      canvas,
+      from: center.translate(dx, -3),
+      to: center.translate(dx, -22),
+      width: 3,
+      muzzleWidth: 4.8,
     );
   }
-  canvas.drawCircle(
-    center.translate(0, -18),
-    6,
-    Paint()..color = const Color(0xFF1a1c20),
-  );
-  canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF7a8592), Color(0xFF2b2f36)],
-      ).createShader(Rect.fromCircle(center: center, radius: 12)),
-  );
-  canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFF4FC3F7),
-  );
-  paintViewhole(canvas, center.translate(0, 7));
+  paintDome(canvas, center, 9.5, accent: _accent);
+  paintViewhole(canvas, center.translate(0, 3));
 }

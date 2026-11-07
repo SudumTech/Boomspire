@@ -1,53 +1,52 @@
 import 'package:flutter/material.dart';
 
-import 'paint_viewhole.dart';
+import 'tower_art.dart';
 
-/// A single slender emitter rod ending in a crystal lens - reads as an
-/// energy weapon rather than a ballistic one.
+const _accent = Color(0xFFFF3D9A);
+
+/// A prism emitter on charging coils, glowing at the lens.
 void paintLaserTurret(Canvas canvas, Offset center) {
-  canvas.drawRRect(
-    RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(0, -12), width: 6, height: 26),
-      const Radius.circular(3),
-    ),
-    Paint()
-      ..shader =
-          const LinearGradient(colors: [Color(0xFF3a1030), Color(0xFF120810)])
-              .createShader(
-                Rect.fromCenter(
-                  center: center.translate(0, -12),
-                  width: 6,
-                  height: 26,
-                ),
-              ),
-  );
-  for (final r in [7.0, 4.0]) {
-    canvas.drawCircle(
-      center.translate(0, -24),
-      r,
-      Paint()
-        ..color = const Color(0xFFFF3D9A)
-            .withValues(alpha: r == 7.0 ? 0.35 : 0.9)
-        ..maskFilter = r == 7.0
-            ? const MaskFilter.blur(BlurStyle.normal, 4)
-            : null,
+  // Focusing prongs.
+  for (final side in [-1.0, 1.0]) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(center.dx + side * 3, center.dy - 4)
+        ..lineTo(center.dx + side * 7, center.dy - 18)
+        ..lineTo(center.dx + side * 4.5, center.dy - 19)
+        ..lineTo(center.dx + side * 1.6, center.dy - 5)
+        ..close(),
+      fillPaint(const Color(0xFF3B424C)),
     );
   }
+  // Glowing lens at the tip.
   canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF7a2a55), Color(0xFF2b2f36)],
-      ).createShader(Rect.fromCircle(center: center, radius: 12)),
+    center.translate(0, -20),
+    7,
+    fillPaint(_accent, alpha: 0.22)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
   );
   canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFFFF3D9A),
+    center.translate(0, -19),
+    3.2,
+    fillPaint(const Color(0xFF2A1220)),
   );
-  paintViewhole(canvas, center.translate(-6, 6));
+  canvas.drawCircle(center.translate(0, -19), 2.1, fillPaint(_accent));
+  paintGlint(canvas, center.translate(-0.7, -19.8), 0.7);
+  // Energy beam core.
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(
+      Rect.fromCenter(center: center.translate(0, -9), width: 3, height: 13),
+      const Radius.circular(1.5),
+    ),
+    fillPaint(_accent, alpha: 0.85),
+  );
+  paintDome(
+    canvas,
+    center,
+    8.8,
+    accent: _accent,
+    light: const Color(0xFF6C6A7C),
+    dark: const Color(0xFF29262F),
+  );
+  canvas.drawCircle(center, 3.2, fillPaint(_accent, alpha: 0.9));
 }

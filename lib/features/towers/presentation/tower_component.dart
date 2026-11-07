@@ -20,6 +20,7 @@ import '../../enemies/presentation/floating_text_component.dart';
 import '../../game_core/domain/models/game_config.dart';
 import '../../game_core/presentation/boomspire_game.dart';
 import '../domain/models/unit_blueprint.dart';
+import 'team_base_marker_component.dart';
 import 'tower_sprites.dart';
 import 'util/paint_tower_overlay.dart';
 import 'util/spawn_low_hp_smoke_interval.dart';
@@ -48,7 +49,7 @@ const double _antiRocketRange = 50;
 /// structural HP - enemies can shoot towers down, and the player can repair,
 /// upgrade, or sell them for gold.
 abstract class TowerComponent extends PositionComponent
-    with HasGameReference<BoomspireGame>, Unit
+    with HasGameReference<BoomspireGame>, Unit, TeamOwned
     implements Attackable {
   /// Seconds between shield charges regenerating once regen kicks in.
   static const double _shieldRechargeInterval = 6.0;
@@ -109,6 +110,9 @@ abstract class TowerComponent extends PositionComponent
   /// unconditionally assuming the player. Set post-construction (not a
   /// constructor param) so no tower subclass needs its signature changed.
   Team owner = Team.defaultPlayer;
+
+  @override
+  Team get ownerTeam => owner;
 
   double _antiRocketCooldown = 0;
 
@@ -254,6 +258,7 @@ abstract class TowerComponent extends PositionComponent
       ..anchor = Anchor.center
       ..position = size / 2;
     await add(baseSprite);
+    await add(TeamBaseMarkerComponent(this));
 
     turret =
         PositionComponent(

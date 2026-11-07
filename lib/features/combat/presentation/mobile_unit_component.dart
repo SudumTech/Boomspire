@@ -122,10 +122,13 @@ bool isTargetDetectable(
 /// nearby teammates push apart) are driven by switching on [objective],
 /// not by subclassing.
 class MobileUnitComponent extends PositionComponent
-    with HasGameReference<BoomspireGame>, Unit
+    with HasGameReference<BoomspireGame>, Unit, TeamOwned
     implements Attackable {
   final MobileUnitBlueprint blueprint;
   final Team team;
+
+  @override
+  Team get ownerTeam => team;
   final UnitObjective objective;
 
   /// Fixed world point to head for and hold at - only meaningful when
@@ -620,6 +623,7 @@ class MobileUnitComponent extends PositionComponent
       selected: game.selectedUnit.value == this,
       idlePhase: _idlePhase,
       accent: team.color,
+      teamColor: teamColor,
       attackRange: blueprint.attackRange,
       health: health,
       effectiveMaxHealth: effectiveMaxHealth,

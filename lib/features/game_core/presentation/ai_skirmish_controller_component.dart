@@ -64,7 +64,7 @@ class AiSkirmishControllerComponent extends Component
   Future<void> onLoad() async {
     _profile = game.difficulty.skirmishAiProfile;
     _buildPlanner = SkirmishBuildPlanner(game, _profile);
-    _productionPlanner = SkirmishProductionPlanner(game, _profile);
+    _productionPlanner = SkirmishProductionPlanner(game);
     _nodePlanner = SkirmishNodePlanner(game);
     _upgradePlanner = SkirmishUpgradePlanner(game);
     _commander = ArmyCommander(game, _profile);
@@ -105,7 +105,7 @@ class AiSkirmishControllerComponent extends Component
         built == BuildingType.trainingCenter ||
         built == BuildingType.warFactory;
     if (!builtProduction) {
-      if (_profile.capturesNodes) _nodePlanner.dispatchCapturer(aiTeam);
+      _nodePlanner.dispatchCapturer(aiTeam);
       _productionPlanner.produce(
         aiTeam,
         savingsTarget: _buildPlanner.savingsTarget(aiTeam, _clock),
@@ -137,8 +137,7 @@ class AiSkirmishControllerComponent extends Component
           .where((n) => n.owner?.id == aiTeam.id)
           .length,
       airTargetLabel: _commander.airTarget?.label ?? '-',
-      spotsNoAntiAir:
-          _profile.exploitsWeaknesses && _weakness.analyze(aiTeam).lacksAntiAir,
+      spotsNoAntiAir: _weakness.analyze(aiTeam).lacksAntiAir,
     );
     final previous = game.aiIntel.value;
     game.aiIntel.value = intel;

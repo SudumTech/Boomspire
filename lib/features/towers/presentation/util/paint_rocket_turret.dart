@@ -1,46 +1,43 @@
 import 'package:flutter/material.dart';
 
-import 'paint_viewhole.dart';
+import 'tower_art.dart';
 
-/// Three-tube launch pod - reads closer to a real MLRS battery.
+const _accent = Color(0xFFFF6B35);
+
+/// A boxy 2x2 rocket pod: four tubes with warheads showing.
 void paintRocketTurret(Canvas canvas, Offset center) {
+  final pod = Rect.fromCenter(
+    center: center.translate(0, -5),
+    width: 21,
+    height: 26,
+  );
   canvas.drawRRect(
     RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center.translate(0, -8), width: 20, height: 32),
-      const Radius.circular(4),
+      pod.shift(const Offset(0.8, 1.2)),
+      const Radius.circular(3),
     ),
-    Paint()..color = const Color(0xFF3a3f47),
+    fillPaint(Colors.black, alpha: 0.3),
   );
-  for (final dx in [-6.0, 0.0, 6.0]) {
-    canvas.drawCircle(
-      Offset(center.dx + dx, center.dy - 22),
-      4.2,
-      Paint()..color = const Color(0xFF1a1c20),
-    );
-    canvas.drawCircle(
-      Offset(center.dx + dx, center.dy - 22),
-      4.2,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1
-        ..color = const Color(0xFF6b6f76),
-    );
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(pod, const Radius.circular(3)),
+    metalPaint(
+      pod,
+      light: const Color(0xFF7A8794),
+      dark: const Color(0xFF2B3138),
+    ),
+  );
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(pod, const Radius.circular(3)),
+    strokePaint(const Color(0xFF14181C), 1.2),
+  );
+  for (final dx in [-4.8, 4.8]) {
+    for (final dy in [-11.0, -2.0]) {
+      final c = center.translate(dx, dy);
+      canvas.drawCircle(c, 3.6, fillPaint(const Color(0xFF0F1318)));
+      canvas.drawCircle(c, 3.6, strokePaint(_accent, 1));
+      canvas.drawCircle(c, 1.7, fillPaint(_accent, alpha: 0.95));
+      paintGlint(canvas, c.translate(-0.8, -0.8), 0.6);
+    }
   }
-  canvas.drawCircle(
-    center,
-    13,
-    Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF9a4a34), Color(0xFF2b2f36)],
-      ).createShader(Rect.fromCircle(center: center, radius: 13)),
-  );
-  canvas.drawCircle(
-    center,
-    13,
-    Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = const Color(0xFFFF6B35),
-  );
-  paintViewhole(canvas, center.translate(-7, 6));
+  paintDome(canvas, center.translate(0, 6), 7.5, accent: _accent);
 }

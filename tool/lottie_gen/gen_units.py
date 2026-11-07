@@ -101,27 +101,85 @@ HULL_DARK = 0xFF172126
 ACCENT = 0xFF00E5FF
 
 
-def ally_aircraft():
+def _mirror_x(points, cx):
+    """The left/right mirror of `points` around the vertical axis `cx`,
+    in reverse order so a polygon built as `right + mirrored` stays a
+    simple (non-self-intersecting) outline."""
+    return [(2 * cx - x, y) for (x, y) in reversed(points)]
+
+
+def jet(light, mid, dark, accent, exhaust):
+    """Top-down fighter jet (nose up): swept main wings, tailplanes,
+    tapered fuselage, canopy, intakes, wingtip missiles and twin engine
+    nozzles. Shared by the ally Aircraft and the enemy Attack Plane (only
+    the palette differs). Mirrors `paintJet` in
+    `lib/core/rendering/util/paint_jet.dart`."""
     s = 50.0
     cx = cy = s / 2
-    ops = [shadow(cx, cy, s * 0.7, s * 0.22)]
-    wing_pts = [
-        (cx, cy - 0.4 * s),
-        (cx + 0.46 * s, cy + 0.34 * s),
-        (cx + 0.1 * s, cy + 0.2 * s),
-        (cx, cy + 0.4 * s),
-        (cx - 0.1 * s, cy + 0.2 * s),
-        (cx - 0.46 * s, cy + 0.34 * s),
+    ops = [shadow(cx + 0.04 * s, cy + 0.07 * s, 0.5 * s, 0.72 * s, 0x2A000000)]
+
+    # Swept main wings (right half, then mirrored left half).
+    right_wing = [
+        (cx + 0.07 * s, cy - 0.06 * s),
+        (cx + 0.47 * s, cy + 0.27 * s),
+        (cx + 0.47 * s, cy + 0.37 * s),
+        (cx + 0.09 * s, cy + 0.25 * s),
     ]
-    wing = polygon(wing_pts)
-    r = 0.4 * s
-    ops.append(op(wing, gradient_fill([0xFFCFD8DC, HULL], cx, cy, 2 * r, 2 * r, "vertical")))
-    ops.append(op(wing, stroke(ACCENT, 1.5, alpha=0.8)))
-    ops.append(op(ellipse(cx, cy - 0.06 * s, 0.13 * s, 0.28 * s), fill(0xFF1A1C20)))
-    ops.append(op(ellipse(cx, cy - 0.1 * s, 0.08 * s, 0.14 * s), fill(ACCENT, alpha=0.9)))
-    for dx in (-0.12 * s, 0.12 * s):
-        ops.append(op(circle(cx + dx, cy + 0.36 * s, 0.06 * s), fill(ACCENT, alpha=0.7)))
+    wing = polygon(right_wing + _mirror_x(right_wing, cx))
+    ops.append(op(wing, gradient_fill([light, mid, dark], cx, cy, 0.94 * s, 0.4 * s, "vertical")))
+    ops.append(op(wing, stroke(accent, 1.0, alpha=0.55)))
+
+    # Tailplanes.
+    right_tail = [
+        (cx + 0.07 * s, cy + 0.3 * s),
+        (cx + 0.23 * s, cy + 0.43 * s),
+        (cx + 0.22 * s, cy + 0.47 * s),
+        (cx + 0.06 * s, cy + 0.4 * s),
+    ]
+    ops.append(op(polygon(right_tail), fill(dark)))
+    ops.append(op(polygon(_mirror_x(right_tail, cx)), fill(dark)))
+
+    # Twin vertical fins seen edge-on.
+    for dx in (-0.06 * s, 0.06 * s):
+        ops.append(op(rrect(cx + dx, cy + 0.34 * s, 0.025 * s, 0.17 * s, 1), fill(dark)))
+
+    # Wingtip missiles.
+    for dx in (-0.41 * s, 0.41 * s):
+        ops.append(op(rrect(cx + dx, cy + 0.27 * s, 0.035 * s, 0.15 * s, 2), fill(0xFFECEFF1)))
+        ops.append(op(circle(cx + dx, cy + 0.2 * s, 0.02 * s), fill(accent)))
+
+    # Fuselage - tapered nose to tail.
+    right_body = [
+        (cx, cy - 0.47 * s),
+        (cx + 0.05 * s, cy - 0.3 * s),
+        (cx + 0.08 * s, cy - 0.05 * s),
+        (cx + 0.075 * s, cy + 0.3 * s),
+        (cx + 0.05 * s, cy + 0.44 * s),
+    ]
+    body = polygon(right_body + _mirror_x(right_body[1:], cx))
+    ops.append(op(body, gradient_fill([dark, mid, light, mid, dark], cx, cy, 0.17 * s, 0.9 * s, "horizontal")))
+    ops.append(op(body, stroke(dark, 0.8, alpha=0.8)))
+
+    # Intakes.
+    for dx in (-0.07 * s, 0.07 * s):
+        ops.append(op(rrect(cx + dx, cy + 0.04 * s, 0.03 * s, 0.1 * s, 1.5), fill(0xFF11161A)))
+
+    # Canopy with a highlight.
+    ops.append(op(ellipse(cx, cy - 0.16 * s, 0.1 * s, 0.22 * s), fill(0xFF14202B)))
+    ops.append(op(ellipse(cx - 0.01 * s, cy - 0.19 * s, 0.045 * s, 0.1 * s), fill(accent, alpha=0.55)))
+
+    # Spine stripe in the team colour.
+    ops.append(op(rrect(cx, cy + 0.14 * s, 0.025 * s, 0.22 * s, 1), fill(accent, alpha=0.85)))
+
+    # Twin engine nozzles with glow.
+    for dx in (-0.035 * s, 0.035 * s):
+        ops.append(op(circle(cx + dx, cy + 0.45 * s, 0.05 * s), fill(exhaust, alpha=0.55)))
+        ops.append(op(circle(cx + dx, cy + 0.43 * s, 0.032 * s), fill(0xFF0D0F10)))
     return ops, s, s
+
+
+def ally_aircraft():
+    return jet(0xFFA9BCC6, 0xFF3F5660, HULL_DARK, ACCENT, 0xFF00E5FF)
 
 
 def ally_anti_air():
@@ -198,44 +256,72 @@ def ally_light_vehicle():
     return ops, s, s
 
 
-def drone(hull, hull_dark, accent):
-    """Small straight-wing UAV silhouette (Reaper/Predator-style) shared
-    shape - long high-aspect wings and a V-tail instead of delta wings, so
-    it reads as a distinct, cheap drone. Mirrors
-    `AllySpriteFactory._paintDrone`/`EnemySpriteFactory._paintDrone`
-    (`accent` is the nose-sensor-ball color: cyan for ally, red for
-    enemy)."""
+def drone(light, hull, hull_dark, accent):
+    """Top-down MQ-9 Reaper-style UAV: long tapered straight wings with
+    under-wing pods, a bulbous sensor nose, slim body, inverted V-tail and a
+    blurred pusher propeller. Mirrors `paintUav` in
+    `lib/core/rendering/util/paint_uav.dart` (`accent` is the sensor-lens
+    and marking colour: cyan for ally, red for enemy)."""
     s = 42.0
     cx = cy = s / 2
-    ops = [shadow(cx, cy, 0.5 * s, 0.7 * s, 0x33000000)]
-    wing = rect(cx, cy, 0.86 * s, 0.12 * s)
-    ops.append(op(wing, gradient_fill([hull, hull_dark], cx, cy, 0.86 * s, 0.12 * s, "vertical")))
-    fuselage = rrect(cx, cy, 0.16 * s, 0.78 * s, 6)
-    ops.append(op(fuselage, gradient_fill([hull, hull_dark], cx, cy, 0.16 * s, 0.78 * s, "vertical")))
-    tail_pts = [
-        (cx, cy + 0.3 * s),
-        (cx - 0.16 * s, cy + 0.39 * s),
-        (cx - 0.05 * s, cy + 0.3 * s),
+    ops = [shadow(cx + 0.04 * s, cy + 0.07 * s, 0.7 * s, 0.5 * s, 0x26000000)]
+
+    # Long, slightly tapered straight wings.
+    right_wing = [
+        (cx + 0.08 * s, cy - 0.05 * s),
+        (cx + 0.48 * s, cy - 0.01 * s),
+        (cx + 0.48 * s, cy + 0.07 * s),
+        (cx + 0.08 * s, cy + 0.11 * s),
     ]
-    ops.append(op(polygon(tail_pts), fill(hull_dark)))
-    tail_pts2 = [
-        (cx, cy + 0.3 * s),
-        (cx + 0.16 * s, cy + 0.39 * s),
-        (cx + 0.05 * s, cy + 0.3 * s),
+    wing = polygon(right_wing + _mirror_x(right_wing, cx))
+    ops.append(op(wing, gradient_fill([light, hull, hull_dark], cx, cy, 0.96 * s, 0.16 * s, "vertical")))
+    ops.append(op(wing, stroke(hull_dark, 0.8, alpha=0.9)))
+
+    # Under-wing hardpoint pods + wingtip marking.
+    for dx in (-0.27 * s, 0.27 * s):
+        ops.append(op(ellipse(cx + dx, cy + 0.04 * s, 0.045 * s, 0.15 * s), fill(0xFF1A1C20)))
+    for dx in (-0.44 * s, 0.44 * s):
+        ops.append(op(rrect(cx + dx, cy + 0.03 * s, 0.05 * s, 0.07 * s, 1), fill(accent, alpha=0.85)))
+
+    # Inverted V-tail.
+    right_tail = [
+        (cx + 0.025 * s, cy + 0.28 * s),
+        (cx + 0.2 * s, cy + 0.42 * s),
+        (cx + 0.16 * s, cy + 0.45 * s),
+        (cx + 0.02 * s, cy + 0.36 * s),
     ]
-    ops.append(op(polygon(tail_pts2), fill(hull_dark)))
-    ops.append(op(circle(cx, cy - 0.34 * s, 0.07 * s), fill(0xFF1A1C20)))
-    ops.append(op(circle(cx, cy - 0.34 * s, 0.045 * s), fill(accent, alpha=0.9)))
-    ops.append(op(circle(cx, cy + 0.36 * s, 0.05 * s), fill(0xFF1A1C20)))
+    ops.append(op(polygon(right_tail), fill(hull_dark)))
+    ops.append(op(polygon(_mirror_x(right_tail, cx)), fill(hull_dark)))
+
+    # Slim fuselage with a bulbous nose.
+    right_body = [
+        (cx, cy - 0.44 * s),
+        (cx + 0.085 * s, cy - 0.33 * s),
+        (cx + 0.09 * s, cy - 0.2 * s),
+        (cx + 0.06 * s, cy - 0.05 * s),
+        (cx + 0.04 * s, cy + 0.36 * s),
+    ]
+    body = polygon(right_body + _mirror_x(right_body[1:], cx))
+    ops.append(op(body, gradient_fill([hull_dark, hull, light, hull, hull_dark], cx, cy, 0.18 * s, 0.8 * s, "horizontal")))
+    ops.append(op(body, stroke(hull_dark, 0.7, alpha=0.9)))
+
+    # Sensor ball under the nose + dorsal antenna.
+    ops.append(op(circle(cx, cy - 0.33 * s, 0.065 * s), fill(0xFF1A1C20)))
+    ops.append(op(circle(cx, cy - 0.33 * s, 0.04 * s), fill(accent, alpha=0.9)))
+    ops.append(op(rrect(cx, cy - 0.08 * s, 0.02 * s, 0.1 * s, 1), fill(light, alpha=0.9)))
+
+    # Pusher propeller: hub plus a faint spinning disc.
+    ops.append(op(ellipse(cx, cy + 0.41 * s, 0.3 * s, 0.06 * s), fill(0xFFFFFFFF, alpha=0.18)))
+    ops.append(op(circle(cx, cy + 0.39 * s, 0.045 * s), fill(0xFF1A1C20)))
     return ops, s, s
 
 
 def ally_drone():
-    return drone(HULL, HULL_DARK, ACCENT)
+    return drone(0xFFA9BCC6, 0xFF3F5660, HULL_DARK, ACCENT)
 
 
 def enemy_drone():
-    return drone(0xFF9E9D7D, 0xFF33321F, 0xFFE53935)
+    return drone(0xFFC9C7A4, 0xFF8A8868, 0xFF33321F, 0xFFE53935)
 
 
 def ally_rocket_barrage():
@@ -306,24 +392,7 @@ def enemy_artillery_barrage():
 
 
 def enemy_attack_plane():
-    s = 50.0
-    cx = cy = s / 2
-    ops = [shadow(cx, cy, 0.7 * s, 0.22 * s)]
-    wing_pts = [
-        (cx, cy - 0.4 * s),
-        (cx + 0.46 * s, cy + 0.34 * s),
-        (cx + 0.1 * s, cy + 0.2 * s),
-        (cx, cy + 0.4 * s),
-        (cx - 0.1 * s, cy + 0.2 * s),
-        (cx - 0.46 * s, cy + 0.34 * s),
-    ]
-    ops.append(op(polygon(wing_pts), gradient_fill([0xFFB0BEC5, 0xFF37474F], cx, cy, 0.8 * s, 0.8 * s, "vertical")))
-    ops.append(op(ellipse(cx, cy - 0.06 * s, 0.13 * s, 0.28 * s), fill(0xFF1A1C20)))
-    ops.append(op(ellipse(cx, cy - 0.1 * s, 0.08 * s, 0.14 * s), fill(0xCC00E5FF)))
-    for dx in (-0.12 * s, 0.12 * s):
-        ops.append(op(circle(cx + dx, cy + 0.36 * s, 0.07 * s), fill(0xFFFF7043)))
-        ops.append(op(circle(cx + dx, cy + 0.36 * s, 0.035 * s), fill(0xFFFFF3C4)))
-    return ops, s, s
+    return jet(0xFFB0BEC5, 0xFF78909C, 0xFF37474F, 0xFFFF5252, 0xFFFF7043)
 
 
 def enemy_helicopter():
@@ -427,19 +496,54 @@ def enemy_tank():
 # instead of recoloring the model), mirroring
 # `AllySpriteFactory._paintStealthBomber`/`EnemySpriteFactory._paintStealthBomber`.
 def stealth_bomber():
+    """Top-down B-2 style flying wing: a two-kink swept leading edge, the
+    double-W sawtooth trailing edge, cockpit windows, intake slits, panel
+    lines and a lighter spine. One silhouette shared by both `ally_` and
+    `enemy_` keys (ownership is shown by the team ring/stripe overlays).
+    Mirrors `paintStealthBomber` in
+    `lib/core/rendering/util/paint_bomber.dart`."""
     s = 54.0
     cx = cy = s / 2
-    ops = []
-    wing_pts = [
-        (cx, cy - 0.12 * s),
-        (cx + 0.48 * s, cy + 0.34 * s),
-        (cx + 0.3 * s, cy + 0.4 * s),
-        (cx, cy + 0.16 * s),
-        (cx - 0.3 * s, cy + 0.4 * s),
-        (cx - 0.48 * s, cy + 0.34 * s),
+    ops = [shadow(cx + 0.04 * s, cy + 0.07 * s, 0.9 * s, 0.5 * s, 0x2A000000)]
+    right = [
+        (cx, cy - 0.40 * s),
+        (cx + 0.22 * s, cy - 0.16 * s),
+        (cx + 0.50 * s, cy + 0.20 * s),
+        (cx + 0.50 * s, cy + 0.27 * s),
+        (cx + 0.36 * s, cy + 0.40 * s),
+        (cx + 0.24 * s, cy + 0.32 * s),
+        (cx + 0.12 * s, cy + 0.42 * s),
+        (cx, cy + 0.30 * s),
     ]
-    ops.append(op(polygon(wing_pts), gradient_fill([0xFF3A3F44, 0xFF0D0F10], cx, cy, 0.8 * s, 0.8 * s, "vertical")))
-    ops.append(op(ellipse(cx, cy - 0.02 * s, 0.1 * s, 0.16 * s), fill(0xFF1A1C1E)))
+    wing = polygon(right[:-1] + [(cx, cy + 0.30 * s)] + _mirror_x(right[1:-1], cx))
+    ops.append(op(wing, gradient_fill([0xFF59606A, 0xFF2A2F36, 0xFF121417], cx, cy, 1.0 * s, 0.8 * s, "vertical")))
+    ops.append(op(wing, stroke(0xFF0A0B0D, 1.0, alpha=0.9)))
+
+    # Lighter spine along the centre line.
+    spine = [
+        (cx, cy - 0.38 * s),
+        (cx + 0.07 * s, cy - 0.1 * s),
+        (cx + 0.06 * s, cy + 0.26 * s),
+        (cx, cy + 0.29 * s),
+        (cx - 0.06 * s, cy + 0.26 * s),
+        (cx - 0.07 * s, cy - 0.1 * s),
+    ]
+    ops.append(op(polygon(spine), fill(0xFF7B838E, alpha=0.26)))
+
+    # Panel lines across each wing.
+    for sx in (1, -1):
+        ops.append(op(line_shape((cx + sx * 0.08 * s, cy - 0.08 * s), (cx + sx * 0.42 * s, cy + 0.22 * s)), stroke(0xFF000000, 0.7, alpha=0.35)))
+        ops.append(op(line_shape((cx + sx * 0.1 * s, cy + 0.08 * s), (cx + sx * 0.3 * s, cy + 0.3 * s)), stroke(0xFF000000, 0.7, alpha=0.3)))
+
+    # Intake slits and cockpit windows.
+    for sx in (1, -1):
+        ops.append(op(rrect(cx + sx * 0.1 * s, cy - 0.06 * s, 0.07 * s, 0.022 * s, 1), fill(0xFF050607)))
+        ops.append(op(rrect(cx + sx * 0.035 * s, cy - 0.27 * s, 0.03 * s, 0.05 * s, 1), fill(0xFF1B2A38)))
+        ops.append(op(rrect(cx + sx * 0.035 * s, cy - 0.285 * s, 0.014 * s, 0.02 * s, 0.5), fill(0xFF9BC4E2, alpha=0.7)))
+
+    # Exhaust slots between the trailing-edge teeth.
+    for sx in (1, -1):
+        ops.append(op(rrect(cx + sx * 0.18 * s, cy + 0.35 * s, 0.07 * s, 0.02 * s, 1), fill(0xFF050607)))
     return ops, s, s
 
 

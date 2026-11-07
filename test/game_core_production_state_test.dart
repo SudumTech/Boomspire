@@ -8,7 +8,7 @@ import 'package:boomspire/core/combat/mobile_unit_repository_impl.dart';
 import 'package:boomspire/core/combat/unit_kind.dart';
 import 'package:boomspire/core/rendering/impl/procedural_unit_render_repository_impl.dart';
 import 'package:boomspire/features/ai_director/impl/ai_director_repository_impl.dart';
-import 'package:boomspire/features/audio/domain/models/ambient_sound_type.dart';
+import 'package:boomspire/features/audio/domain/models/ambient_environment.dart';
 import 'package:boomspire/features/audio/domain/models/sfx_type.dart';
 import 'package:boomspire/features/audio/domain/repos/audio_repository.dart';
 import 'package:boomspire/features/game_core/domain/models/game_scenes.dart';
@@ -172,5 +172,5 @@ class _FakeAudioRepository implements AudioRepository {
   Future<void> preload() async {}
 
   @override
-  void setAmbientVolume(AmbientSoundType type, double volume) {}
+  void updateAmbience(AmbientEnvironment environment, double dt) {}
 }

@@ -57,6 +57,8 @@ abstract class EnvironmentSettings with _$EnvironmentSettings {
         snowIntensity: _lerp(from.snowIntensity, to.snowIntensity, t),
         fogDensity: _lerp(from.fogDensity, to.fogDensity, t),
         cloudCover: _lerp(from.cloudCover, to.cloudCover, t),
+        dustIntensity: _lerp(from.dustIntensity, to.dustIntensity, t),
+        birdActivity: _lerp(from.birdActivity, to.birdActivity, t),
         // Discrete, not lerp-able - switches at the halfway point instead.
         windType: t < 0.5 ? from.windType : to.windType,
       );
@@ -79,6 +81,8 @@ abstract class EnvironmentSettings with _$EnvironmentSettings {
     var snowIntensity = 0.0;
     var fogDensity = 0.0;
     var cloudCover = 0.0;
+    var dustIntensity = 0.0;
+    var birdActivity = 0.0;
     var dominantWeight = -1.0;
     var dominantWindType = WindType.automatic;
     for (var i = 0; i < timeline.length; i++) {
@@ -89,6 +93,8 @@ abstract class EnvironmentSettings with _$EnvironmentSettings {
       snowIntensity += kf.snowIntensity * w;
       fogDensity += kf.fogDensity * w;
       cloudCover += kf.cloudCover * w;
+      dustIntensity += kf.dustIntensity * w;
+      birdActivity += kf.birdActivity * w;
       // Discrete, not blend-able - the most-focused keyframe decides it,
       // same "switches, doesn't fade" rule [sample] uses at its midpoint.
       if (w > dominantWeight) {
@@ -103,6 +109,8 @@ abstract class EnvironmentSettings with _$EnvironmentSettings {
       snowIntensity: snowIntensity.clamp(0.0, 1.0),
       fogDensity: fogDensity.clamp(0.0, 1.0),
       cloudCover: cloudCover.clamp(0.0, 1.0),
+      dustIntensity: dustIntensity.clamp(0.0, 1.0),
+      birdActivity: birdActivity.clamp(0.0, 1.0),
       windType: dominantWindType,
     );
   }

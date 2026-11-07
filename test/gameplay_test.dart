@@ -18,17 +18,21 @@ import 'package:boomspire/features/ai_director/domain/models/skirmish_directive.
 import 'package:boomspire/features/skirmish_ai/impl/player_weakness_analyzer.dart';
 import 'package:boomspire/features/skirmish_ai/impl/skirmish_build_planner.dart';
 import 'package:boomspire/features/ai_director/impl/ai_director_repository_impl.dart';
-import 'package:boomspire/features/audio/domain/models/ambient_sound_type.dart';
+import 'package:boomspire/features/audio/domain/models/ambient_environment.dart';
 import 'package:boomspire/features/audio/domain/models/sfx_type.dart';
 import 'package:boomspire/features/audio/domain/repos/audio_repository.dart';
 import 'package:boomspire/features/combat/presentation/mobile_unit_component.dart';
 import 'package:boomspire/features/game_core/domain/models/game_config.dart';
 import 'package:boomspire/features/game_core/domain/models/game_difficulty.dart';
 import 'package:boomspire/features/game_core/domain/models/game_scene.dart';
+import 'package:boomspire/features/map_editor/domain/models/environment_settings.dart';
+import 'package:boomspire/features/map_editor/domain/models/weather_keyframe.dart';
+import 'package:boomspire/features/terrain/presentation/components/bird_flock_component/bird_flock_component.dart';
 import 'package:boomspire/features/skirmish_ai/domain/enums/army_stance.dart';
 import 'package:boomspire/features/skirmish_ai/domain/models/army_strength.dart';
 import 'package:boomspire/features/skirmish_ai/extensions/game_difficulty_ai_extensions.dart';
 import 'package:boomspire/features/skirmish_ai/domain/enums/strike_target_kind.dart';
+import 'package:boomspire/features/skirmish_ai/impl/ai_base_queries.dart';
 import 'package:boomspire/features/skirmish_ai/impl/army_commander.dart';
 import 'package:boomspire/features/skirmish_ai/impl/strike_planner.dart';
 import 'package:boomspire/features/game_core/domain/models/game_scenes.dart';
@@ -668,16 +672,18 @@ void main() {
         final warFactories = game.world.activeTowers
             .whereType<WarFactoryComponent>()
             .where((t) => t.owner.id == aiTeam.id);
+        final productionCap =
+            GameDifficulty.normal.skirmishAiProfile.maxProductionBuildings;
         expect(
           trainingCenters.length,
-          lessThanOrEqualTo(2),
+          lessThanOrEqualTo(productionCap),
           reason:
               'the AI should stop at its production-building target '
               'instead of endlessly re-building Training Centers',
         );
         expect(
           warFactories.length,
-          lessThanOrEqualTo(2),
+          lessThanOrEqualTo(productionCap),
           reason:
               'the AI should stop at its production-building target '
               'instead of endlessly re-building War Factories',
@@ -1341,6 +1347,17 @@ void main() {
       return unit;
     }
 
+    MobileUnitComponent spawnPlane(BoomspireGame game, Team team, Vector2 at) {
+      final unit = MobileUnitComponent(
+        blueprint: game.unitRepository.blueprintFor(team, UnitKind.aircraft),
+        team: team,
+        objective: UnitObjective.assaultBase,
+        position: at,
+      );
+      game.world.spawnUnit(unit);
+      return unit;
+    }
+
     Future<void> settle(BoomspireGame game) async {
       await Future<void>.delayed(Duration.zero);
       game.update(0);
@@ -1489,6 +1506,118 @@ void main() {
       expect(planner.savingsTarget(aiTeam, 25), 0, reason: 'time-boxed');
       expect(planner.savingsTarget(aiTeam, 45), greaterThan(0));
     });
+
+    test(
+      'even on Easy the AI answers enemy aircraft with anti-air towers',
+      () async {
+        final game = await _bootGame(
+          GameScenes.skirmishes.first,
+          difficulty: GameDifficulty.easy,
+        );
+        final aiTeam = game.aiTeam!;
+        for (var i = 0; i < 3; i++) {
+          spawnPlane(game, game.playerTeam, Vector2(900 + i * 20, 100));
+        }
+        await settle(game);
+        game.aiEconomy!.addGold(20000);
+
+        final planner = SkirmishBuildPlanner(
+          game,
+          GameDifficulty.easy.skirmishAiProfile,
+        );
+        const directive = SkirmishDirective(aggression: 0.5, buildBias: 0.5);
+        for (var i = 0; i < 30; i++) {
+          planner.tryBuild(aiTeam, directive);
+          await settle(game);
+        }
+
+        expect(
+          AiBaseQueries(game).ownedAntiAirTowerCount(aiTeam),
+          greaterThan(0),
+        );
+        expect(AiBaseQueries(game).desiredAntiAirTowers(aiTeam), 2);
+      },
+    );
+
+    test('ground anti-air units stay home as guards while the opponent has '
+        'aircraft instead of marching off with the assault', () async {
+      final game = await _bootGame(GameScenes.skirmishes.first);
+      final aiTeam = game.aiTeam!;
+      final base = game.world.aiHomeBase!.position;
+      final aaBlueprint = game.unitRepository.blueprintFor(
+        aiTeam,
+        UnitKind.antiAirSoldier,
+      );
+      final guard = MobileUnitComponent(
+        blueprint: aaBlueprint,
+        team: aiTeam,
+        objective: UnitObjective.assaultBase,
+        position: base.clone(),
+      );
+      game.world.spawnUnit(guard);
+      final others = [
+        for (var i = 0; i < 8; i++) spawnSoldier(game, aiTeam, base.clone()),
+      ];
+      // A player aircraft out near the player's own base: seen, but no threat
+      // to the AI base itself.
+      spawnPlane(
+        game,
+        game.playerTeam,
+        Vector2(game.terrainMap.basePoint.x, game.terrainMap.basePoint.y),
+      );
+      await settle(game);
+
+      final commander = ArmyCommander(
+        game,
+        GameDifficulty.normal.skirmishAiProfile,
+      );
+      commander.command(aiTeam, 0.5);
+
+      expect(commander.stance, ArmyStance.attack);
+      expect(others.every((u) => !u.underManualControl), isTrue);
+      expect(guard.underManualControl, isTrue, reason: 'guard held back');
+    });
+
+    test(
+      'the AI works through the whole prerequisite chain to build a SAM '
+      'Site against aircraft (Power Plant, Tech Lab, Command Post, SAM)',
+      () async {
+        final game = await _bootGame(
+          GameScenes.skirmishes.first,
+          difficulty: GameDifficulty.normal,
+        );
+        final aiTeam = game.aiTeam!;
+        for (var i = 0; i < 3; i++) {
+          spawnPlane(game, game.playerTeam, Vector2(900 + i * 20, 100));
+        }
+        await settle(game);
+        game.aiEconomy!.addGold(40000);
+
+        final planner = SkirmishBuildPlanner(
+          game,
+          GameDifficulty.normal.skirmishAiProfile,
+        );
+        const directive = SkirmishDirective(aggression: 0.5, buildBias: 0.5);
+        for (var i = 0; i < 80; i++) {
+          planner.tryBuild(aiTeam, directive);
+          await settle(game);
+        }
+
+        final queries = AiBaseQueries(game);
+        for (final building in [
+          BuildingType.powerPlant,
+          BuildingType.techLab,
+          BuildingType.commandPost,
+        ]) {
+          expect(
+            queries.ownedCountOf(aiTeam, building),
+            1,
+            reason: '$building',
+          );
+        }
+        expect(queries.ownedCountOf(aiTeam, TowerType.sam), greaterThan(0));
+      },
+    );
 
     test(
       'a small AI army musters at the rally point instead of rushing',
@@ -1653,6 +1782,40 @@ void main() {
     );
   });
 
+  group('birds', () {
+    GameScene birdyScene(double rain) => GameScene(
+      id: 'birdy',
+      name: 'Birdy',
+      briefing: '',
+      biome: GameScenes.all.first.biome,
+      waveCount: 3,
+      environment: EnvironmentSettings(
+        timeline: [
+          WeatherKeyframe(atProgress: 0, birdActivity: 1, rainIntensity: rain),
+        ],
+      ),
+    );
+
+    Future<int> flocksAfter(GameScene scene) async {
+      final game = await _bootGame(scene);
+      final birds = game.world.children.whereType<BirdFlockComponent>().single;
+      var peak = 0;
+      for (var i = 0; i < 1200; i++) {
+        game.update(0.1);
+        if (birds.flockCount > peak) peak = birds.flockCount;
+      }
+      return peak;
+    }
+
+    test('a bird-friendly sky sends flocks across the map', () async {
+      expect(await flocksAfter(birdyScene(0)), greaterThan(0));
+    });
+
+    test('no flocks in heavy rain', () async {
+      expect(await flocksAfter(birdyScene(1)), 0);
+    });
+  });
+
   test('every scene generates a terrain where every spawn can reach base', () {
     for (final scene in GameScenes.all) {
       final terrain = TerrainRepositoryImpl().loadTerrain(scene: scene);
@@ -1741,5 +1904,5 @@ class _FakeAudioRepository implements AudioRepository {
   Future<void> preload() async {}
 
   @override
-  void setAmbientVolume(AmbientSoundType type, double volume) {}
+  void updateAmbience(AmbientEnvironment environment, double dt) {}
 }
